@@ -15,6 +15,8 @@ import sys
 from IPython.lib.kernel import find_connection_file
 from IPython.zmq.blockingkernelmanager import BlockingKernelManager
 
+infofile = "/Users/ljunf/Documents/Projects/JuliaLab/src/kernel.info"
+
 # TODO: find existing kernel, save info to kerner.info
 cf = find_connection_file('76368')
 km = BlockingKernelManager()
@@ -36,58 +38,9 @@ def run_cell(code):
         for line in reply['content']['traceback']:
             print line
 
-def _status():
-    run_cell('')
-
-def _figure(fignum = ''):
-    cmd = 'figure(' + str(fignum) + ')'
-    run_cell(cmd)
-
-def _show(fignum = ''):
-    cmd = 'show(' + str(fignum) + ')'
-    run_cell(cmd)
-
-def _plot(args):
-    cmd = 'plot(' + args + ')'
-    print cmd
-    run_cell(cmd)
-
-def _plotfile(args):
-    cmd = 'plotfile(' + args + ", delimiter = ' ')"
-    print cmd
-    run_cell(cmd)
-
-def _mrun(args):
-    run_cell(args)
-
-def _test():
-    run_cell('from pylab import *')
-    _figure()
-    run_cell('plot([1, 2, 3])')
-    _show()
-
-
 import argparse
-# syntax: server --cmd CMD --args ARGS
 parser = argparse.ArgumentParser()
-parser.add_argument('-c', '--cmd', default = '')
-parser.add_argument('-a', '--args', default = '')
+parser.add_argument('cmd')
 cmd = parser.parse_args().cmd
-args = parser.parse_args().args
-
-if cmd == '':
-    _status()
-elif cmd == 'status':
-    _status()
-elif cmd == 'figure':
-    _figure()
-elif cmd == 'show':
-    _show()
-elif cmd == 'plot':
-    _plot(args)
-elif cmd == 'plotfile':
-    _plotfile(args)
-elif cmd == 'mrun':
-    _mrun(args)
-elif cmd == 'test':
-    _test()
+print cmd
+run_cell(cmd)

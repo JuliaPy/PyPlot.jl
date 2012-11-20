@@ -4,6 +4,7 @@ using Base
 export status, figure, show, plot, plotfile, mrun, test
 
 server = "/Users/ljunf/Documents/Projects/JuliaLab/src/server.py"
+
 _PLOTPOINTS_ = 100
 
 ## convert array to real string
@@ -16,37 +17,42 @@ function to_str(xa::Array)
     return str
 end
 
+## run matplotlib commands, to adjust such as title, formatter, tics
+## TODO: support block parameters
+## TODO: support for multiline
+function mrun(cmd::String)
+    cmd = strcat(server, " ", "\"", cmd, "\"")
+    system(cmd)
+end
+
 ## check server status
 function status()
-    cmd = strcat(server, " --cmd status")
-    system(cmd)
+    mrun("")
 end
 
 # TODO: add optional arguemnt, fignum
 ## create/activate figure
 function figure()
-    cmd = strcat(server, " --cmd figure")
-    system(cmd)
+    mrun("figure()")
 end
 
 # TODO: add optional argument, fignum
 ## show figure
 function show()
-    cmd = strcat(server, " --cmd show")
-    system(cmd)
+    mrun("show()")
 end
 
 ## plot x, y
 function plot(x::Array, y::Array, plottype::String)
-    cmd = strcat(server, " --cmd plot", " --args " , "\"", to_str(x), ", ", to_str(y), ", ", plottype, "\"")
-    system(cmd)
+    cmd = strcat("plot(", to_str(x), ", ", to_str(y), ", ", plottype, ")")
+    mrun(cmd)
 end
 plot(x::Array, y::Array) = plot(x, y, "")
 
 ## plot y
 function plot(y::Array, plottype::String)
-    cmd = strcat(server, " --cmd plot", " --args " , "\"", to_str(y), ", ", plottype, "\"")
-    system(cmd)
+    cmd = strcat("plot(", to_str(y), ", ", plottype, ")")
+    run(cmd)
 end
 plot(y::Array) = plot(y, "")
 
@@ -69,27 +75,36 @@ plot(f::Function, xmin::Number, xmax::Number) = plot(f, xmin, xmax, "")
 
 
 ## plot file
-function plotfile(f::String, plotstyle::String)
-    cmd = strcat(server, " --cmd plotfile", " --args ", f, ", ", plottype)
-    system(cmd)
+function plotfile(f::String, plottype::String)
+    cmd = strcat("plotfile(", "'", f, "'", ", ", plottype, ")")
+    mrun(cmd)
 end
-plotfile(f::String) = plot(f, "")
-
-## TODO: allow block as parameters
-## run matplotlib commands, to adjust such as title, formatter, tics
-function mrun(cmd::String)
-    if cmd == ""
-        return
-    else
-        cmd = strcat(server, " --cmd mrun", " --args ", "\"", cmd, "\"")
-        system(cmd)
-    end
-end
+plotfile(f::String) = plotfile(f, "")
 
 ## test
 function test()
-    cmd = strcat(server, " --cmd test")
-    system(cmd)
+    x = linspace(-pi, pi)
+    y = sin(x)
+    figure()
+    plot(x, y)
+    show()
+    figure()
+    plot(x, y, "linestyle = 'None', marker = 'o'")
+    show()
+
+    cx = [1.0 + 1.0im, 2.0 + 2.0im, 3.0 + 3.0im]
+    figure()
+    plot(cx)
+    show()
+
+    open("tmp.dat", "w") do file
+        for i = 1:10
+            println(file, i, "\t", i)
+        end
+    end
+    figure()
+    plotfile("tmp.dat")
+    show()
 end
 
 end # end module
