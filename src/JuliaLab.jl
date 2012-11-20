@@ -1,10 +1,23 @@
 module JuliaLab
 using Base
 
-export plot
+export status, figure, plot, plotfile
+
+## Init
+system("/Users/ljunf/Documents/Projects/JuliaLab/src/server.py")
+## end Init
+
+function status()
+
+end
+
+function figure()
+end
 
 function plot()
-    println("Tobe implemented")
+end
+
+function plotfile()
 end
 
 end # end module
