@@ -32,7 +32,7 @@ def run_cell(code):
     reply = shell.get_msg()
 
     if reply['content']['status'] == 'error':
-        print 'Failed to create figure!'
+        print 'Error occured!'
         for line in reply['content']['traceback']:
             print line
 
@@ -48,10 +48,17 @@ def _show(fignum = ''):
     run_cell(cmd)
 
 def _plot(args):
-    pass
+    cmd = 'plot(' + args + ')'
+    print cmd
+    run_cell(cmd)
 
 def _plotfile(args):
-    pass
+    cmd = 'plotfile(' + args + ", delimiter = ' ')"
+    print cmd
+    run_cell(cmd)
+
+def _mrun(args):
+    run_cell(args)
 
 def _test():
     run_cell('from pylab import *')
@@ -80,5 +87,7 @@ elif cmd == 'plot':
     _plot(args)
 elif cmd == 'plotfile':
     _plotfile(args)
+elif cmd == 'mrun':
+    _mrun(args)
 elif cmd == 'test':
     _test()
