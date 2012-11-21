@@ -72,9 +72,11 @@ end
 
 ## main plot function
 function plot(x::Array, y::Array, args::Tuple)
+    # try convert to float
+
     # check number of arguments
     if rem(length(args), 2) == 1
-        println("SyntaxError: Symbols and parameters not pair")
+        println("SyntaxError: Symbols and parameters not pair!")
         return
     end
 
@@ -114,9 +116,20 @@ end
 ## syntax: plot(x, y, :option, parameters)
 plot(x::Array, y::Array, args...) = plot(x, y, args)
 ## plot y
-plot(y::Array, args...) = plot([], y, args)
-## plot complex x
-plot(cx::Array{Complex128}, args...) = plot(real(cx), imag(cx), args)
+function plot(cx::Array, args...)
+    if isa(cx[1], Real)
+        plot([], cx, args)
+    elseif isa(cx[1], Complex128)
+        x = Array(Float64, size(cx)[1])
+        y = Array(Float64, size(cx)[1])
+        for i in 1:length(x)
+            x[i] = real(cx[i])
+            y[i] = imag(cx[i])
+        end
+        plot(x, y, args)
+    end
+end
+
 ## plot real function
 function plot(f::Function, xmin::Number, xmax::Number, args...)
         x = linspace(float(xmin), float(xmax), _PLOTPOINTS_ + 1)

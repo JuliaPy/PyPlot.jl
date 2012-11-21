@@ -13,8 +13,7 @@
 from IPython.lib.kernel import find_connection_file
 from IPython.zmq.blockingkernelmanager import BlockingKernelManager
 
-#infofile = "/Users/ljunf/Documents/Projects/JuliaLab.jl/src/kernel.info"
-infofile = "./kernel.info"
+infofile = "/Users/ljunf/Documents/Projects/JuliaLab.jl/src/kernel.info"
 
 # evalutate code
 def run_cell(code):
@@ -27,6 +26,7 @@ def run_cell(code):
 
     if reply['content']['status'] == 'error':
         print 'Error occured!'
+        print "CMD: ", cmd
         for line in reply['content']['traceback']:
             print line
 
