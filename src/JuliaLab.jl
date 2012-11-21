@@ -74,6 +74,12 @@ end
 function plot(x::Array, y::Array, args::Tuple)
     # try convert to float
 
+    # check array dimension
+    if ndims(x) != 1 || ndims(y) != 1
+        println("SyntaxError: parameters should be one dimension array!")
+        return
+    end
+
     # check number of arguments
     if rem(length(args), 2) == 1
         println("SyntaxError: Symbols and parameters not pair!")
