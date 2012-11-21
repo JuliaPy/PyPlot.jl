@@ -13,7 +13,8 @@
 from IPython.lib.kernel import find_connection_file
 from IPython.zmq.blockingkernelmanager import BlockingKernelManager
 
-infofile = "/Users/ljunf/Documents/Projects/JuliaLab/src/kernel.info"
+#infofile = "/Users/ljunf/Documents/Projects/JuliaLab.jl/src/kernel.info"
+infofile = "./kernel.info"
 
 # evalutate code
 def run_cell(code):
@@ -31,6 +32,8 @@ def run_cell(code):
 
 with open(infofile, 'r') as f:
     cf = f.readline()
+    cf = f.readline()
+cf = cf.split(' ')[-1]
 cf = cf[0:-2]
 cf = find_connection_file(cf)
 km = BlockingKernelManager()

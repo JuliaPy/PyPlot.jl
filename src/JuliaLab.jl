@@ -3,7 +3,7 @@ using Base
 
 export status, figure, show, plot, plotfile, mrun, test
 
-server = "/Users/ljunf/Documents/Projects/JuliaLab/src/server.py"
+server = "/Users/ljunf/Documents/Projects/JuliaLab.jl/src/server.py"
 
 _PLOTPOINTS_ = 100
 
