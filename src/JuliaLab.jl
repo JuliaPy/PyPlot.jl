@@ -52,7 +52,7 @@ plot(x::Array, y::Array) = plot(x, y, "")
 ## plot y
 function plot(y::Array, plottype::String)
     cmd = strcat("plot(", to_str(y), ", ", plottype, ")")
-    run(cmd)
+    mrun(cmd)
 end
 plot(y::Array) = plot(y, "")
 
