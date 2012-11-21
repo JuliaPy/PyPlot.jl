@@ -10,19 +10,10 @@
 # * https://github.com/ipython/ipython/blob/master/IPython/frontend/terminal/console/interactiveshell.py
 
 
-import sys
-
 from IPython.lib.kernel import find_connection_file
 from IPython.zmq.blockingkernelmanager import BlockingKernelManager
 
 infofile = "/Users/ljunf/Documents/Projects/JuliaLab/src/kernel.info"
-
-# TODO: find existing kernel, save info to kerner.info
-cf = find_connection_file('76368')
-km = BlockingKernelManager()
-km.connection_file = cf
-km.load_connection_file()
-km.start_channels()
 
 # evalutate code
 def run_cell(code):
@@ -38,9 +29,19 @@ def run_cell(code):
         for line in reply['content']['traceback']:
             print line
 
+with open(infofile, 'r') as f:
+    cf = f.readline()
+cf = cf[0:-2]
+cf = find_connection_file(cf)
+km = BlockingKernelManager()
+km.connection_file = cf
+km.load_connection_file()
+km.start_channels()
+
+
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('cmd')
 cmd = parser.parse_args().cmd
-print cmd
+#print cmd
 run_cell(cmd)

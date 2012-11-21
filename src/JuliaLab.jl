@@ -97,14 +97,11 @@ function test()
     plot(cx)
     show()
 
-    open("tmp.dat", "w") do file
-        for i = 1:10
-            println(file, i, "\t", i)
-        end
-    end
     figure()
-    plotfile("tmp.dat")
+    plotfile("test.dat")
     show()
 end
+
+## TODO: initialize ipython kernel, write info to kernel.info
 
 end # end module
