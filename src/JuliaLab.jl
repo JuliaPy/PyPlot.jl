@@ -1,10 +1,9 @@
 module JuliaLab
 using Base
 
-export status, figure, show, plot, plotfile, mrun, test
+export status, test, figure, mshow, plot, plotfile, mrun, xlim, ylim, title, xlabel, ylabel
 
 server = "/Users/ljunf/Documents/Projects/JuliaLab.jl/src/server.py"
-
 _PLOTPOINTS_ = 100
 
 ## convert array to real string
@@ -17,11 +16,11 @@ function to_str(xa::Array)
     return str
 end
 
-## run matplotlib commands, to adjust such as title, formatter, tics
+## run matplotlib commands, to adjust figure ditail, like ticks
 ## TODO: support block parameters
-## TODO: support for multiline
 function mrun(cmd::String)
-    cmd = strcat(server, " ", "\"", cmd, "\"")
+    cmd = strcat(server, " \'", cmd, "\'")
+    println(cmd)
     system(cmd)
 end
 
@@ -30,19 +29,27 @@ function status()
     mrun("")
 end
 
-# TODO: add optional arguemnt, fignum
 ## create/activate figure
 function figure()
     mrun("figure()")
 end
+function figure(num::Integer)
+    cmd = strcat("figure(", num, ")")
+    mrun(cmd)
+end
 
-# TODO: add optional argument, fignum
 ## show figure
-function show()
+function mshow()
     mrun("show()")
+end
+function mshow(num::Integer)
+    cmd = strcat("show(", num, ")")
+    mrun(cmd)
 end
 
 ## plot x, y
+## TODO: using option parameters to provide more direct control options,
+## like linestyle, marker, linewidth ...
 function plot(x::Array, y::Array, plottype::String)
     cmd = strcat("plot(", to_str(x), ", ", to_str(y), ", ", plottype, ")")
     mrun(cmd)
@@ -76,32 +83,59 @@ plot(f::Function, xmin::Number, xmax::Number) = plot(f, xmin, xmax, "")
 
 ## plot file
 function plotfile(f::String, plottype::String)
-    cmd = strcat("plotfile(", "'", f, "'", ", ", plottype, ")")
+    cmd = strcat("plotfile(\"", f, "\"", ", ", plottype, ")")
     mrun(cmd)
 end
 plotfile(f::String) = plotfile(f, "")
+
+
+## set xlim
+function xlim(xmin::Number, xmax::Number)
+    cmd = strcat("xlim(", xmin, ", ", xmax, ")")
+    mrun(cmd)
+end
+
+## set ylim
+function ylim(ymin::Number, ymax::Number)
+    cmd = strcat("ylim(", ymin, ", ", ymax, ")")
+    mrun(cmd)
+end
+
+## set title
+function title(s::String)
+    cmd = strcat("title(\"", s, "\")")
+    mrun(cmd)
+end
+
+## set xlabel
+function xlabel(s::String)
+    cmd = strcat("xlabel(\"", s, "\")")
+    mrun(cmd)
+end
+
+## set ylabel
+function ylabel(s::String)
+    cmd = strcat("ylabel(\"", s, "\")")
+    mrun(cmd)
+end
 
 ## test
 function test()
     x = linspace(-pi, pi)
     y = sin(x)
-    figure()
     plot(x, y)
-    show()
-    figure()
-    plot(x, y, "linestyle = 'None', marker = 'o'")
-    show()
+    xlim(-2pi, 2pi)
+    ylim(-2, 2)
+    title(E"$sin(x)$")
+    xlabel(E"$x$")
+    ylabel(E"$y$")
+
+    plot(x, y, "linestyle = \"None\", marker = \"o\"")
 
     cx = [1.0 + 1.0im, 2.0 + 2.0im, 3.0 + 3.0im]
-    figure()
     plot(cx)
-    show()
 
-    figure()
     plotfile("test.dat")
-    show()
 end
-
-## TODO: initialize ipython kernel, write info to kernel.info
 
 end # end module
