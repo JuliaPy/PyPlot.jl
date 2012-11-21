@@ -1,7 +1,7 @@
 module JuliaLab
 using Base
 
-export status, test, figure, mshow, plot, plotfile, mrun, xlim, ylim, title, xlabel, ylabel, legend, close, savefig
+export status, test, figure, mshow, plot, plotfile, mrun, xlim, ylim, title, xlabel, ylabel, legend, clear, close, savefig
 
 server = "/Users/ljunf/Documents/Projects/JuliaLab.jl/src/server.py"
 _PLOTPOINTS_ = 100
@@ -192,7 +192,7 @@ function legend(labels::Tuple, loc)
     mrun(cmd)
 end
 legend(loc) = legend((), loc)
-legend() = ledgent((), "")
+legend() = legend((), "")
 
 ## test
 function test()
