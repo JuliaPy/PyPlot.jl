@@ -1,7 +1,7 @@
 module JuliaLab
 using Base
 
-export status, test, figure, mshow, plot, plotfile, mrun, xlim, ylim, title, xlabel, ylabel, legend, clear, close, savefig
+export mrun, status, test, figure, fig, showfig, plot, plotfile,  xlim, ylim, title, xlabel, ylabel, legend, clearfig, closefig, savefig
 
 server = "/Users/ljunf/Documents/Projects/JuliaLab.jl/src/server.py"
 _PLOTPOINTS_ = 100
@@ -37,21 +37,27 @@ function figure(num::Integer)
     cmd = strcat("figure(", num, ")")
     mrun(cmd)
 end
+fig = figure
 
 ## show figure
-function mshow()
+function showfig()
     mrun("show()")
 end
-function mshow(num::Integer)
+function showfig(num::Integer)
     cmd = strcat("show(", num, ")")
     mrun(cmd)
 end
 
+## clear figure
+function clearfig()
+    mrun("clf()")
+end
+
 ## close figure
-function close()
+function closefig()
     mrun("close()")
 end
-function close(num::Integer)
+function closefig(num::Integer)
     cmd = strcat("close(", num, ")")
     mrun(cmd)
 end
