@@ -1,7 +1,7 @@
 module JuliaLab
 using Base
 
-export status, test, figure, mshow, plot, plotfile, mrun, xlim, ylim, title, xlabel, ylabel
+export status, test, figure, mshow, plot, plotfile, mrun, xlim, ylim, title, xlabel, ylabel, close, savefig
 
 server = "/Users/ljunf/Documents/Projects/JuliaLab.jl/src/server.py"
 _PLOTPOINTS_ = 100
@@ -44,6 +44,21 @@ function mshow()
 end
 function mshow(num::Integer)
     cmd = strcat("show(", num, ")")
+    mrun(cmd)
+end
+
+## close figure
+function close()
+    mrun("close()")
+end
+function close(num::Integer)
+    cmd = strcat("close(", num, ")")
+    mrun(cmd)
+end
+
+## save figure
+function savefig(s::String)
+    cmd = strcat("savefig(\"", s, "\")")
     mrun(cmd)
 end
 
