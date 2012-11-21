@@ -184,7 +184,12 @@ function ylabel(s::String)
 end
 
 ## legend
-function legend(labels::Tuple, loc)
+function legend(labels, loc)
+    if isa(labels, Tuple) == false
+        println("SyntaxError: labels should be tuple!")
+        return
+    end
+
     if length(labels) == 0
         cmd = strcat("legend(", "loc = \"", loc, "\")")
     else
@@ -210,13 +215,14 @@ function test()
     title(E"$sin(x)$")
     xlabel(E"$x$")
     ylabel(E"$y$")
+    legend((E"$sin(x)$", ), "upper left")
 
     plot(x, y, :linestyle, "None", :marker, "o", :color, "r")
 
     cx = [-2.0 + 0.0im, 0.0 + 0.0im, 2.0 + 0.0im]
     plot(cx)
 
-    plotfile("test.dat")
+    #plotfile("test.dat")
 end
 
 end # end module
