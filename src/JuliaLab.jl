@@ -20,7 +20,7 @@ end
 ## TODO: support block parameters
 function mrun(cmd::String)
     cmd = strcat(server, " \'", cmd, "\'")
-    println(cmd)
+    #println(cmd)
     system(cmd)
 end
 
@@ -62,46 +62,89 @@ function savefig(s::String)
     mrun(cmd)
 end
 
+## main plot function
+function plot(x::Array, y::Array, args::Tuple)
+    # check number of arguments
+    if rem(length(args), 2) == 1
+        println("SyntaxError: Symbols and parameters not pair")
+        return
+    end
+
+    # translate x, y
+    if length(x) == 0
+        cmdea = ""
+    else
+        cmdea = strcat(to_str(x), ", ")
+    end
+    if length(y) == 0
+        cmdeb = ""
+    else
+        cmdeb = strcat(to_str(y), ", ")
+    end
+    cmd = strcat("plot(", cmdea, cmdeb)
+
+    # translate arguments
+    for i = 1:2:length(args)
+        if isa(args[i], Symbol) == false
+            println("SyntaxError: Failed to retrive Symbol")
+            return
+        end
+
+        if isa(args[i+1], String)
+            cmde = strcat(args[i], "=\"", args[i+1], "\"")
+        else
+            cmde = strcat(args[i], "=", args[i+1])
+        end
+        cmd = strcat(cmd, cmde, ", ")
+    end
+
+    cmd = strcat(cmd, ")")
+    mrun(cmd)
+end
+
 ## plot x, y
-## TODO: using option parameters to provide more direct control options,
-## like linestyle, marker, linewidth ...
-function plot(x::Array, y::Array, plottype::String)
-    cmd = strcat("plot(", to_str(x), ", ", to_str(y), ", ", plottype, ")")
-    mrun(cmd)
-end
-plot(x::Array, y::Array) = plot(x, y, "")
-
+## syntax: plot(x, y, :option, parameters)
+plot(x::Array, y::Array, args...) = plot(x, y, args)
 ## plot y
-function plot(y::Array, plottype::String)
-    cmd = strcat("plot(", to_str(y), ", ", plottype, ")")
-    mrun(cmd)
-end
-plot(y::Array) = plot(y, "")
-
-## plot complex y
-function plot(cx::Array{Complex128}, plottype::String)
-    x = real(cx)
-    y = imag(cx)
-    plot(x, y, plottype)
-end
-plot(cx::Array{Complex128}) = plot(cx, "")
-
-
-## plot function
-function plot(f::Function, xmin::Number, xmax::Number, plottype::String)
+plot(y::Array, args...) = plot([], y, args)
+## plot complex x
+plot(cx::Array{Complex128}, args...) = plot(real(cx), imag(cx), args)
+## plot real function
+function plot(f::Function, xmin::Number, xmax::Number, args...)
         x = linspace(xmin, xmax, _PLOTPOINTS_ + 1)
         y = [f(i) for i in x]
-        plot(x, y, plottype)
+        plot(x, y, args)
 end
-plot(f::Function, xmin::Number, xmax::Number) = plot(f, xmin, xmax, "")
-
 
 ## plot file
-function plotfile(f::String, plottype::String)
-    cmd = strcat("plotfile(\"", f, "\"", ", ", plottype, ")")
+function plotfile(f::String, args::Tuple)
+    # check number of arguments
+    if rem(length(args), 2) == 1
+        println("SyntaxError: Symbols and parameters not pair")
+        return
+    end
+
+    cmd = strcat("plotfile(\"", f, "\"", ", ")
+
+    # translate arguments
+    for i = 1:2:length(args)
+        if isa(args[i], Symbol) == false
+            println("SyntaxError: Failed to retrive Symbol")
+            return
+        end
+
+        if isa(args[i+1], String)
+            cmde = strcat(args[i], "=\"", args[i+1], "\"")
+        else
+            cmde = strcat(args[i], "=", args[i+1])
+        end
+        cmd = strcat(cmd, cmde, ", ")
+    end
+
+    cmd = strcat(cmd, ")")
     mrun(cmd)
 end
-plotfile(f::String) = plotfile(f, "")
+plotfile(f::String, args...) = plotfile(f, args)
 
 
 ## set xlim
@@ -145,9 +188,9 @@ function test()
     xlabel(E"$x$")
     ylabel(E"$y$")
 
-    plot(x, y, "linestyle = \"None\", marker = \"o\"")
+    plot(x, y, :linestyle, "None", :marker, "o", :color, "r")
 
-    cx = [1.0 + 1.0im, 2.0 + 2.0im, 3.0 + 3.0im]
+    cx = [-2.0 + 0.0im, 0.0 + 0.0im, 2.0 + 0.0im]
     plot(cx)
 
     plotfile("test.dat")
