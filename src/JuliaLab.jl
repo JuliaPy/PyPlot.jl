@@ -1,7 +1,7 @@
 module JuliaLab
 using Base
 
-export status, test, figure, mshow, plot, plotfile, mrun, xlim, ylim, title, xlabel, ylabel, close, savefig
+export status, test, figure, mshow, plot, plotfile, mrun, xlim, ylim, title, xlabel, ylabel, legend, close, savefig
 
 server = "/Users/ljunf/Documents/Projects/JuliaLab.jl/src/server.py"
 _PLOTPOINTS_ = 100
@@ -111,7 +111,7 @@ plot(y::Array, args...) = plot([], y, args)
 plot(cx::Array{Complex128}, args...) = plot(real(cx), imag(cx), args)
 ## plot real function
 function plot(f::Function, xmin::Number, xmax::Number, args...)
-        x = linspace(xmin, xmax, _PLOTPOINTS_ + 1)
+        x = linspace(float(xmin), float(xmax), _PLOTPOINTS_ + 1)
         y = [f(i) for i in x]
         plot(x, y, args)
 end
@@ -176,6 +176,23 @@ function ylabel(s::String)
     cmd = strcat("ylabel(\"", s, "\")")
     mrun(cmd)
 end
+
+## legend
+function legend(labels::Tuple, loc)
+    if length(labels) == 0
+        cmd = strcat("legend(", "loc = \"", loc, "\")")
+    else
+        cmde = "("
+        for label in labels
+            cmde = strcat(cmde, "\"", label, "\", ")
+        end
+        cmde = strcat(cmde, ")")
+        cmd = strcat("legend(", cmde, ", loc=\"", loc, "\")")
+    end
+    mrun(cmd)
+end
+legend(loc) = legend((), loc)
+legend() = ledgent((), "")
 
 ## test
 function test()
