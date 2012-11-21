@@ -3,6 +3,8 @@ using Base
 
 export mrun, status, test, figure, fig, showfig, plot, plotfile,  xlim, ylim, title, xlabel, ylabel, legend, clearfig, closefig, savefig
 
+## TODO: xticks, yticks, formatter, subplot
+
 server = "/Users/ljunf/Documents/Projects/JuliaLab.jl/src/server.py"
 _PLOTPOINTS_ = 100
 
