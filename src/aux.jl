@@ -4,6 +4,8 @@
 # Description:
 # Created: November 21, 2012
 
+export integrate, bisec, mismore, mfilter
+
 # one-dimensional numerical integration: quadrature
 function integrate(f::Function, x1::Real, x2::Real)
     N = 100     # sampling

@@ -2,6 +2,7 @@ module JuliaLab
 using Base
 
 export mrun, status, test, figure, fig, showfig, plot, plotfile,  xlim, ylim, title, xlabel, ylabel, legend, clearfig, closefig, savefig
+include("/Users/ljunf/Documents/Projects/JuliaLab.jl/src/aux.jl")
 
 ## TODO: xticks, yticks, formatter, subplot
 
