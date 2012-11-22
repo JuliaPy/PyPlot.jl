@@ -45,11 +45,6 @@ end
 # imag part, the bigger of x.
 function mismore(x1::Complex128, x2::Complex128)
     THOLD = -0.2    # key threshold
-    if real(x1) == 0
-        return false
-    elseif real(x2) == 0
-        return true
-    end
 
     if imag(x1) > THOLD && imag(x2) > THOLD
         return (real(x1) > real(x2)) ? true : false
@@ -57,7 +52,7 @@ function mismore(x1::Complex128, x2::Complex128)
         return (imag(x1) > imag(x2)) ? true : false
     elseif imag(x1) > THOLD && imag(x2) < THOLD
         return true
-    elseif imag(x1) < THOLD && imag(x2) > THOLD
+    else
         return false
     end
 end

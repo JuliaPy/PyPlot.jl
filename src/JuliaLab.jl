@@ -2,9 +2,13 @@ module JuliaLab
 using Base
 
 export mrun, status, test, figure, fig, showfig, plot, plotfile,  xlim, ylim, title, xlabel, ylabel, legend, clearfig, closefig, savefig
+
 include("/Users/ljunf/Documents/Projects/JuliaLab.jl/src/aux.jl")
 
-## TODO: xticks, yticks, formatter, subplot
+## TODO:
+# * xticks, yticks, formatter, subplot
+# * portable
+# * usage and example in README
 
 server = "/Users/ljunf/Documents/Projects/JuliaLab.jl/src/server.py"
 _PLOTPOINTS_ = 100
