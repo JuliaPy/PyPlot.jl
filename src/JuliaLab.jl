@@ -102,7 +102,7 @@ function plot(x::Array, y::Array, args::Tuple)
     # translate arguments
     for i = 1:2:length(args)
         if isa(args[i], Symbol) == false
-            println("SyntaxError: Failed to retrive Symbol")
+            println("SyntaxError: failed when retriving Symbol")
             return
         end
 
@@ -123,11 +123,11 @@ end
 plot(x::Array, y::Array, args...) = plot(x, y, args)
 ## plot y
 function plot(cx::Array, args...)
-    if isa(cx[1], Real)
+    if eltype(cx) <: Real
         plot([], cx, args)
-    elseif isa(cx[1], Complex128)
-        x = Array(Float64, size(cx)[1])
-        y = Array(Float64, size(cx)[1])
+    elseif eltype(cx) <: Complex
+        x = Array(Float64, size(cx, 1))
+        y = Array(Float64, size(cx, 1))
         for i in 1:length(x)
             x[i] = real(cx[i])
             y[i] = imag(cx[i])
