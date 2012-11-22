@@ -25,7 +25,7 @@ function mrun(cmd::String)
     # using escaped single quoted cmd to
     # avoid confusing system call, ie, shell
     cmd = "$server \'$cmd\'"
-    println(cmd)
+    #println(cmd)
     system(cmd)
 end
 
