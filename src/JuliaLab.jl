@@ -22,9 +22,10 @@ end
 ## run matplotlib commands, to adjust figure ditail, like ticks
 ## TODO: support block parameters
 function mrun(cmd::String)
-    ## single quote cmd to avoid confusing system call, ie, shell
+    # using escaped single quoted cmd to
+    # avoid confusing system call, ie, shell
     cmd = "$server \'$cmd\'"
-    #println(cmd)
+    println(cmd)
     system(cmd)
 end
 
@@ -193,16 +194,21 @@ end
 ## legend
 function legend(labels::Tuple, loc::String)
     if length(labels) == 0
-        cmd = "legend(\"$loc\")"
+        part1 = ""
     else
-        cmd = "("
+        part1 = "("
         for label in labels
-            cmd = "$cmd\"$label\", "
+            part1 = "$part1\"$label\", "
         end
-        cmd = "$cmd)"
-        cmd = "legend($cmd, loc=\"$loc\""
+        part1 = "$part1), "
     end
-    cmd = "$cmd)"
+
+    if loc == ""
+        part2 = ""
+    else
+        part2 = "loc=\"$loc\""
+    end
+    cmd = "legend($part1 $part2)"
     mrun(cmd)
 end
 legend(loc::String) = legend((), loc)
