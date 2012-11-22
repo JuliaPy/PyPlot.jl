@@ -123,9 +123,9 @@ end
 plot(x::Array, y::Array, args...) = plot(x, y, args)
 ## plot y
 function plot(cx::Array, args...)
-    if eltype(cx) <: Real
+    if typeof(cx[1]) <: Real
         plot([], cx, args)
-    elseif eltype(cx) <: Complex
+    elseif typeof(cx[1]) <: Complex
         x = Array(Float64, size(cx, 1))
         y = Array(Float64, size(cx, 1))
         for i in 1:length(x)
@@ -137,7 +137,7 @@ function plot(cx::Array, args...)
 end
 
 ## plot real function
-function plot(f::Function, xmin::Number, xmax::Number, args...)
+function plot(f::Function, xmin::Real, xmax::Real, args...)
         x = linspace(float(xmin), float(xmax), _PLOTPOINTS_ + 1)
         y = [f(i) for i in x]
         plot(x, y, args)
