@@ -1,12 +1,11 @@
 module JuliaLab
 using Base
 
-export mrun, status, test, figure, fig, showfig, plot, plotfile,  xlim, ylim, title, xlabel, ylabel, legend, clearfig, closefig, savefig
+export mrun, mstatus, mtest, figure, fig, subplot, showfig, plot, plotfile,  xlim, ylim, title, xlabel, ylabel, legend, clearfig, closefig, savefig, grid, xloc_major, xloc_minor, xloc, yloc_major, yloc_minor, yloc, xformatter_major, xformatter_minor, xformatter, yformatter_major, yformatter_minor, yformatter, xscale, yscale, twinx, twiny
 
 include("/Users/ljunf/Documents/Projects/JuliaLab.jl/src/aux.jl")
 
 ## TODO:
-# * xticks, yticks, formatter, subplot
 # * portable
 # * usage and example in README
 
@@ -34,7 +33,7 @@ function mrun(cmd::String)
 end
 
 ## check server status
-function status()
+function mstatus()
     mrun("")
 end
 
@@ -46,6 +45,14 @@ function figure(num::Integer)
     mrun("figure($num)")
 end
 fig = figure
+
+## subplot
+function subplot(num::Integer)
+    mrun("subplot($num)")
+end
+function subplot(numRows::Integer, numCols::Integer, plotNum::Integer)
+    mrun("subplot($numRows, $numCols, $plotNum)")
+end
 
 ## show figure
 function showfig()
@@ -116,7 +123,7 @@ function plot(x::Array, y::Array, args::Tuple)
     mrun(cmd)
 end
 
-## plot x, y
+## plot x,y array
 ## syntax: plot(x, y, :option, parameters)
 plot(x::Array, y::Array, args...) = plot(x, y, args)
 ## plot y, real or complex
@@ -134,7 +141,7 @@ function plot(cx::Array, args...)
     end
 end
 
-## plot real function
+## plot a function
 function plot(f::Function, xmin::Real, xmax::Real, args...)
         x = linspace(float(xmin), float(xmax), _PLOTPOINTS_ + 1)
         y = [f(i) for i in x]
@@ -195,7 +202,7 @@ function ylabel(s::String)
     mrun("ylabel(\"$s\")")
 end
 
-## legend
+## set/show legend
 function legend(labels::Tuple, loc::String)
     if length(labels) == 0
         part1 = ""
@@ -217,6 +224,72 @@ function legend(labels::Tuple, loc::String)
 end
 legend(loc::String) = legend((), loc)
 legend() = legend((), "")
+
+## turn grid on/off
+function grid(b::Bool)
+    if b == true
+        mrun("grid(True)")
+    else
+        mrun("grid(False)")
+    end
+end
+grid() = grid(true)
+
+## set axis locator
+function xloc_major(loc::Real)
+    mrun("gca().xaxis.set_major_locator(MultipleLocator($loc))")
+    mrun("draw()")
+end
+function xloc_minor(loc::Real)
+    mrun("gca().xaxis.set_minor_locator(MultipleLocator($loc))")
+    mrun("draw()")
+end
+xloc(loc::Real) = xloc_major(loc)
+function yloc_major(loc::Real)
+    mrun("gca().yaxis.set_major_locator(MultipleLocator($loc))")
+    mrun("draw()")
+end
+function yloc_minor(loc::Real)
+    mrun("gca().yaxis.set_minor_locator(MultipleLocator($loc))")
+    mrun("draw()")
+end
+yloc(loc::Real) = yloc_major(loc)
+
+## set axis formatter
+function xformatter_major(formatter::String)
+    mrun("gca().xaxis.set_major_formatter(FormatStrFormatter(\"$formatter\"))")
+    mrun("draw()")
+end
+function xformatter_minor(formatter::String)
+    mrun("gca().xaxis.set_minor_formatter(FormatStrFormatter(\"$formatter\"))")
+    mrun("draw()")
+end
+xformatter(formatter::String) = xformatter_major(formatter)
+function yformatter_major(formatter::String)
+    mrun("gca().yaxis.set_major_formatter(FormatStrFormatter(\"$formatter\"))")
+    mrun("draw()")
+end
+function yformatter_minor(formatter::String)
+    mrun("gca().yaxis.set_minor_formatter(FormatStrFormatter(\"$formatter\"))")
+    mrun("draw()")
+end
+yformatter(formatter::String) = yformatter_major(formatter)
+
+## set axis scale
+function xscale(scaletype::String)
+    mrun("xscale(\"$scaletype\")")
+end
+function yscale(scaletype::String)
+    mrun("yscale(\"$scaletype\")")
+end
+
+## twin x/y
+function twinx()
+    mrun("twinx()")
+end
+function twiny()
+    mrun("twiny()")
+end
 
 ## test
 function test()

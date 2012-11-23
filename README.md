@@ -5,7 +5,7 @@ Create comfortuable working environment for scientific computing using [Julia][]
 
 ## Main Work
 
-* Graphical solution based on matploblib.
+* Graphical solution based on matploblib (mainly pyplot module).
 * Functions frequently used but hasn't been supported by the official Julia
 team, like derivation, integration and eigenvalue problems.
 
