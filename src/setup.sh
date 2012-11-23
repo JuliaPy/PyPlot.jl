@@ -13,9 +13,10 @@ if [ "$?" -eq 1 ]; then
     echo "No session found. Creating new one ..."
     tmux new-session -d -s $SESSION_NAME
     tmux send-keys "ipython qtconsole --pylab \
-        > $JuliaLab_HOME/kernel.info; clear &" C-m
+        > $JuliaLab_HOME/kernel.info &" C-m
+    tmux send-keys "sleep 5 && clear" C-m
     tmux split-window -v 'julia'
-    tmux send-keys "require(\"JuliaLab\")" C-m
+    tmux send-keys "require(\"JuliaLab\")"
 else
     echo "Session found. Attaching ..."
 fi
