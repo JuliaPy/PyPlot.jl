@@ -1,13 +1,14 @@
 module JuliaLab
 using Base
 
-export mrun, mstatus, mtest, figure, fig, subplot, showfig, plot, plotfile,  xlim, ylim, title, xlabel, ylabel, legend, clearfig, closefig, savefig, grid, xloc_major, xloc_minor, xloc, yloc_major, yloc_minor, yloc, xformatter_major, xformatter_minor, xformatter, yformatter_major, yformatter_minor, yformatter, xscale, yscale, twinx, twiny
+export mrun, mstatus, mtest, figure, fig, subplot, draw, showfig, plot, plotfile,  xlim, ylim, title, xlabel, ylabel, legend, clearfig, clearax, closefig, delax, hold, savefig, grid, xloc_major, xloc_minor, xloc, yloc_major, yloc_minor, yloc, xformatter_major, xfomatter_minor, xformatter, yformatter_major, yformatter_minor, yformatter, minorticks, xscale, yscale, twinx, twiny, axhline, axvline, axhspan, axvspan
 
 include("/Users/ljunf/Documents/Projects/JuliaLab.jl/src/aux.jl")
 
 ## TODO:
+# * annotate/figtext, hist
 # * portable
-# * usage and example in README
+# * usage explanation and example in README
 
 server = "/Users/ljunf/Documents/Projects/JuliaLab.jl/src/server.py"
 _PLOTPOINTS_ = 100
@@ -67,12 +68,40 @@ function clearfig()
     mrun("clf()")
 end
 
+## clear axes
+function clearax()
+    mrun("cla()")
+end
+
 ## close figure
 function closefig()
     mrun("close()")
 end
 function closefig(num::Integer)
     mrun("close($num)")
+end
+
+## delete axes
+function delax()
+    mrun("delaxes()")
+end
+
+## toggle hold state
+function hold(state::Bool)
+    if state == true
+        mrun("hold(True)")
+    else
+        mrun("hold(False)")
+    end
+end
+function hold()
+    mrun("hold()")
+end
+
+
+## redraw figure
+function draw()
+    mrun("draw()")
 end
 
 ## save figure
@@ -223,6 +252,7 @@ function legend(labels::Tuple, loc::String)
     mrun(cmd)
 end
 legend(loc::String) = legend((), loc)
+legend(labels::Tuple) = legend(labels, "")
 legend() = legend((), "")
 
 ## turn grid on/off
@@ -233,7 +263,9 @@ function grid(b::Bool)
         mrun("grid(False)")
     end
 end
-grid() = grid(true)
+function grid()
+    mrun("grid()")
+end
 
 ## set axis locator
 function xloc_major(loc::Real)
@@ -275,6 +307,15 @@ function yformatter_minor(formatter::String)
 end
 yformatter(formatter::String) = yformatter_major(formatter)
 
+## True on/off minorticks
+function minorticks(state::Bool)
+    if state == true
+        mrun("minorticks_on()")
+    else
+        mrun("minorticks_off()")
+    end
+end
+
 ## set axis scale
 function xscale(scaletype::String)
     mrun("xscale(\"$scaletype\")")
@@ -291,8 +332,23 @@ function twiny()
     mrun("twiny()")
 end
 
+# draw horizontal/vertical line/rectangle across axes
+function axhline(y::Real, xmin::Real, xmax::Real)
+    mrun("axhline(y=$y, xmin=$xmin, xmax=$xmax)")
+end
+function axvline(x::Real, ymin::Real, xmax::Real)
+    mrun("axvline(x=$x, ymin=$ymin, ymax=$ymax")
+end
+function axhspan(xmin::Real, xmax::Real, ymin::Real, ymax::Real)
+    mrun("axhspan(xmin, xmax, ymin=$ymin, ymax=$ymax)")
+end
+function axvspan(xmin::Real, xmax::Real, ymin::Real, ymax::Real)
+    mrun("axvspan(xmin, xmax, ymin=$ymin, ymax=$ymax)")
+end
+
+
 ## test
-function test()
+function mtest()
     x = linspace(-pi, pi)
     y = sin(x)
     plot(x, y)
