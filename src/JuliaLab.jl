@@ -1,7 +1,7 @@
 module JuliaLab
 using Base
 
-JuliaLab_HOME = "/Users/ljunf/Documents/Projects/JuliaLab.jl/src"
+JuliaLab_HOME = getenv("JuliaLab_HOME")
 
 ## matploblib.pyplot wrapper
 include("$JuliaLab_HOME/plot.jl")
