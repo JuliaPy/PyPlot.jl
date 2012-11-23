@@ -58,7 +58,7 @@ function mismore(x1::Complex128, x2::Complex128)
 end
 
 
-# filter effective indices
+## filter/sort effective indices
 function mfilter(A::Array, start::Number, num::Integer)
     B = copy(A)
     B = sort(mismore, B)

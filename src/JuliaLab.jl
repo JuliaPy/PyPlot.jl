@@ -1,7 +1,7 @@
 module JuliaLab
 using Base
 
-export mrun, mstatus, mtest, figure, fig, subplot, draw, showfig, plot, plotfile,  xlim, ylim, title, xlabel, ylabel, legend, clearfig, clearax, closefig, delax, hold, savefig, grid, xloc_major, xloc_minor, xloc, yloc_major, yloc_minor, yloc, xformatter_major, xfomatter_minor, xformatter, yformatter_major, yformatter_minor, yformatter, minorticks, xscale, yscale, twinx, twiny, axhline, axvline, axhspan, axvspan
+export J, mrun, mstatus, mtest, figure, fig, subplot, draw, showfig, plot, plotfile,  xlim, ylim, title, xlabel, ylabel, legend, clearfig, clearax, closefig, delax, hold, savefig, grid, xloc_major, xloc_minor, xloc, yloc_major, yloc_minor, yloc, xformatter_major, xfomatter_minor, xformatter, yformatter_major, yformatter_minor, yformatter, minorticks, xscale, yscale, twinx, twiny, axhline, axvline, axhspan, axvspan
 
 include("/Users/ljunf/Documents/Projects/JuliaLab.jl/src/aux.jl")
 
@@ -12,6 +12,13 @@ include("/Users/ljunf/Documents/Projects/JuliaLab.jl/src/aux.jl")
 
 server = "/Users/ljunf/Documents/Projects/JuliaLab.jl/src/server.py"
 _PLOTPOINTS_ = 100
+
+## autojump :)
+function J(dst::String)
+    cd(readchomp(`autojump $dst`))
+    cwd()
+end
+J() = J("")
 
 ## convert array to real string
 function to_str(xa::Array)
