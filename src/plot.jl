@@ -3,18 +3,68 @@
 # * portable
 # * usage explanation and example in README
 
-
 export mrun, mstatus, mtest, figure, fig, subplot, draw, showfig, plot, plotfile,  xlim, ylim, title, xlabel, ylabel, legend, clearfig, clearax, closefig, delax, hold, savefig, grid, xloc_major, xloc_minor, xloc, yloc_major, yloc_minor, yloc, xformatter_major, xfomatter_minor, xformatter, yformatter_major, yformatter_minor, yformatter, minorticks, xscale, yscale, twinx, twiny, axhline, axvline, axhspan, axvspan
 
 
-## convert array to real string
-function to_str(xa::Array)
-    str = "["
-    for x in xa
-        str = "$str$x, "
+## translate array
+function trans_arr(arr::Array)
+    # return empty string when array is empty
+    if arr == []
+        return ""
+    else
+        str = "["
+        for a in arr
+            str = "$str$a, "
+        end
+        str = "$str]"
+        return str
     end
-    str = "$str]"
-    return str
+end
+
+## translate tuple
+function trans_tuple(tuple::Tuple)
+    # return empty string when tuple is empty
+    if tuple == ()
+        return ""
+    else
+        str = "("
+        for t in tuple
+            str = "$str\"$t\", "
+        end
+        str = "$str), "
+        return str
+    end
+end
+
+
+## translate args syntax
+## `:linewidth, 2` will be translated to `linewidth=2, `
+## `:label, "sin(x)"` will be translated to `label=\"sin(x)\"`
+## return 1 when come up with errors!
+function trans_args(args::Tuple)
+    # check number of arguments
+    if rem(length(args), 2) == 1
+        println("Syntax Error: symbols and parameters should in pair!")
+        return 1
+    end
+
+    cmd = ""
+    for i = 1:2:length(args)
+        if !isa(args[i], Symbol)
+            println("Syntax Error: args should use Symbol!")
+            return 1
+        end
+
+        if isa(args[i+1], String)
+            cmd = "$cmd$(args[i])=\"$(args[i+1])\", "
+        elseif isa(args[i+1], Tuple)
+            cmd = "$cmd$(args[i])=$(trans_tuple(args[i+1]))"
+        else
+            cmd = "$cmd$(args[i])=$(args[i+1]), "
+        end
+    end
+
+    return cmd
 end
 
 ## run matplotlib commands, to adjust figure ditail, like ticks
@@ -24,8 +74,8 @@ function mrun(cmd::String)
     # using escaped single quoted cmd to
     # avoid confusing system call, ie, shell
     cmd = "$SERVER \'$cmd\'"
-    #println(cmd)
-    system(cmd)
+    println(cmd)
+    #system(cmd)
 end
 
 ## check server status
@@ -112,52 +162,36 @@ function plot(x::Array, y::Array, args::Tuple)
     if ndims(x) != 1 || ndims(y) != 1
         println("SyntaxError: input arrays should be of one dimension!")
         return
-    # check length of arrays
-    elseif size(x, 1) != size(y, 1)
-        println("SyntaxError: lengths of input arrays should be equal!")
-    end
-    # check number of arguments
-    if rem(length(args), 2) == 1
-        println("SyntaxError: Symbols and parameters should in pair!")
-        return
     end
 
     cmd = "plot("
     # translate x, y
-    if length(x) != 0
-        cmd = "$cmd$(to_str(x)), "
-    end
-    cmd = "$cmd$(to_str(y)), "
+    cmd = "$cmd$(trans_arr(x))"
+    cmd = "$cmd$(trans_arr(y))"
 
-    # translate arguments
-    for i = 1:2:length(args)
-        if !isa(args[i], Symbol)
-            println("SyntaxError: args should use Symbol!")
-            return
-        end
-
-        if isa(args[i+1], String)
-            cmd = "$cmd $(args[i])=\"$(args[i+1])\", "
-        else
-            cmd = "$cmd $(args[i])=$(args[i+1]), "
-        end
+    # translate args
+    if (args = trans_args(args)) != 1
+        cmd = "$cmd $args"
+    else
+        return
     end
 
     cmd = "$cmd)"
     mrun(cmd)
 end
-
-## plot x,y array
+## plot two array
 ## syntax: plot(x, y, :option, parameters)
 plot(x::Array, y::Array, args...) = plot(x, y, args)
-## plot y, real or complex
-function plot(cx::Array, args...)
-    if typeof(cx[1]) <: Real
-        plot([1:length(cx)], cx, args)
-    elseif typeof(cx[1]) <: Complex
-        x = Array(Float64, size(cx, 1))
-        y = Array(Float64, size(cx, 1))
-        for i in 1:length(x)
+
+## plot single array,  real or complex
+function plot(arr::Array, args...)
+    if typeof(arr[1]) <: Real
+        plot([], arr, args)
+    elseif typeof(arr[1]) <: Complex
+        asize = size(arr, 1)
+        x = Array(Float64, asize)
+        y = Array(Float64, asize)
+        for i in 1:asize
             x[i] = real(cx[i])
             y[i] = imag(cx[i])
         end
@@ -175,25 +209,13 @@ end
 
 ## plotfile
 function plotfile(f::String, args::Tuple)
-    # check number of arguments
-    if rem(length(args), 2) == 1
-        println("SyntaxError: Symbols and parameters should in pair!")
-        return
-    end
-
     cmd = "plotfile(\"$f\", "
-    # translate arguments
-    for i = 1:2:length(args)
-        if isa(args[i], Symbol) == false
-            println("SyntaxError: args should use Symbol!")
-            return
-        end
 
-        if isa(args[i+1], String)
-            cmd = "$cmd $(args[i])=\"$(args[i+1])\", "
-        else
-            cmd = "$cmd $(args[i])=$(args[i+1]), "
-        end
+    # translate arguments
+    if (args = trans_args(args)) != 1
+        cmd = "$cmd$args"
+    else
+        return
     end
 
     cmd = "$cmd)"
@@ -229,22 +251,15 @@ end
 
 ## set/show legend
 function legend(labels::Tuple, loc::String)
-    if length(labels) == 0
-        part1 = ""
-    else
-        part1 = "("
-        for label in labels
-            part1 = "$part1\"$label\", "
-        end
-        part1 = "$part1), "
-    end
+    labels = trans_tuple(labels)
 
     if loc == ""
-        part2 = ""
+        loc = ""
     else
-        part2 = "loc=\"$loc\""
+        loc = "loc=\"$loc\""
     end
-    cmd = "legend($part1 $part2)"
+
+    cmd = "legend($labels$loc)"
     mrun(cmd)
 end
 legend(loc::String) = legend((), loc)
@@ -311,6 +326,22 @@ function minorticks(state::Bool)
         mrun("minorticks_off()")
     end
 end
+
+## Change appearance of ticks and tick labels
+function tick_params(args::Tuple)
+    args = trans_tuple(args)
+    cmd = "tick_params($args)"
+    mrun(cmd)
+end
+tick_params(args...) = tick_params(args)
+
+## Change label format
+function ticklabel_format(args::Tuple)
+    args = trans_tuple(args)
+    cmd = "ticklable_format($args)"
+    mrun(cmd)
+end
+ticklabel_format(args...) = ticklabel_format(args)
 
 ## set axis scale
 function xscale(scaletype::String)
