@@ -16,7 +16,7 @@ function trans_arr(arr::Array)
         for a in arr
             str = "$str$a, "
         end
-        str = "$str]"
+        str = "$str], "
         return str
     end
 end
@@ -29,7 +29,11 @@ function trans_tuple(tuple::Tuple)
     else
         str = "("
         for t in tuple
-            str = "$str\"$t\", "
+            if isa(t, String)
+                str = "$str\"$t\", "
+            else
+                str = "$str$t, "
+            end
         end
         str = "$str), "
         return str
@@ -74,8 +78,8 @@ function mrun(cmd::String)
     # using escaped single quoted cmd to
     # avoid confusing system call, ie, shell
     cmd = "$SERVER \'$cmd\'"
-    println(cmd)
-    #system(cmd)
+    #println(cmd)
+    system(cmd)
 end
 
 ## check server status
@@ -171,7 +175,7 @@ function plot(x::Array, y::Array, args::Tuple)
 
     # translate args
     if (args = trans_args(args)) != 1
-        cmd = "$cmd $args"
+        cmd = "$cmd$args"
     else
         return
     end
@@ -192,8 +196,8 @@ function plot(arr::Array, args...)
         x = Array(Float64, asize)
         y = Array(Float64, asize)
         for i in 1:asize
-            x[i] = real(cx[i])
-            y[i] = imag(cx[i])
+            x[i] = real(arr[i])
+            y[i] = imag(arr[i])
         end
         plot(x, y, args)
     end
@@ -329,7 +333,7 @@ end
 
 ## Change appearance of ticks and tick labels
 function tick_params(args::Tuple)
-    args = trans_tuple(args)
+    args = trans_args(args)
     cmd = "tick_params($args)"
     mrun(cmd)
 end
@@ -337,7 +341,7 @@ tick_params(args...) = tick_params(args)
 
 ## Change label format
 function ticklabel_format(args::Tuple)
-    args = trans_tuple(args)
+    args = trans_args(args)
     cmd = "ticklable_format($args)"
     mrun(cmd)
 end
