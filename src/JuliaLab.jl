@@ -1,10 +1,11 @@
 module JuliaLab
 using Base
 
-## matploblib.pyplot wrapper
-include("/Users/ljunf/Documents/Projects/JuliaLab.jl/src/plot.jl")
+JuliaLab_HOME = "/Users/ljunf/Documents/Projects/JuliaLab.jl/src"
 
+## matploblib.pyplot wrapper
+include("$JuliaLab_HOME/plot.jl")
 ## other auxiliary functions
-include("/Users/ljunf/Documents/Projects/JuliaLab.jl/src/aux.jl")
+include("$JuliaLab_HOME/aux.jl")
 
 end # end module

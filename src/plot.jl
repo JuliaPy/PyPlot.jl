@@ -19,7 +19,7 @@ end
 
 ## run matplotlib commands, to adjust figure ditail, like ticks
 ## TODO: support block parameters
-SERVER = "/Users/ljunf/Documents/Projects/JuliaLab.jl/src/server.py"
+SERVER = "$JuliaLab_HOME/server.py"
 function mrun(cmd::String)
     # using escaped single quoted cmd to
     # avoid confusing system call, ie, shell
