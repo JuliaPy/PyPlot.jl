@@ -4,8 +4,10 @@
 # Description: start tmux session for julia
 # Created: November 17, 2012
 
+JuliaLab_HOME="/Users/ljunf/Documents/Projects/JuliaLab.jl/src"
+
+infofile=$JuliaLab_HOME"/kernel.info"
 SESSION_NAME="IJulia"
-infofile="/Users/ljunf/Documents/Projects/JuliaLab.jl/src/kernel.info"
 
 tmux has-session -t $SESSION_NAME 2>/dev/null
 if [ "$?" -eq 1 ]; then
