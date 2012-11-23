@@ -284,19 +284,31 @@ end
 
 ## set axis locator
 function xloc_major(loc::Real)
+    if loc <= 0
+        println("ValueError: loc should be greater than 0")
+    end
     mrun("gca().xaxis.set_major_locator(MultipleLocator($loc))")
     mrun("draw()")
 end
 function xloc_minor(loc::Real)
+    if loc <= 0
+        println("ValueError: loc should be greater than 0")
+    end
     mrun("gca().xaxis.set_minor_locator(MultipleLocator($loc))")
     mrun("draw()")
 end
 xloc(loc::Real) = xloc_major(loc)
 function yloc_major(loc::Real)
+    if loc <= 0
+        println("ValueError: loc should be greater than 0")
+    end
     mrun("gca().yaxis.set_major_locator(MultipleLocator($loc))")
     mrun("draw()")
 end
 function yloc_minor(loc::Real)
+    if loc <= 0
+        println("ValueError: loc should be greater than 0")
+    end
     mrun("gca().yaxis.set_minor_locator(MultipleLocator($loc))")
     mrun("draw()")
 end
@@ -389,6 +401,7 @@ function mtest()
     xlabel(E"$x$")
     ylabel(E"$y$")
     legend((E"$sin(x)$", ), "upper left")
+    grid()
 
     plot(x, y, :linestyle, "None", :marker, "o", :color, "r", :linewidth, 2)
 
