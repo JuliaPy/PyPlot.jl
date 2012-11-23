@@ -4,7 +4,14 @@
 # Description:
 # Created: November 21, 2012
 
-export integrate, bisec, mismore, mfilter
+export J, integrate, bisec, mismore, mfilter
+
+## autojump :)
+function J(dst::String)
+    cd(readchomp(`autojump $dst`))
+    cwd()
+end
+J() = J("")
 
 # one-dimensional numerical integration: quadrature
 function integrate(f::Function, x1::Real, x2::Real)
