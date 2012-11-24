@@ -1,5 +1,5 @@
 #!/usr/bin/env julia
-# File: 2-plot.jl
+# File: 2-subplot.jl
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: subplot
 # Created: November 24, 2012
@@ -31,4 +31,4 @@ title("Plot function")
 grid(true)
 plot(cos, -pi, pi)  # plot a function
 
-#savefig("2-plot.pdf")
+#savefig("2-subplot.pdf")
