@@ -1,4 +1,4 @@
-export mrun, mstatus, mtest, figure, fig, subplot, draw, showfig, plot, plotfile,  xlim, ylim, title, xlabel, ylabel, legend, clearfig, clearax, closefig, delax, hold, savefig, grid, xloc_major, xloc_minor, xloc, yloc_major, yloc_minor, yloc, xformatter_major, xfomatter_minor, xformatter, yformatter_major, yformatter_minor, yformatter, minorticks, xscale, yscale, twinx, twiny, axhline, axvline, axhspan, axvspan
+export mrun, mstatus, figure, fig, subplot, draw, showfig, plot, plotfile,  xlim, ylim, title, xlabel, ylabel, legend, clearfig, clearax, closefig, delax, hold, savefig, grid, xloc_major, xloc_minor, xloc, yloc_major, yloc_minor, yloc, xformatter_major, xfomatter_minor, xformatter, yformatter_major, yformatter_minor, yformatter, minorticks, xscale, yscale, twinx, twiny, axhline, axvline, axhspan, axvspan
 
 
 ## translate array
@@ -66,13 +66,23 @@ function trans_args(args::Tuple)
     return cmd
 end
 
+global DEBUG = false
+function debug(state::Bool)
+    global DEBUG = state
+end
+function debug()
+    global DEBUG = !DEBUG
+end
+
 ## run matplotlib commands, to adjust figure ditail, like ticks
 ## TODO: support block parameters
 function mrun(cmd::String)
     # using escaped single quoted cmd to
     # avoid confusing system call, ie, shell
     cmd = "$JuliaLab_HOME/eval.py \'$cmd\'"
-    #println(cmd)
+    if DEBUG
+        println(cmd)
+    end
     system(cmd)
 end
 
@@ -149,7 +159,7 @@ end
 
 ## save figure
 function savefig(file::String)
-    mrun("savefig($file)")
+    mrun("savefig(\"$file\")")
 end
 
 ## main plot function
@@ -381,27 +391,4 @@ function axhspan(xmin::Real, xmax::Real, ymin::Real, ymax::Real)
 end
 function axvspan(xmin::Real, xmax::Real, ymin::Real, ymax::Real)
     mrun("axvspan(xmin, xmax, ymin=$ymin, ymax=$ymax)")
-end
-
-
-## test
-function mtest()
-    x = linspace(-pi, pi)
-    y = sin(x)
-    plot(x, y)
-    xlim(-2pi, 2pi)
-    ylim(-2, 2)
-    title(E"$sin(x)$")
-    xlabel(E"$x$")
-    ylabel(E"$y$")
-    legend((E"$sin(x)$", ), "upper left")
-    grid()
-
-    plot(x, y, :linestyle, "None", :marker, "o", :color, "r", :linewidth, 2)
-
-    cx = [-2.0 + 1.0im, 0.0 + 0.0im, 2.0 + -1.0im]
-    plot(cx)
-
-    #plotfile("test.dat")
-    #plotfile("test.dat", :linewidth, 2, :linestyle, "None")
 end
