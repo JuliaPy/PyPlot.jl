@@ -1,10 +1,10 @@
-#!/usr/bin/env zsh
-# File: setup.zsh
+#!/usr/bin/env bash
+# File: tmux_IJulia.sh
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: start tmux session for julia
 # Created: November 17, 2012
 
-export JuliaLab_HOME="$HOME/Documents/Projects/JuliaLab.jl/src"
+export JuliaLab_HOME=$(dirname $(grealpath $0))
 
 SESSION_NAME="IJulia"
 

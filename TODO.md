@@ -10,4 +10,10 @@ Open subprocess to start `eval.py`, write command to subprocess's STDIN,
 thus made the evaluation process more elegent and economic, as well as
 the debug process easier though writing log to file.
 * Rewrite test using Julia test framework.
-* Document on prerequirements, setups, usages and examples.
+* Document on requirements, setups, usages and examples.
+    * requirements
+        * julia
+        * `grealpath`/`realpath`: from coreutils
+        * ipython, matploblib
+        * tmux (optional)
+        * patience
