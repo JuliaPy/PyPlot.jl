@@ -14,8 +14,8 @@ if [ "$?" -eq 1 ]; then
     tmux new-session -d -s $SESSION_NAME
     tmux send-keys "ipython qtconsole --pylab \
         > $JuliaLab_HOME/kernel.info &" C-m
-    tmux send-keys "sleep 3 && clear" C-m
-    tmux split-window -v 'julia -L extra/JuliaLab'
+    tmux send-keys "sleep 5 && clear" C-m
+    tmux split-window -v 'julia -L JuliaLab'
     tmux send-keys "using JuliaLab"
 else
     echo "Session found. Attaching ..."
