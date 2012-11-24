@@ -9,6 +9,8 @@ Create comfortuable working environment for scientific computing using [Julia][]
 * Functions frequently used but hasn't been supported by the official Julia
 team, like derivation, integration and eigenvalue problems.
 
+![screenshot](screenshot.png)
+
 ## Why
 
 The Julia team seems to favor graphics solutions from ground up, and the
