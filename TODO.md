@@ -1,10 +1,6 @@
 ## TODO
 
 * Functions: annotate/figtext, hist
-* Portable
-    * Make script use relative path. Currently all script rely on an env
-    variable exported from the `setup.sh`, i.e., `JuliaLab_HOME`, which
-    contains a definitive path.
 * More sophisticated way to communicate between `plot.pl` and `eval.py`.
 Open subprocess to start `eval.py`, write command to subprocess's STDIN,
 thus made the evaluation process more elegent and economic, as well as
