@@ -1,8 +1,3 @@
-## TODO:
-# * annotate/figtext, hist
-# * portable
-# * usage explanation and example in README
-
 export mrun, mstatus, mtest, figure, fig, subplot, draw, showfig, plot, plotfile,  xlim, ylim, title, xlabel, ylabel, legend, clearfig, clearax, closefig, delax, hold, savefig, grid, xloc_major, xloc_minor, xloc, yloc_major, yloc_minor, yloc, xformatter_major, xfomatter_minor, xformatter, yformatter_major, yformatter_minor, yformatter, minorticks, xscale, yscale, twinx, twiny, axhline, axvline, axhspan, axvspan
 
 
