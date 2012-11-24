@@ -7,8 +7,9 @@
     contains a definitive path.
     * Tell julia where to find JuliLab module. Currently, it is solved
     by linking `JuliaLab.jl` to `JULIA_HOME/lib/julia/extras/`. Problems
-    may be solved when given more info on Julia package system [1], [2].
+    may be solved when given more info on Julia package system [1][wiki], [2][METADATA].
+* More sophisticated way to communicate between `plot.pl` and `eval.py`.
 * Document on prerequirements, setups, usages and examples.
 
-[1]: https://github.com/JuliaLang/julia/wiki/Package-system
-[2]: https://github.com/JuliaLang/METADATA.jl
+[wiki]: https://github.com/JuliaLang/julia/wiki/Package-system
+[METADATA]: https://github.com/JuliaLang/METADATA.jl

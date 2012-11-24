@@ -68,11 +68,10 @@ end
 
 ## run matplotlib commands, to adjust figure ditail, like ticks
 ## TODO: support block parameters
-SERVER = "$JuliaLab_HOME/server.py"
 function mrun(cmd::String)
     # using escaped single quoted cmd to
     # avoid confusing system call, ie, shell
-    cmd = "$SERVER \'$cmd\'"
+    cmd = "$JuliaLab_HOME/eval.py \'$cmd\'"
     #println(cmd)
     system(cmd)
 end
