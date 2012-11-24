@@ -9,7 +9,7 @@ Create comfortuable working environment for scientific computing using [Julia][]
 * Functions frequently used but hasn't been supported by the official Julia
 team, like derivation, integration and eigenvalue problems.
 
-![screenshot](JuliaLab.jl/blob/master/screenshot.png)
+![screenshot](https://github.com/autozimu/JuliaLab.jl/raw/master/screenshot.png)
 
 ## Why
 
