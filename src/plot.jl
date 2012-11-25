@@ -66,6 +66,7 @@ function trans_args(args::Tuple)
     return cmd
 end
 
+## Toggle debug
 global DEBUG = false
 function debug(state::Bool)
     global DEBUG = state
@@ -79,11 +80,11 @@ end
 function mrun(cmd::String)
     # using escaped single quoted cmd to
     # avoid confusing system call, ie, shell
-    cmd = "$JuliaLab_HOME/eval.py \'$cmd\'"
+    cmd = `$JuliaLab_HOME/eval.py $cmd`
     if DEBUG
         println(cmd)
     end
-    system(cmd)
+    run(cmd)
 end
 
 ## check server status
