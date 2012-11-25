@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# File: server.py
+# File: eval.py
 # Author: Junfeng Li <li424@mcmaster.ca>
-# Description: interprete and evalulate plot commands
+# Description: evalulate plot commands
 # Created: November 20, 2012
 
 ## ref
