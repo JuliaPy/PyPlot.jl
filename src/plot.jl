@@ -35,7 +35,7 @@ function trans_tuple(tuple::Tuple)
     end
 end
 
-
+## TODO: translate all parameters, both args and optinons
 ## translate args syntax
 ## `:linewidth, 2` will be translated to `linewidth=2, `
 ## `:label, "sin(x)"` will be translated to `label=\"sin(x)\"`
