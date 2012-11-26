@@ -4,6 +4,13 @@
 # Description: evalulate plot commands
 # Created: November 20, 2012
 
+## FIXME
+# The most suitable solution for this scenario is starting this script
+# as a subprocess and send plot command directly to its STDIN. But I
+# cannot find enouth information about open and communicate with a
+# persistant subprocess in Julia, and I cann't implement it in Python,
+# either. :(
+
 ## ref
 # * http://stackoverflow.com/questions/9977446/connecting-to-a-remote-ipython-instance
 # * https://github.com/ivanov/vim-ipython
