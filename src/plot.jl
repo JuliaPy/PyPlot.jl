@@ -108,7 +108,6 @@ end
 
 ## run matplotlib commands directly
 ## TODO: support block parameters
-JuliaLab_HOME = getenv("JuliaLab_HOME")
 function mrun(cmd::String)
     # using escaped single quoted cmd to
     # avoid confusing system call, ie, shell
@@ -196,7 +195,7 @@ function savefig(file::String)
 end
 
 ## plot two arrays
-function plot(x::Array, y::Array, args...)
+function plot(x::Array, y::Array, args::Tuple)
     cmd = ""
     cmd = "$cmd$(parse(x))"
     cmd = "$cmd$(parse(y))"
@@ -206,6 +205,7 @@ function plot(x::Array, y::Array, args...)
 
     mrun("plot($cmd)")
 end
+plot(x::Array, y::Array, args...) = plot(x, y, args)
 
 ## plot single array,  real or complex
 function plot(arr::Array, args...)
