@@ -274,7 +274,7 @@ function legend(labels::Tuple, loc::String)
     else
         loc = "loc=$(parse(loc))"
     end
-    mrun("$labels$loc")
+    mrun("legend($labels$loc)")
 end
 legend(loc::String) = legend((), loc)
 legend(labels::Tuple) = legend(labels, "")
@@ -375,7 +375,7 @@ function twiny()
     mrun("twiny()")
 end
 
-# draw horizontal/vertical line/rectangle across axes
+## draw horizontal/vertical line/rectangle across axes
 function axhline(y::Real, xmin::Real, xmax::Real)
     mrun("axhline(y=$y, xmin=$xmin, xmax=$xmax)")
 end
@@ -387,4 +387,12 @@ function axhspan(xmin::Real, xmax::Real, ymin::Real, ymax::Real)
 end
 function axvspan(xmin::Real, xmax::Real, ymin::Real, ymax::Real)
     mrun("axvspan(xmin, xmax, ymin=$ymin, ymax=$ymax)")
+end
+
+## test
+function mtest()
+    load("../examples/1-plot.jl")
+    load("../examples/2-subplot.jl")
+    #load("../examples/3-plotfile.jl")
+    load("../4-control-details.jl")
 end

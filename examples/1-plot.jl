@@ -8,6 +8,8 @@ require("JuliaLab")
 using JuliaLab
 
 x = linspace(-pi, pi)
+
+figure()
 plot(x, sin(x), :label, E"$sin(x)$")
 xlim(-2pi, 2pi)     # set xrange
 ylim(-2, 2)         # set yrange

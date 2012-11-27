@@ -7,7 +7,8 @@
 require("JuliaLab")
 using JuliaLab
 
+figure()
 plotfile("3-plotfile.txt", :delimiter, " ", :cols, (0, 1), :marker, "^")
 title("Plot data from file")
 
-savefig("3-plotfile.pdf")
+#savefig("3-plotfile.pdf")

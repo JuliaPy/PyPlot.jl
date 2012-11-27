@@ -11,6 +11,7 @@ x = linspace(-pi, pi)
 y = cos(x)
 x = x / 1.0e4
 
+figure()
 plot(x, y)
 grid()
 title("Example to show how to control details in figure")

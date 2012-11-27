@@ -11,6 +11,8 @@ x = linspace(-pi, pi, 20)
 y = sin(x)
 cx = [-1 + 0im, 0 + 1im, 1 + 0im]
 
+figure()
+
 subplot(221)
 title("Plot without lines")
 grid(true)

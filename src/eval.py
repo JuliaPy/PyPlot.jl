@@ -31,8 +31,6 @@ def run_cell(code):
     reply = shell.get_msg()
 
     if reply['content']['status'] == 'error':
-        print 'Error occured!'
-        print "CMD: ", cmd
         for line in reply['content']['traceback']:
             print line
 
