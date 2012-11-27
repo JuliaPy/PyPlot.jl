@@ -108,11 +108,11 @@ end
 
 ## run matplotlib commands directly
 ## TODO: support block parameters
+JuliaLab_HOME = getenv("JuliaLab_HOME")
 function mrun(cmd::String)
     # using escaped single quoted cmd to
     # avoid confusing system call, ie, shell
-    dir = getenv("JuliaLab_HOME")
-    cmd = `$dir/eval.py $cmd`
+    cmd = `$JuliaLab_HOME/eval.py $cmd`
     if DEBUG
         println(cmd)
     end
