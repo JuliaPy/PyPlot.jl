@@ -34,8 +34,8 @@ def run_cell(code):
         for line in reply['content']['traceback']:
             print line
 
-PYPLOT_JL_HOME = os.getenv("PYPLOT_JL_HOME")
-infofile = PYPLOT_JL_HOME + "/kernel.info"
+
+infofile = os.path.dirname(__file__) + "/kernel.info"
 with open(infofile, 'r') as f:
     cf = f.readline()
     cf = f.readline()
