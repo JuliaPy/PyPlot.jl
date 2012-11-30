@@ -14,8 +14,7 @@ if [ "$?" -eq 1 ]; then
     tmux send-keys "ipython qtconsole --pylab \
         > $PYPLOT_JL_HOME/kernel.info &" C-m
     tmux send-keys "sleep 5 && clear" C-m
-    tmux split-window -v 'julia -L pyplot'
-    tmux send-keys "using pyplot"
+    tmux split-window -v 'julia'
 else
     echo "Session found. Attaching ..."
 fi
