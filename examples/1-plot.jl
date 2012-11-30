@@ -4,8 +4,8 @@
 # Description: simple plot
 # Created: November 24, 2012
 
-require("JuliaLab")
-using JuliaLab
+require("pyplot")
+using pyplot
 
 x = linspace(-pi, pi)
 

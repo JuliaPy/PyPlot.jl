@@ -4,8 +4,8 @@
 # Description: example to show how to control details in figure
 # Created: November 24, 2012
 
-require("JuliaLab")
-using JuliaLab
+require("pyplot")
+using pyplot
 
 x = linspace(-pi, pi)
 y = cos(x)
