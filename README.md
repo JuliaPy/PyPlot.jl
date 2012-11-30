@@ -1,21 +1,16 @@
-## Objective
+## What
 
-Create comfortuable working environment for scientific computing using [Julia][].
+Graphical solution for [Julia][] based on [matploblib][], mainly the pyplot
+module.
 
-
-## Main Work
-
-* Graphical solution based on matploblib (mainly pyplot module).
-* Functions frequently used but hasn't been supported by the official Julia
-team, like derivation, integration and eigenvalue problems.
-
-![screenshot](https://github.com/autozimu/JuliaLab.jl/raw/master/screenshot.png)
+![screenshot](https://github.com/autozimu/pyplot.jl/raw/master/screenshot.png)
 
 ## Why
 
-The Julia team seems to favor graphics solutions from ground up, and the
-standard solution has not been decided yet. I just cannot wait that
-long, so I started my own.
+The Julia team seems to prefer graphics solutions that started from
+ground up, and the standard solution has not been decided yet. I just
+cannot wait that long, so I started my own.
 
 
 [Julia]: http://julialang.org/ "The Julia Language"
+[matploblib]: http://matplotlib.org/ "matplotlib"
