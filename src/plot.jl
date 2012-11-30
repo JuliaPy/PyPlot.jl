@@ -1,3 +1,9 @@
+#!/usr/bin/env julia
+# File: plot.jl
+# Author: Junfeng Li <li424@mcmaster.ca>
+# Description: real wrapper
+# Created: November 29, 2012
+
 export  mrun,
         mstatus,
         figure,

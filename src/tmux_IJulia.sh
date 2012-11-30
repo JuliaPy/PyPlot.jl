@@ -4,9 +4,8 @@
 # Description: start tmux session for julia
 # Created: November 17, 2012
 
-export PYPLOT_JL_HOME=$(dirname $(grealpath $0))
-
 SESSION_NAME="IJulia"
+PYPLOT_JL_HOME=$(dirname $(grealpath $0))
 
 tmux has-session -t $SESSION_NAME 2>/dev/null
 if [ "$?" -eq 1 ]; then
