@@ -1,4 +1,4 @@
-module JuliaLab
+module pyplot
 using Base
 
 JuliaLab_HOME = getenv("JuliaLab_HOME")

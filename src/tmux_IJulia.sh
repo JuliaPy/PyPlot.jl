@@ -4,7 +4,7 @@
 # Description: start tmux session for julia
 # Created: November 17, 2012
 
-export JuliaLab_HOME=$(dirname $(grealpath $0))
+export PYPLOT_JL_HOME =$(dirname $(grealpath $0))
 
 SESSION_NAME="IJulia"
 
@@ -13,10 +13,10 @@ if [ "$?" -eq 1 ]; then
     echo "No session found. Creating new one ..."
     tmux new-session -d -s $SESSION_NAME
     tmux send-keys "ipython qtconsole --pylab \
-        > $JuliaLab_HOME/kernel.info &" C-m
+        > $PYPLOT_JL_HOME/kernel.info &" C-m
     tmux send-keys "sleep 5 && clear" C-m
-    tmux split-window -v 'julia -L JuliaLab'
-    tmux send-keys "using JuliaLab"
+    tmux split-window -v 'julia -L pyplot'
+    tmux send-keys "using pyplot"
 else
     echo "Session found. Attaching ..."
 fi
