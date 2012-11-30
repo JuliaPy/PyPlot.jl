@@ -4,7 +4,7 @@
 # Description: start tmux session for julia
 # Created: November 17, 2012
 
-export PYPLOT_JL_HOME =$(dirname $(grealpath $0))
+export PYPLOT_JL_HOME=$(dirname $(grealpath $0))
 
 SESSION_NAME="IJulia"
 

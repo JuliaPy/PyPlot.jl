@@ -1,11 +1,11 @@
 module pyplot
 using Base
 
-JuliaLab_HOME = getenv("JuliaLab_HOME")
+PYPLOT_JL_HOME = getenv("PYPLOT_JL_HOME")
 
 ## matploblib.pyplot wrapper
-include("$JuliaLab_HOME/plot.jl")
+include("$PYPLOT_JL_HOME/plot.jl")
 ## other auxiliary functions
-include("$JuliaLab_HOME/aux.jl")
+include("$PYPLOT_JL_HOME/aux.jl")
 
 end # end module
