@@ -4,51 +4,19 @@
 # Description: real wrapper
 # Created: November 29, 2012
 
-export  mrun,
-        mstatus,
-        figure,
-        fig,
-        subplot,
-        draw,
-        showfig,
-        plot,
-        plotfile,
-        xlim,
-        ylim,
-        title,
-        xlabel,
-        ylabel,
-        legend,
-        clearfig,
-        clearax,
-        closefig,
-        delax,
-        hold,
-        savefig,
-        grid,
-        xloc_major,
-        xloc_minor,
-        xloc,
-        yloc_major,
-        yloc_minor,
-        yloc,
-        xformatter_major,
-        xfomatter_minor,
-        xformatter,
-        yformatter_major,
-        yformatter_minor,
-        yformatter,
-        minorticks,
-        ticklabel_format,
-        tick_params,
-        xscale,
-        yscale,
-        twinx,
-        twiny,
-        axhline,
-        axvline,
-        axhspan,
-        axvspan
+export
+    # util
+    mrun, mstatus,
+    # manipulate figure/axes
+    figure, fig, subplot, draw, showfig, clearfig, clearax, closefig, delax, hold, savefig,
+    # plot data
+    plot, plotfile,
+    # minipulate details
+    xlim, ylim, title, xlabel, ylabel, legend, grid, xloc_major, xloc_minor, xloc, yloc_major, yloc_minor, yloc, xformatter_major, xfomatter_minor, xformatter, yformatter_major, yformatter_minor, yformatter, minorticks, ticklabel_format, tick_params,
+    # axes
+    xscale, yscale, twinx, twiny,
+    # other
+    axhline, axvline, axhspan, axvspan
 
 ## parse string
 function parse(str::String)
