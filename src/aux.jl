@@ -5,7 +5,7 @@
 # team yet
 # Created: November 21, 2012
 
-export J, +, integrate, bisec, mismore, mfilter
+export J, integrate, bisec, mismore, mfilter
 
 ## autojump :)
 function J(dst::String)
