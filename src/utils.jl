@@ -1,5 +1,5 @@
 #!/usr/bin/env julia
-# File: aux.jl
+# File: utils.jl
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: useful functions that hasn't been implemented by julia core
 # team yet

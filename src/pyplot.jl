@@ -22,7 +22,7 @@ else
     ## matploblib.pyplot wrapper
     include("$PYPLOT_JL_HOME/plot.jl")
     ## other useful functions
-    include("$PYPLOT_JL_HOME/aux.jl")
+    include("$PYPLOT_JL_HOME/utils.jl")
 end
 
 end # end module
