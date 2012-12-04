@@ -14,8 +14,7 @@ function J(dst::String)
 end
 J() = J("")
 
-
-# one-dimensional numerical integration: quadrature
+## one-dimensional numerical integration: quadrature
 function integrate(f::Function, x1::Real, x2::Real)
     N = 100     # sampling
     sum = 0
@@ -29,7 +28,7 @@ function integrate(f::Function, x1::Real, x2::Real)
 end
 
 
-# root: bisection method
+## root: bisection method
 function bisec(f::Function, a::Real, b::Real)
     TOL = 1.0e-9 # tolerence
     c = (a + b)/2
