@@ -18,6 +18,13 @@ export
     # other
     axhline, axvline, axhspan, axvspan
 
+import Base.+
+
+## concatenate strings
+function +(a::String, b::Any)
+    return strcat(a, string(b))
+end
+
 ## parse string
 function parse(str::String)
     if str == ""
@@ -29,7 +36,12 @@ end
 
 ## parse Symbol
 function parse(sym::Symbol)
-    return "$sym="
+    return string(sym) + "="
+end
+
+## parse everything else
+function parse(i::Any)
+    return string(i) + ", "
 end
 
 ## parse Array
@@ -40,10 +52,9 @@ function parse(arr::Array)
     else
         str = "["
         for a in arr
-            str = "$str$a, "
+            str += parse(a)
         end
-        str = "$str], "
-        return str
+        return str + "], "
     end
 end
 
@@ -55,20 +66,10 @@ function parse(tuple::Tuple)
     else
         str = "("
         for t in tuple
-            if isa(t, String)
-                str = "$str\"$t\", "
-            else
-                str = "$str$t, "
-            end
+            str += parse(t)
         end
-        str = "$str), "
-        return str
+        return str + "), "
     end
-end
-
-## parse anything else
-function parse(args)
-    return "$args, "
 end
 
 ## Toggle debug mode
@@ -83,8 +84,6 @@ end
 ## run matplotlib commands directly
 ## TODO: support block parameters
 function mrun(cmd::String)
-    # using escaped single quoted cmd to
-    # avoid confusing system call, ie, shell
     cmd = `$PYPLOT_JL_HOME/eval.py $cmd`
     if DEBUG
         println(cmd)
@@ -171,12 +170,11 @@ end
 ## plot two arrays
 function plot(x::Array, y::Array, args::Tuple)
     cmd = ""
-    cmd = "$cmd$(parse(x))"
-    cmd = "$cmd$(parse(y))"
+    cmd += parse(x)
+    cmd += parse(y)
     for i in args
-        cmd = "$cmd$(parse(i))"
+        cmd += parse(i)
     end
-
     mrun("plot($cmd)")
 end
 plot(x::Array, y::Array, args...) = plot(x, y, args)
@@ -211,7 +209,7 @@ end
 function plotfile(f::String, args...)
     cmd = parse(f)
     for i in args
-        cmd = "$cmd$(parse(i))"
+        cmd += parse(i)
     end
     mrun("plotfile($cmd)")
 end
@@ -330,7 +328,7 @@ end
 function ticklabel_format(args...)
     cmd = ""
     for i in args
-        cmd = "$cmd$(parse(i))"
+        cmd += parse(i)
     end
     mrun("ticklabel_format($cmd)")
 end
@@ -366,9 +364,9 @@ function axvspan(xmin::Real, xmax::Real, ymin::Real, ymax::Real)
 end
 
 ## test
-function mtest()
+function test()
     load("../examples/1-plot.jl")
     load("../examples/2-subplot.jl")
     #load("../examples/3-plotfile.jl")
-    load("../4-control-details.jl")
+    load("../examples/4-control-details.jl")
 end

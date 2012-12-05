@@ -5,7 +5,6 @@
 # Created: November 29, 2012
 
 module pyplot
-using Base
 
 # get src location
 PYPLOT_JL_HOME = dirname(find_in_path("pyplot.jl"))
