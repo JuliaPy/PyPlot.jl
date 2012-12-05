@@ -365,8 +365,8 @@ end
 
 ## test
 function test()
-    load("../examples/1-plot.jl")
-    load("../examples/2-subplot.jl")
-    #load("../examples/3-plotfile.jl")
-    load("../examples/4-control-details.jl")
+    load("../demo/1-plot.jl")
+    load("../demo/2-subplot.jl")
+    #load("../demo/3-plotfile.jl")
+    load("../demo/4-control-details.jl")
 end
