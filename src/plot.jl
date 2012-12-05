@@ -183,9 +183,11 @@ plot(x::Array, y::Array, args...) = plot(x, y, args)
 
 ## plot single array,  real or complex
 function plot(arr::Array, args...)
-    if typeof(arr[1]) <: Real
+    #if typeof(arr[1]) <: Real
+    if eltype(arr) <: Real
         plot([], arr, args)
-    elseif typeof(arr[1]) <: Complex
+    #elseif typeof(arr[1]) <: Complex
+    elseif eltype(arr) <: Complex
         asize = size(arr, 1)
         x = Array(Float64, asize)
         y = Array(Float64, asize)
