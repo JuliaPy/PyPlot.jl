@@ -3,7 +3,7 @@
 Graphical solution for [Julia][] based on [matploblib][], mainly the pyplot
 module.
 
-![screenshot](https://github.com/autozimu/pyplot.jl/raw/master/screenshot.png)
+![screenshot](https://github.com/autozimu/pyplot.jl/raw/screenshot/screenshot.png)
 
 ## Why
 
