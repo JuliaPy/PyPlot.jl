@@ -181,11 +181,9 @@ plot(x::Array, y::Array, args...) = plot(x, y, args)
 
 ## plot single array,  real or complex
 function plot(arr::Array, args...)
-    #if typeof(arr[1]) <: Real
-    if eltype(arr) <: Real
+    if typeof(arr[1]) <: Real
         plot([], arr, args)
-    #elseif typeof(arr[1]) <: Complex
-    elseif eltype(arr) <: Complex
+    elseif typeof(arr[1]) <: Complex
         asize = size(arr, 1)
         x = Array(Float64, asize)
         y = Array(Float64, asize)
@@ -194,6 +192,8 @@ function plot(arr::Array, args...)
             y[i] = imag(arr[i])
         end
         plot(x, y, args)
+    else
+        println("Syntax Error: Failed to detect array type!")
     end
 end
 
