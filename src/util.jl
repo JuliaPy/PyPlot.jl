@@ -5,6 +5,9 @@
 # team yet
 # Created: November 21, 2012
 
+## TODO:
+## edit(): support viewing functions, sources, variables using vim
+
 export J, integrate, bisec, mismore, mfilter
 
 ## autojump :)
