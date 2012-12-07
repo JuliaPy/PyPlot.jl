@@ -87,8 +87,9 @@ function mrun(cmd::String)
     cmd = `$PYPLOT_JL_HOME/eval.py $cmd`
     if DEBUG
         println(cmd)
+    else
+        run(cmd)
     end
-    run(cmd)
 end
 
 ## check server status
@@ -169,6 +170,12 @@ end
 
 ## plot two arrays
 function plot(x::Array, y::Array, args::Tuple)
+    # check array dimension
+    if size(x, 2) != 1
+        println("Syntax Error: arrays dimensions should be 1!")
+        return 0
+    end
+
     cmd = ""
     cmd += parse(x)
     cmd += parse(y)
@@ -191,6 +198,7 @@ function plot(arr::Array, args...)
             x[i] = real(arr[i])
             y[i] = imag(arr[i])
         end
+        println("Warning: Plot complex array!")
         plot(x, y, args)
     else
         println("Syntax Error: Failed to detect array type!")
@@ -365,8 +373,8 @@ end
 
 ## test
 function test()
-    load("../demo/1-plot.jl")
-    load("../demo/2-subplot.jl")
-    #load("../demo/3-plotfile.jl")
-    load("../demo/4-control-details.jl")
+    load("$PYPLOT_JL_HOME/../demo/1-plot.jl")
+    load("$PYPLOT_JL_HOME/../demo/2-subplot.jl")
+    #load("$PYPLOT_JL_HOME/../demo/3-plotfile.jl")
+    load("$PYPLOT_JL_HOME/../demo/4-control-details.jl")
 end
