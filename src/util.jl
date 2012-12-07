@@ -5,17 +5,8 @@
 # team yet
 # Created: November 21, 2012
 
-## TODO:
-## edit(): support viewing functions, sources, variables using vim
 
-export J, integrate, bisec, mismore, mfilter
-
-## autojump :)
-function J(dst::String)
-    cd(readchomp(`autojump $dst`))
-    cwd()
-end
-J() = J("")
+export integrate, bisec, mismore, mfilter
 
 ## one-dimensional numerical integration: quadrature
 function integrate(f::Function, x1::Real, x2::Real)
