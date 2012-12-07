@@ -361,7 +361,7 @@ end
 function axhline(y::Real, xmin::Real, xmax::Real)
     mrun("axhline(y=$y, xmin=$xmin, xmax=$xmax)")
 end
-function axvline(x::Real, ymin::Real, xmax::Real)
+function axvline(x::Real, ymin::Real, ymax::Real)
     mrun("axvline(x=$x, ymin=$ymin, ymax=$ymax")
 end
 function axhspan(xmin::Real, xmax::Real, ymin::Real, ymax::Real)
