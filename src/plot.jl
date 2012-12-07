@@ -192,8 +192,8 @@ function plot(arr::Array, args...)
         plot([], arr, args)
     elseif typeof(arr[1]) <: Complex
         asize = size(arr, 1)
-        x = Array(Float64, asize)
-        y = Array(Float64, asize)
+        x = Array(FloatingPoint, asize)
+        y = Array(FloatingPoint, asize)
         for i in 1:asize
             x[i] = real(arr[i])
             y[i] = imag(arr[i])
