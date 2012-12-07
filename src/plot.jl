@@ -358,22 +358,45 @@ function twiny()
 end
 
 ## draw horizontal/vertical line/rectangle across axes
-function axhline(y::Real, xmin::Real, xmax::Real)
-    mrun("axhline(y=$y, xmin=$xmin, xmax=$xmax)")
+function axhline(y::Real, xmin::Real, xmax::Real, args::Tuple)
+    opt = ""
+    for arg in args
+        opt += parse(arg)
+    end
+    mrun("axhline($y, xmin=$xmin, xmax=$xmax, $opt)")
 end
-axhline(y::Real) = axhline(y, 0.0, 1.0)
-function axvline(x::Real, ymin::Real, ymax::Real)
-    mrun("axvline(x=$x, ymin=$ymin, ymax=$ymax)")
+axhline(y::Real, xmin::Real, xmax::Real, args...) = axhline(y, xmin, xmax, args)
+axhline(y::Real, args...) = axhline(y, 0.0, 1.0, args)
+
+function axvline(x::Real, ymin::Real, ymax::Real, args::Tuple)
+    opt = ""
+    for arg in args
+        opt += parse(arg)
+    end
+    mrun("axvline($x, ymin=$ymin, ymax=$ymax, $opt)")
 end
-axvline(x::Real) = axvline(x, 0.0, 1.0)
-function axhspan(ymin::Real, ymax::Real, xmin::Real, xmax::Real)
-    mrun("axhspan(ymin, ymax, xmin=$xmin, xmax=$xmax)")
+axvline(x::Real, ymin::Real, ymax::Real, args...) = axvline(x, ymin, ymax, args)
+axvline(x::Real, args...) = axvline(x, 0.0, 1.0, args)
+
+function axhspan(ymin::Real, ymax::Real, xmin::Real, xmax::Real, args::Tuple)
+    opt = ""
+    for arg in args
+        opt += parse(arg)
+    end
+    mrun("axhspan($ymin, $ymax, xmin=$xmin, xmax=$xmax, $opt)")
 end
-axhspan(ymin::Real, ymax::Real) = axhspan(ymin, ymax, 0.0, 1.0)
-function axvspan(xmin::Real, xmax::Real, ymin::Real, ymax::Real)
-    mrun("axvspan(xmin, xmax, ymin=$ymin, ymax=$ymax)")
+axhspan(ymin::Real, ymax::Real, xmin::Real, xmax::Real, args...) = axhspan(ymin, ymax, xmin, xmax, args)
+axhspan(ymin::Real, ymax::Real, args...) = axhspan(ymin, ymax, 0.0, 1.0, args)
+
+function axvspan(xmin::Real, xmax::Real, ymin::Real, ymax::Real, args::Tuple)
+    opt = ""
+    for arg in args
+        opt += parse(arg)
+    end
+    mrun("axvspan($xmin, $xmax, ymin=$ymin, ymax=$ymax, $opt)")
 end
-axvspan(xmin::Real, xmax::Real) = axvspan(xmin, xmax, 0.0, 1.0)
+axvspan(xmin::Real, xmax::Real, ymin::Real, ymax::Real, args...) = axvspan(xmin, xmax, ymin, ymax, args)
+axvspan(xmin::Real, xmax::Real, args...) = axvspan(xmin, xmax, 0.0, 1.0, args)
 
 ## test
 function test()
