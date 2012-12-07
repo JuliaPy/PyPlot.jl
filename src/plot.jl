@@ -361,15 +361,19 @@ end
 function axhline(y::Real, xmin::Real, xmax::Real)
     mrun("axhline(y=$y, xmin=$xmin, xmax=$xmax)")
 end
+axhline(y::Real) = axhline(y, 0.0, 1.0)
 function axvline(x::Real, ymin::Real, ymax::Real)
-    mrun("axvline(x=$x, ymin=$ymin, ymax=$ymax")
+    mrun("axvline(x=$x, ymin=$ymin, ymax=$ymax)")
 end
-function axhspan(xmin::Real, xmax::Real, ymin::Real, ymax::Real)
-    mrun("axhspan(xmin, xmax, ymin=$ymin, ymax=$ymax)")
+axvline(x::Real) = axvline(x, 0.0, 1.0)
+function axhspan(ymin::Real, ymax::Real, xmin::Real, xmax::Real)
+    mrun("axhspan(ymin, ymax, xmin=$xmin, xmax=$xmax)")
 end
+axhspan(ymin::Real, ymax::Real) = axhspan(ymin, ymax, 0.0, 1.0)
 function axvspan(xmin::Real, xmax::Real, ymin::Real, ymax::Real)
     mrun("axvspan(xmin, xmax, ymin=$ymin, ymax=$ymax)")
 end
+axvspan(xmin::Real, xmax::Real) = axvspan(xmin, xmax, 0.0, 1.0)
 
 ## test
 function test()
