@@ -11,7 +11,5 @@ PYPLOT_JL_HOME = dirname(find_in_path("pyplot.jl"))
 
 # load matploblib.pyplot wrapper
 load("$PYPLOT_JL_HOME/plot.jl")
-# load other useful functions
-load("$PYPLOT_JL_HOME/util.jl")
 
 end # end module
