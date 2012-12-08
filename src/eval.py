@@ -19,7 +19,6 @@
 from IPython.lib.kernel import find_connection_file
 from IPython.zmq.blockingkernelmanager import BlockingKernelManager
 
-
 # evalutate code
 def run_cell(code):
     # now we can run code. This is done on the shell channel
@@ -33,12 +32,11 @@ def run_cell(code):
         for line in reply['content']['traceback']:
             print line
 
-infofile = '/tmp/pyplot-jl-ipython-daemon.pid'
-with open(infofile, 'r') as f:
+pidfile = '/tmp/pyplot-jl-ipython-daemon.pid'
+with open(pidfile, 'r') as f:
     cf = f.readline()
-    cf = f.readline()
-cf = cf.split(' ')[-1]
-cf = cf[0:-2]
+# remove trailing carriage-return
+cf = cf[:-1]
 cf = find_connection_file(cf)
 km = BlockingKernelManager()
 km.connection_file = cf
@@ -46,9 +44,5 @@ km.load_connection_file()
 km.start_channels()
 
 
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument('cmd')
-cmd = parser.parse_args().cmd
-#print cmd
-run_cell(cmd)
+from sys import argv
+run_cell(argv[1])
