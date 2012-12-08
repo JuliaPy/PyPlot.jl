@@ -16,7 +16,6 @@
 # * https://github.com/ivanov/vim-ipython
 # * https://github.com/ipython/ipython/blob/master/IPython/frontend/terminal/console/interactiveshell.py
 
-import os
 from IPython.lib.kernel import find_connection_file
 from IPython.zmq.blockingkernelmanager import BlockingKernelManager
 
@@ -34,8 +33,7 @@ def run_cell(code):
         for line in reply['content']['traceback']:
             print line
 
-
-infofile = os.path.dirname(__file__) + "/kernel.info"
+infofile = '/tmp/pyplot-jl-ipython-daemon.pid'
 with open(infofile, 'r') as f:
     cf = f.readline()
     cf = f.readline()

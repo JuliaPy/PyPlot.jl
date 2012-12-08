@@ -11,7 +11,6 @@ tmux has-session -t $SESSION_NAME 2>/dev/null
 if [ "$?" -eq 1 ]; then
     echo "No session found. Creating new one ..."
     tmux new-session -d -s $SESSION_NAME
-    tmux send-keys "ipython kernel --pylab <&- &>$PYPLOT_JL_HOME/kernel.info &" C-m
     tmux split-window -v
     tmux send-keys "julia" C-m
 else
