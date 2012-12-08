@@ -16,8 +16,10 @@ function start_deamon()
         Nothing
         #println(ex)
     end
+
     # start listening server
     try
+        run(`sleep 5`)  # wait for kernel startup
         run(`daemonize -p $pidfile_eval -l $pidfile_eval $PYPLOT_JL_HOME/eval.py`)
     catch ex
         Nothing
