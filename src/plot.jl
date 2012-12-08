@@ -19,7 +19,6 @@ export
     axhline, axvline, axhspan, axvspan
 
 import Base.+
-
 ## concatenate strings
 function +(a::String, b::Any)
     return strcat(a, string(b))
@@ -397,11 +396,3 @@ function axvspan(xmin::Real, xmax::Real, ymin::Real, ymax::Real, args::Tuple)
 end
 axvspan(xmin::Real, xmax::Real, ymin::Real, ymax::Real, args...) = axvspan(xmin, xmax, ymin, ymax, args)
 axvspan(xmin::Real, xmax::Real, args...) = axvspan(xmin, xmax, 0.0, 1.0, args)
-
-## test
-function test()
-    load("$PYPLOT_JL_HOME/../demo/1-plot.jl")
-    load("$PYPLOT_JL_HOME/../demo/2-subplot.jl")
-    #load("$PYPLOT_JL_HOME/../demo/3-plotfile.jl")
-    load("$PYPLOT_JL_HOME/../demo/4-control-details.jl")
-end

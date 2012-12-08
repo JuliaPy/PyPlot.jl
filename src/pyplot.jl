@@ -12,12 +12,9 @@ PYPLOT_JL_HOME = dirname(find_in_path("pyplot.jl"))
 # load matploblib.pyplot wrapper
 load("$PYPLOT_JL_HOME/plot.jl")
 
-# start ipython daemon
-try
-    run(`daemonize -p /tmp/pyplot-jl-ipython-daemon.pid -l /tmp/pyplot-jl-ipython-daemon.pid /usr/local/bin/ipython kernel --pylab`)
-# catch multiple instances exception
-catch ex
-    #println(ex)
-end
+# load aux.jl
+load("$PYPLOT_JL_HOME/aux.jl")
+
+start_ipython_kernel()
 
 end # end module
