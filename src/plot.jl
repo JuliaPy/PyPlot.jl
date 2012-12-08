@@ -83,9 +83,22 @@ end
 ## send matplotlib code
 require("ZMQ")
 using ZMQ
-ctx = ZMQContext(1)
-socket = ZMQSocket(ctx, ZMQ_REQ)
-ZMQ.connect(socket, "tcp://localhost:1989")
+
+global ctx, socket
+function start_socket()
+    global ctx = ZMQContext(1)
+    global socket = ZMQSocket(ctx, ZMQ_REQ)
+    ZMQ.connect(socket, "tcp://localhost:1989")
+end
+function stop_socket()
+    ZMQ.close(socket)
+    ZMQ.close(ctx)
+end
+function restart_socket()
+    stop_socket()
+    start_socket()
+end
+
 function mrun(cmd::String)
     ZMQ.send(socket, ZMQMessage(cmd))
     msg = ZMQ.recv(socket)
@@ -95,6 +108,7 @@ function mrun(cmd::String)
         println(takebuf_string(out))
     end
 end
+
 
 ## check server status
 function mstatus()

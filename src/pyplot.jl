@@ -15,6 +15,9 @@ load("$PYPLOT_JL_HOME/plot.jl")
 # load aux.jl
 load("$PYPLOT_JL_HOME/aux.jl")
 
-start_deamon()
+# start ipython and eval daemon
+start_daemon()
+# satart socket client
+start_socket()
 
 end # end module
