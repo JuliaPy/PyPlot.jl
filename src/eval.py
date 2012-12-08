@@ -4,7 +4,6 @@
 # Description: evalulate plot commands
 # Created: November 20, 2012
 
-from sys import argv
 from IPython.lib.kernel import find_connection_file
 from IPython.zmq.blockingkernelmanager import BlockingKernelManager
 
@@ -20,14 +19,31 @@ km.connection_file = cf
 km.load_connection_file()
 km.start_channels()
 
-# parse commands
-code = argv[1]
+def run_code(code):
+    # execution is immediate and async, returning a UUID
+    msg_id = km.shell_channel.execute(code)
+    # get_meg can block for a reply
+    reply = km.shell_channel.get_msg()
 
-# execution is immediate and async, returning a UUID
-msg_id = km.shell_channel.execute(code)
-# get_meg can block for a reply
-reply = km.shell_channel.get_msg()
+    if reply['content']['status'] == 'error':
+        for line in reply['content']['traceback']:
+            print line
 
-if reply['content']['status'] == 'error':
-    for line in reply['content']['traceback']:
-        print line
+# receive code
+import zmq
+import time
+
+context = zmq.Context()
+socket = context.socket(zmq.REP)
+socket.bind("tcp://*:1989")
+
+while True:
+    #  Wait for next request from client
+    msg = socket.recv()
+
+    #  Do some 'work'
+    time.sleep (1)        #   Do some 'work'
+
+    #  Send reply back to client
+    socket.send("Received!")
+    run_code(msg)

@@ -80,14 +80,19 @@ function debug()
     global DEBUG = !DEBUG
 end
 
-## run matplotlib commands directly
-## TODO: support block parameters
+## send matplotlib code
+require("ZMQ")
+using ZMQ
+ctx = ZMQContext(1)
+socket = ZMQSocket(ctx, ZMQ_REQ)
+ZMQ.connect(socket, "tcp://localhost:1989")
 function mrun(cmd::String)
-    cmd = `$PYPLOT_JL_HOME/eval.py $cmd`
+    ZMQ.send(socket, ZMQMessage(cmd))
+    msg = ZMQ.recv(socket)
     if DEBUG
-        println(cmd)
-    else
-        run(cmd)
+        println("Running code:", cmd)
+        out = convert(IOStream, msg)
+        println(takebuf_string(out))
     end
 end
 

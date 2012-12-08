@@ -6,32 +6,54 @@
 
 
 # ipython daemon
-pidfile = "/tmp/pyplot-jl-ipython-daemon.pid"
-function start_ipython_kernel()
+pidfile_ipython = "/tmp/pyplot-jl-ipython-daemon.pid"
+pidfile_eval = "/tmp/pyplot-jl-eval-daemon.pid"
+function start_deamon()
+    # start ipython kernel
     try
-        run(`daemonize -p $pidfile -l $pidfile /usr/local/bin/ipython kernel --pylab`)
+        run(`daemonize -p $pidfile_ipython -l $pidfile_ipython /usr/local/bin/ipython kernel --pylab`)
     catch ex
+        Nothing
         #println(ex)
+    end
+    # start listening server
+    try
+        run(`daemonize -p $pidfile_eval -l $pidfile_eval $PYPLOT_JL_HOME/eval.py`)
+    catch ex
+        Nothing
     end
 end
 
-function stop_ipython_kernel()
+function stop_deamon()
+    # stop ipython kernel
     try
         pid = 0
-        open(pidfile, "r") do file
+        open(pidfile_ipython, "r") do file
             pid = readline(file)
         end
         # remove trailing carriage-return
         pid = pid[1:end-1]
         run(`kill $pid`)
     catch ex
+        Nothing
         #println(ex)
+    end
+    # stop listening server
+    try
+        pid = 0
+        open(pidfile_eval, "r") do file
+            pid = readline(file)
+        end
+        pid = pid[1:end-1]
+        run(`kill $pid`)
+    catch
+        Nothing
     end
 end
 
-function restart_ipython_kernel()
-    stop_ipython_kernel()
-    start_ipython_kernel()
+function restart_deamon()
+    stop_daemon()
+    start_deamon()
 end
 
 ## test
