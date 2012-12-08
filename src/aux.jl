@@ -8,7 +8,7 @@
 # ipython daemon
 pidfile_ipython = "/tmp/pyplot-jl-ipython-daemon.pid"
 pidfile_eval = "/tmp/pyplot-jl-eval-daemon.pid"
-function start_deamon()
+function start_daemon()
     # start ipython kernel
     try
         run(`daemonize -p $pidfile_ipython -l $pidfile_ipython /usr/local/bin/ipython kernel --pylab`)
@@ -26,7 +26,7 @@ function start_deamon()
     end
 end
 
-function stop_deamon()
+function stop_daemon()
     # stop ipython kernel
     try
         pid = 0
@@ -53,9 +53,9 @@ function stop_deamon()
     end
 end
 
-function restart_deamon()
+function restart_daemon()
     stop_daemon()
-    start_deamon()
+    start_daemon()
 end
 
 ## test
