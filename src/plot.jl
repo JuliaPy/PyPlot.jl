@@ -49,9 +49,14 @@ function parse(arr::Array)
     if arr == []
         return ""
     else
+        # generate warning when plot complex arrays
+        if eltype(arr) <: Complex
+            println("ComplexWarning: Casting complex values to real discards the imaginary part!")
+        end
+
         str = "["
         for a in arr
-            str += parse(a)
+            str += parse(real(a))
         end
         return str + "], "
     end
