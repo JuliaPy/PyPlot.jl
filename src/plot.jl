@@ -186,41 +186,13 @@ function savefig(file::String)
     mrun("savefig(\"$file\")")
 end
 
-## plot two arrays
-function plot(x::Array, y::Array, args::Tuple)
-    # check array dimension
-    if size(x, 2) != 1
-        println("Syntax Error: arrays dimensions should be 1!")
-        return 0
-    end
-
-    cmd = ""
-    cmd += parse(x)
-    cmd += parse(y)
-    for i in args
-        cmd += parse(i)
+## plot arrays
+function plot(A::Array, args...)
+    cmd = parse(A)
+    for arg in args
+        cmd += parse(arg)
     end
     mrun("plot($cmd)")
-end
-plot(x::Array, y::Array, args...) = plot(x, y, args)
-
-## plot single array,  real or complex
-function plot(arr::Array, args...)
-    if typeof(arr[1]) <: Real
-        plot([], arr, args)
-    elseif typeof(arr[1]) <: Complex
-        asize = size(arr, 1)
-        x = Array(FloatingPoint, asize)
-        y = Array(FloatingPoint, asize)
-        for i in 1:asize
-            x[i] = real(arr[i])
-            y[i] = imag(arr[i])
-        end
-        println("Warning: Plot complex array!")
-        plot(x, y, args)
-    else
-        println("Syntax Error: Failed to detect array type!")
-    end
 end
 
 ## plot a function
@@ -232,10 +204,10 @@ function plot(f::Function, xmin::Real, xmax::Real, args...)
 end
 
 ## plotfile
-function plotfile(f::String, args...)
-    cmd = parse(f)
-    for i in args
-        cmd += parse(i)
+function plotfile(args...)
+    cmd = ""
+    for arg in args
+        cmd += parse(arg)
     end
     mrun("plotfile($cmd)")
 end
