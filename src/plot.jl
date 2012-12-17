@@ -187,8 +187,12 @@ function draw()
 end
 
 ## save figure
-function savefig(file::String)
-    mrun("savefig(\"$(cwd())/$file\")")
+function savefig(file::String, args...)
+    args_str = ""
+    for arg in args
+        args_str += parse(arg)
+    end
+    mrun("savefig(\"$(cwd())/$file\", $args_str)")
 end
 
 ## plot arrays
