@@ -38,6 +38,11 @@ function parse(sym::Symbol)
     return string(sym) + "="
 end
 
+## parse bool
+function parse(b::Bool)
+    return b ? "True" : "False"
+end
+
 ## parse everything else
 function parse(i::Any)
     return string(i) + ", "
