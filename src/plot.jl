@@ -55,6 +55,7 @@ function parse(arr::Array)
         return ""
     else
         # generate warning when plot complex arrays
+
         if eltype(arr) <: Complex
             println("ComplexWarning: Casting complex values to real discards the imaginary part!")
         end
@@ -214,7 +215,7 @@ function plot(f::Function, xmin::Real, xmax::Real, args...)
     _PLOTPOINTS_ = 100
     x = linspace(float(xmin), float(xmax), _PLOTPOINTS_ + 1)
     y = [f(i) for i in x]
-    plot(x, y, args)
+    plot(x, y, args...)
 end
 
 ## plotfile
