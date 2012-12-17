@@ -11,6 +11,7 @@
     * requirements
         * [julia](http://julialang.org/)
         * [ipython](http://ipython.org/), [matploblib](http://matplotlib.org/)
+        * zmq + pyzmq
         * [daemonize](http://software.clapper.org/daemonize/)
         * patience
     * setups

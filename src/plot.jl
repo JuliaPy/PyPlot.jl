@@ -188,7 +188,7 @@ end
 
 ## save figure
 function savefig(file::String)
-    mrun("savefig(\"$file\")")
+    mrun("savefig(\"$(cwd())/$file\")")
 end
 
 ## plot arrays
