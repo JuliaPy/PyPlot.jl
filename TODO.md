@@ -7,6 +7,7 @@
   [2](https://github.com/JuliaLang/METADATA.jl/tree/master/ZMQ "julia
   binding for ZMQ")
   [3](https://github.com/ipython/ipython/tree/master/IPython/zmq)
+* Reveal traceback error message in python
 * Document on requirements, setups, usages and demos.
     * requirements
         * [julia](http://julialang.org/) + zmq
