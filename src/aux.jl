@@ -9,7 +9,7 @@ function start_daemon()
     if fork() == 0
         run(`daemon --name=ipython $PYPLOT_JL_HOME/ipython.py`)
         sleep(5)
-        exec(`daemon --name=pyplot $PYPLOT_JL_HOME/eval.py`)
+        exec(`daemon --name=pyplot $PYPLOT_JL_HOME/pyplot.py`)
     end
 end
 

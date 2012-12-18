@@ -9,14 +9,13 @@ module pyplot
 # get src location
 PYPLOT_JL_HOME = dirname(find_in_path("pyplot.jl"))
 
+# comminication between wrapper and pyplot backend
+load("$PYPLOT_JL_HOME/aux.jl")
 # matploblib.pyplot wrapper
 load("$PYPLOT_JL_HOME/plot.jl")
 
-# comminication between wrapper and pyplot backend
-load("$PYPLOT_JL_HOME/aux.jl")
-
-# start ipython and eval daemon
-start_pyplot()
+# start ipython and pyplot daemon
+start_daemon()
 # satart socket client
 start_socket()
 

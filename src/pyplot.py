@@ -44,7 +44,7 @@ socket.bind("tcp://*:1989")
 while True:
     #  Wait for next request from client
     msg = socket.recv()
+
     #  Send reply back to client
     socket.send("Received!")
-
     run_code(msg)
