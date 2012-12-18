@@ -4,6 +4,8 @@
 # Description:
 # Created: December 08, 2012
 
+export mrun
+
 # daemon
 function start_daemon()
     if fork() == 0

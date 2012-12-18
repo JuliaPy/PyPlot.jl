@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# File: eval.py
+# File: pyplot.py
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: evalulate plot commands
 # Created: November 20, 2012
@@ -16,6 +16,7 @@ with open(pidfile, 'r') as f:
 # remove trailing carriage-return
 cf = cf[:-1]
 try:
+    # get real pid of ipython kernel
     cf = str(int(cf) + 1)
     cf = find_connection_file(cf)
 except IOError:

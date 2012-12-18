@@ -1,12 +1,12 @@
 #!/usr/bin/env julia
-# File: plot.jl
+# File: wrapper.jl
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: real wrapper
 # Created: November 29, 2012
 
 export
     # util
-    mrun, mstatus,
+    mstatus,
     # manipulate figure/axes
     figure, fig, subplot, draw, showfig, clearfig, clearax, closefig, delax, hold, savefig,
     # plot data
@@ -366,11 +366,11 @@ axvspan(xmin::Real, xmax::Real, args...) = axvspan(xmin, xmax, 0.0, 1.0, args)
 
 
 ## Toggle debug mode
-function debug(state::Bool)
-    mrun("DEBUG = $(parse(DEBUG))")
+function debug(b::Bool)
+    global DEBUG = b
 end
 function debug()
-    mrun("DEBUG = !DEBUG")
+    global DEBUG = !DEBUG
 end
 
 ## test
