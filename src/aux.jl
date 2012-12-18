@@ -4,64 +4,47 @@
 # Description:
 # Created: December 08, 2012
 
-
-# ipython daemon
-pidfile_ipython = "/tmp/pyplot-jl-ipython-daemon.pid"
-pidfile_eval = "/tmp/pyplot-jl-eval-daemon.pid"
-function start_daemon()
-    # start ipython kernel
-    try
-        run(`daemonize -p $pidfile_ipython -l $pidfile_ipython /usr/local/bin/ipython kernel --pylab`)
-    catch ex
-        Nothing
-        #println(ex)
-    end
-
-    # start listening server
-    try
-        run(`sleep 5`)  # wait for kernel startup
-        run(`daemonize -p $pidfile_eval -l $pidfile_eval $PYPLOT_JL_HOME/eval.py`)
-    catch ex
-        Nothing
+## start pyplot backend
+function start_pyplot()
+    # start ipython kernel and ZMQ server
+    if fork() == 0
+        exec(`daemon --name=pyplot_exec $PYPLOT_JL_HOME/exec.py`)
     end
 end
 
-function stop_daemon()
-    # stop ipython kernel
-    try
-        pid = 0
-        open(pidfile_ipython, "r") do file
-            pid = readline(file)
-        end
-        # remove trailing carriage-return
-        pid = pid[1:end-1]
-        run(`kill $pid`)
-    catch ex
-        Nothing
-        #println(ex)
-    end
-    # stop listening server
-    try
-        pid = 0
-        open(pidfile_eval, "r") do file
-            pid = readline(file)
-        end
-        pid = pid[1:end-1]
-        run(`kill $pid`)
-    catch
-        Nothing
-    end
+function stop_pyplot()
+    run(`daemon --name-pyplot_exec --stop`)
 end
 
-function restart_daemon()
-    stop_daemon()
-    start_daemon()
+function restart_pyplot()
+    run(`daemon --name-pyplot_exec --restart`)
 end
 
-## test
-function test()
-    load("$PYPLOT_JL_HOME/../demo/1-plot.jl")
-    load("$PYPLOT_JL_HOME/../demo/2-subplot.jl")
-    #load("$PYPLOT_JL_HOME/../demo/3-plotfile.jl")
-    load("$PYPLOT_JL_HOME/../demo/4-control-details.jl")
+## send matplotlib code
+require("ZMQ")
+using ZMQ
+
+global ctx, socket
+
+function start_socket()
+    global ctx = ZMQContext(1)
+    global socket = ZMQSocket(ctx, ZMQ_REQ)
+    ZMQ.connect(socket, "tcp://localhost:1989")
+end
+
+function stop_socket()
+    ZMQ.close(socket)
+    ZMQ.close(ctx)
+end
+
+function restart_socket()
+    stop_socket()
+    start_socket()
+end
+
+## send commands
+function mrun(cmd::String)
+    ZMQ.send(socket, ZMQMessage(cmd))
+    msg = ZMQ.recv(socket)
+    Nothing
 end
