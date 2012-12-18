@@ -55,6 +55,7 @@ function parse(arr::Array)
         return ""
     else
         # generate warning when plot complex arrays
+
         if eltype(arr) <: Complex
             println("ComplexWarning: Casting complex values to real discards the imaginary part!")
         end
@@ -80,45 +81,6 @@ function parse(tuple::Tuple)
         return str + "), "
     end
 end
-
-## Toggle debug mode
-global DEBUG = false
-function debug(state::Bool)
-    global DEBUG = state
-end
-function debug()
-    global DEBUG = !DEBUG
-end
-
-## send matplotlib code
-require("ZMQ")
-using ZMQ
-
-global ctx, socket
-function start_socket()
-    global ctx = ZMQContext(1)
-    global socket = ZMQSocket(ctx, ZMQ_REQ)
-    ZMQ.connect(socket, "tcp://localhost:1989")
-end
-function stop_socket()
-    ZMQ.close(socket)
-    ZMQ.close(ctx)
-end
-function restart_socket()
-    stop_socket()
-    start_socket()
-end
-
-function mrun(cmd::String)
-    ZMQ.send(socket, ZMQMessage(cmd))
-    msg = ZMQ.recv(socket)
-    if DEBUG
-        println("Running code:", cmd)
-        out = convert(IOStream, msg)
-        println(takebuf_string(out))
-    end
-end
-
 
 ## check server status
 function mstatus()
@@ -214,7 +176,7 @@ function plot(f::Function, xmin::Real, xmax::Real, args...)
     _PLOTPOINTS_ = 100
     x = linspace(float(xmin), float(xmax), _PLOTPOINTS_ + 1)
     y = [f(i) for i in x]
-    plot(x, y, args)
+    plot(x, y, args...)
 end
 
 ## plotfile
@@ -401,3 +363,20 @@ function axvspan(xmin::Real, xmax::Real, ymin::Real, ymax::Real, args::Tuple)
 end
 axvspan(xmin::Real, xmax::Real, ymin::Real, ymax::Real, args...) = axvspan(xmin, xmax, ymin, ymax, args)
 axvspan(xmin::Real, xmax::Real, args...) = axvspan(xmin, xmax, 0.0, 1.0, args)
+
+
+## Toggle debug mode
+function debug(state::Bool)
+    mrun("DEBUG = $(parse(DEBUG))")
+end
+function debug()
+    mrun("DEBUG = !DEBUG")
+end
+
+## test
+function test()
+    load("$PYPLOT_JL_HOME/../demo/1-plot.jl")
+    load("$PYPLOT_JL_HOME/../demo/2-subplot.jl")
+    #load("$PYPLOT_JL_HOME/../demo/3-plotfile.jl")
+    load("$PYPLOT_JL_HOME/../demo/4-control-details.jl")
+end
