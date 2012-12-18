@@ -24,7 +24,7 @@ function +(a::String, b::Any)
     return strcat(a, string(b))
 end
 
-## parse string
+## parse String
 function parse(str::String)
     if str == ""
         return ""
@@ -33,12 +33,21 @@ function parse(str::String)
     end
 end
 
+## parse Char
+function parse(ch::Char)
+    if ch == ' '
+        return ""
+    else
+        return "\"$ch\", "
+    end
+end
+
 ## parse Symbol
 function parse(sym::Symbol)
     return string(sym) + "="
 end
 
-## parse bool
+## parse Bool
 function parse(b::Bool)
     return b ? "True" : "False"
 end
