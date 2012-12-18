@@ -10,12 +10,17 @@ from IPython.zmq.blockingkernelmanager import BlockingKernelManager
 
 
 # startup channel
-pidfile = '/tmp/pyplot-jl-ipython-daemon.pid'
+pidfile = '/tmp/ipython.pid'
 with open(pidfile, 'r') as f:
     cf = f.readline()
 # remove trailing carriage-return
 cf = cf[:-1]
-cf = find_connection_file(cf)
+try:
+    cf = str(int(cf) + 1)
+    cf = find_connection_file(cf)
+except IOError:
+    cf = str(int(cf) + 1)
+    cf = find_connection_file(cf)
 km = BlockingKernelManager()
 km.connection_file = cf
 km.load_connection_file()

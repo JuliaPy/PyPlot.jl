@@ -6,56 +6,22 @@
 
 
 # ipython daemon
-pidfile_ipython = "/tmp/pyplot-jl-ipython-daemon.pid"
-pidfile_eval = "/tmp/pyplot-jl-eval-daemon.pid"
 function start_daemon()
-    # start ipython kernel
-    try
+    if fork() == 0
         run(`daemon --name=ipython $PYPLOT_JL_HOME/ipython.py`)
-    catch ex
-        Nothing
-        #println(ex)
-    end
-
-    # start listening server
-    try
-        run(`sleep 5`)  # wait for kernel startup
-        run(`daemonize -p $pidfile_eval -l $pidfile_eval $PYPLOT_JL_HOME/eval.py`)
-    catch ex
-        Nothing
+        sleep(5)
+        exec(`daemon --name=pyplot $PYPLOT_JL_HOME/eval.py`)
     end
 end
 
 function stop_daemon()
-    # stop ipython kernel
-    try
-        pid = 0
-        open(pidfile_ipython, "r") do file
-            pid = readline(file)
-        end
-        # remove trailing carriage-return
-        pid = pid[1:end-1]
-        run(`kill $pid`)
-    catch ex
-        Nothing
-        #println(ex)
-    end
-    # stop listening server
-    try
-        pid = 0
-        open(pidfile_eval, "r") do file
-            pid = readline(file)
-        end
-        pid = pid[1:end-1]
-        run(`kill $pid`)
-    catch
-        Nothing
-    end
+    run(`daemon --name=ipython --stop`)
+    run(`daemon --name=pyplot --stop`)
 end
 
 function restart_daemon()
-    stop_daemon()
-    start_daemon()
+    run(`daemon --name=ipython --restart`)
+    run(`daemon --name=pyplot --restart`)
 end
 
 ## test
