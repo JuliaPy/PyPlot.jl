@@ -9,10 +9,9 @@
   [3](https://github.com/ipython/ipython/tree/master/IPython/zmq)
 * Document on requirements, setups, usages and demos.
     * requirements
-        * [julia](http://julialang.org/)
-        * [ipython](http://ipython.org/), [matploblib](http://matplotlib.org/)
-        * zmq + pyzmq
-        * [daemonize](http://software.clapper.org/daemonize/)
+        * [julia](http://julialang.org/) + zmq
+        * [ipython](http://ipython.org/), [matploblib](http://matplotlib.org/) + zmq + pyzmq
+        * [daemon](http://libslack.org/daemon/)
         * patience
     * setups
     * usage
