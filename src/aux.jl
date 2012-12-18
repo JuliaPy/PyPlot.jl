@@ -11,7 +11,7 @@ pidfile_eval = "/tmp/pyplot-jl-eval-daemon.pid"
 function start_daemon()
     # start ipython kernel
     try
-        run(`daemonize -p $pidfile_ipython -l $pidfile_ipython /usr/local/bin/ipython kernel --pylab`)
+        run(`daemon --name=ipython $PYPLOT_JL_HOME/ipython.py`)
     catch ex
         Nothing
         #println(ex)

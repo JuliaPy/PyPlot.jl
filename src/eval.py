@@ -4,8 +4,10 @@
 # Description: evalulate plot commands
 # Created: November 20, 2012
 
+import zmq
 from IPython.lib.kernel import find_connection_file
 from IPython.zmq.blockingkernelmanager import BlockingKernelManager
+
 
 # startup channel
 pidfile = '/tmp/pyplot-jl-ipython-daemon.pid'
@@ -29,10 +31,7 @@ def run_code(code):
         for line in reply['content']['traceback']:
             print line
 
-# receive code
-import zmq
-import time
-
+# ZMQ server
 context = zmq.Context()
 socket = context.socket(zmq.REP)
 socket.bind("tcp://*:1989")
@@ -40,9 +39,6 @@ socket.bind("tcp://*:1989")
 while True:
     #  Wait for next request from client
     msg = socket.recv()
-
-    #  Do some 'work'
-    time.sleep (1)        #   Do some 'work'
 
     #  Send reply back to client
     socket.send("Received!")
