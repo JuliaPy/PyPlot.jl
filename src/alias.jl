@@ -24,7 +24,7 @@ function savefig(file::String, args...)
         args_str += parse(arg)
     end
 
-    send("savefig($args_str)")
+    send("savefig($args_str transparent=True)")
 end
 export savefig
 
