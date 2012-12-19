@@ -1,12 +1,10 @@
 #!/usr/bin/env julia
-# File: aux.jl
+# File: send.jl
 # Author: Junfeng Li <li424@mcmaster.ca>
-# Description:
-# Created: December 08, 2012
+# Description: send python code to ipython
+# Created: December 19, 2012
 
-export mrun
-
-# daemon
+# daemon: ipyton, zmq server
 function start_daemon()
     if fork() == 0
         run(`daemon --name=ipython $PYPLOT_JL_HOME/ipython.py`)
@@ -25,7 +23,7 @@ function restart_daemon()
     start_daemon()
 end
 
-## send matplotlib code
+## zmq client
 require("ZMQ")
 using ZMQ
 
@@ -47,8 +45,18 @@ function restart_socket()
     start_socket()
 end
 
-## send commands
-function mrun(cmd::String)
+## Toggle debug
+global DEBUG = false
+function debug(b::Bool)
+    global DEBUG = b
+end
+function debug()
+    global DEBUG = !DEBUG
+end
+
+
+## send commands to zmq server
+function send(cmd::String)
     ZMQ.send(socket, ZMQMessage(cmd))
     msg = ZMQ.recv(socket)
     if DEBUG

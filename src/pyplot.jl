@@ -6,19 +6,18 @@
 
 module pyplot
 
-DEBUG = false
-
 # get src location
 PYPLOT_JL_HOME = dirname(find_in_path("pyplot.jl"))
 
-# comminication between wrapper and pyplot backend
-load("$PYPLOT_JL_HOME/aux.jl")
-# matploblib.pyplot wrapper
-load("$PYPLOT_JL_HOME/wrapper.jl")
+load("$PYPLOT_JL_HOME/send.jl")
+load("$PYPLOT_JL_HOME/parse.jl")
+load("$PYPLOT_JL_HOME/funcs.jl")
+load("$PYPLOT_JL_HOME/wrap.jl")
+load("$PYPLOT_JL_HOME/export.jl")
+load("$PYPLOT_JL_HOME/alias.jl")
 
-# start ipython and pyplot daemon
+# start ipython and zmq server
 start_daemon()
-# satart socket client
+# start zmq client
 start_socket()
-
 end # end module
