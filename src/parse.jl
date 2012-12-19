@@ -34,6 +34,11 @@ function parse(str::String)
     end
 end
 
+## parse everything else
+function parse(i::Any)
+    return string(i) + ", "
+end
+
 ## parse Array
 function parse(arr::Array)
     if arr == []
@@ -47,7 +52,7 @@ function parse(arr::Array)
 
         str = "["
         for a in arr
-            str += parse(real(a))
+            str += parse(a)
         end
         return str + "], "
     end
@@ -65,9 +70,4 @@ function parse(tuple::Tuple)
         end
         return str + "), "
     end
-end
-
-## parse everything else
-function parse(i::Any)
-    return string(i) + ", "
 end
