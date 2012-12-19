@@ -21,8 +21,8 @@ function stop_daemon()
 end
 
 function restart_daemon()
-    run(`daemon --name=ipython --restart`)
-    run(`daemon --name=pyplot --restart`)
+    stop_daemon()
+    start_daemon()
 end
 
 ## send matplotlib code
