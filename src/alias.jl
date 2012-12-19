@@ -37,3 +37,57 @@ function showfig(args...)
     send("show($args_str)")
 end
 export showfig
+
+## set locators
+function xloc_major(loc::Real)
+    send("gca().xaxis.set_major_locator(MultipleLocator($loc))")
+    send("draw()")
+end
+
+function xloc_minor(loc::Real)
+    send("gca().xaxis.set_minor_locator(MultipleLocator($loc))")
+    send("draw()")
+end
+
+xloc(loc::Real) = xloc_major(loc)
+
+function yloc_major(loc::Real)
+    send("gca().yaxis.set_major_locator(MultipleLocator($loc))")
+    send("draw()")
+end
+
+function yloc_minor(loc::Real)
+    send("gca().yaxis.set_minor_locator(MultipleLocator($loc))")
+    send("draw()")
+end
+
+yloc(loc::Real) = yloc_major(loc)
+
+export xloc_major, xloc_minor, xloc, yloc_major, yloc_minor, yloc
+
+## set formatter
+function xformatter_major(formatter::String)
+    send("gca().xaxis.set_major_formatter(FormatStrFormatter(\"$formatter\"))")
+    send("draw()")
+end
+
+function xformatter_minor(formatter::String)
+    send("gca().xaxis.set_minor_formatter(FormatStrFormatter(\"$formatter\"))")
+    send("draw()")
+end
+
+xformatter(formatter::String) = xformatter_major(formatter)
+
+function yformatter_major(formatter::String)
+    send("gca().yaxis.set_major_formatter(FormatStrFormatter(\"$formatter\"))")
+    send("draw()")
+end
+
+function yformatter_minor(formatter::String)
+    send("gca().yaxis.set_minor_formatter(FormatStrFormatter(\"$formatter\"))")
+    send("draw()")
+end
+
+yformatter(formatter::String) = yformatter_major(formatter)
+
+export xformatter_major, xformatter_minor, xformatter, yformatter_major, yformatter_minor, yformatter

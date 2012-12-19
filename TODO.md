@@ -13,5 +13,7 @@
         * [daemon](http://libslack.org/daemon/)
         * patience
     * setups
-    * usage
+    * Syntax difference with pyplot
+        * kwargs
+        * `\\n`
     * demos

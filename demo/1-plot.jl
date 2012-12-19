@@ -17,6 +17,5 @@ title(E"$sin(x)$")
 xlabel(E"$x$")
 ylabel(E"$y$")
 legend()            # show legend
-grid(true)              # show grid
 
 #savefig("1-plot.pdf")

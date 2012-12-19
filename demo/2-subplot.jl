@@ -15,22 +15,18 @@ figure()
 
 subplot(221)
 title("Plot without lines")
-grid(true)
-plot(x, y, :linestyle, "None", :marker, "o")    # don't draw lines
+plot(x, y, 'o')    # don't draw lines
 
 subplot(222)
 title("Plot one array")
-grid(true)
 plot(y)             # plot one array
 
 subplot(223)
 title("Plot complex array")
-grid(true)
 plot(cx)            # plot complex array
 
 subplot(224)
 title("Plot function")
-grid(true)
 plot(cos, -pi, pi)  # plot a function
 
 #savefig("2-subplot.pdf")
