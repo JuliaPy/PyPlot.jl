@@ -1,5 +1,6 @@
 ## TODO
 
+* Using macro or expr to wrap all the pyplot functions. Customized function will be added in separate file.
 * Functions: annotate/figtext, hist, pie (I don't use thos
   functionality, will be implemented upon requested)
 * Send code directly to ipython kernel using ZMQ from Julia.
