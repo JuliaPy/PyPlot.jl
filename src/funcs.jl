@@ -117,7 +117,6 @@ funcs = (
 :rcdefaults,
 :register_cmap,
 :rgrids,
-:savefig,
 :sca,
 :scatter,
 :sci,

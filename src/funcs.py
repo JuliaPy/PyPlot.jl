@@ -7,7 +7,7 @@
 import matplotlib.pyplot as plt
 import inspect
 
-blacklists = ['show', ]
+blacklists = ['show', 'savefig']
 
 funcs = inspect.getmembers(plt, inspect.isfunction)
 

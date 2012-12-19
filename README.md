@@ -1,3 +1,16 @@
+## Example
+
+    require("pyplot")
+    using pyplot
+
+    x = linspace(-pi, pi)
+    y = sin(x)
+
+    plot(x, y)
+    title(E"$sin(x)$")
+    savefig("sin.png")
+    # savefig("sin.pdf")
+
 ## What
 
 Graphical solution for [Julia][] based on [matploblib][], mainly the pyplot
