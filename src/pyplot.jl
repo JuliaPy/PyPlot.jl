@@ -13,8 +13,8 @@ load("$PYPLOT_JL_HOME/send.jl")
 load("$PYPLOT_JL_HOME/parse.jl")
 load("$PYPLOT_JL_HOME/funcs.jl")
 load("$PYPLOT_JL_HOME/wrap.jl")
-load("$PYPLOT_JL_HOME/export.jl")
 load("$PYPLOT_JL_HOME/alias.jl")
+load("$PYPLOT_JL_HOME/export.jl")
 
 # start ipython and zmq server
 start_daemon()

@@ -11,4 +11,6 @@ function plot(f::Function, xmin::Real, xmax::Real, args...)
     y = [f(i) for i in x]
     plot(x, y, args...)
 end
-export plot
+
+## legend: take string argument as location, not label
+legend(loc::String, args...) = legend(:loc, loc, args...)
