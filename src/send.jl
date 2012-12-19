@@ -63,3 +63,6 @@ function send(cmd::String)
         println(cmd)
     end
 end
+
+psend = send
+export psend
