@@ -5,6 +5,7 @@
 # Created: December 19, 2012
 
 ## concatenate strings
+import Base.+
 function +(a::String, b::Any)
     return strcat(a, string(b))
 end
