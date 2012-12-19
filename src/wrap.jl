@@ -18,4 +18,5 @@ for func in funcs
             send("$cmd($args_str)")
         end
     end
+    eval(expr(:export, func))
 end
