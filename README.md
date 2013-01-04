@@ -70,7 +70,9 @@ support [kwargs][]:
 * kwargs: use `:color, "red"` for `color="red"`
 * escaping characters: use `\\n` for `\n`
 
-Demos should be enough for elementary and medium uses.
+[Demo][demo] should be enough for elementary and medium usages.
+
+[demo](https://github.com/autozimu/pyplot.jl/tree/master/demo)
 
 ## Support and Contact
 
