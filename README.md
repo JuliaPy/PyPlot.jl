@@ -72,7 +72,7 @@ support [kwargs][]:
 
 [Demo][demo] should be enough for elementary and medium usages.
 
-[demo](https://github.com/autozimu/pyplot.jl/tree/master/demo)
+[demo]: https://github.com/autozimu/pyplot.jl/tree/master/demo
 
 ## Support and Contact
 
