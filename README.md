@@ -36,8 +36,9 @@ that long, so I started my own.
 * [Julia](https://github.com/JuliaLang/julia)
 * [zmq](http://www.zeromq.org/)
 * [daemon](http://libslack.org/daemon/)
-* [ipython](http://ipython.org/) + [matplotlib](http://matplotlib.org/)
-  + [pyzmq](https://github.com/zeromq/pyzmq)
+* [ipython](http://ipython.org/) +
+[matplotlib](http://matplotlib.org/) +
+[pyzmq](https://github.com/zeromq/pyzmq)
 * patience :)
 
 ## Setup
