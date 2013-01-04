@@ -1,6 +1,6 @@
 ## Want More?
 
-As has been said, this module is just a simple wrapper for matplotlib,
+As mentioned before, this module is just a simple wrapper for matplotlib,
 the powerful python plot library. Usually the `*args` parameters in
 matplotlib is translated to positional parameters in Julia, while the
 `*kwargs` parameters could be send by `:Symbol, Value` pair (since the

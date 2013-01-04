@@ -18,4 +18,5 @@ xloc(0.0002)            # set x axis (major) ticks
 xloc_minor(0.0001)      # set x axis minor ticks
 ticklabel_format(:scilimits, (-3, 3))     # set scientific limit
 
+savefig("4-control-details.png")
 #savefig("4-control-details.pdf")

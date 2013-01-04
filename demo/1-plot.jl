@@ -18,4 +18,5 @@ xlabel(E"$x$")
 ylabel(E"$y$")
 legend()            # show legend
 
+savefig("1-plot.png")
 #savefig("1-plot.pdf")
