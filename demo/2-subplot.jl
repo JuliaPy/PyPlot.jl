@@ -30,4 +30,3 @@ title("Plot function")
 plot(cos, -pi, pi)  # plot a function
 
 savefig("2-subplot.png")
-#savefig("2-subplot.pdf")

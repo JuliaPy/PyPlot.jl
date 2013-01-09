@@ -27,11 +27,7 @@ end
 
 ## parse String
 function parse(str::String)
-    if str == ""
-        return ""
-    else
-        return "'$str', "
-    end
+    return "'$str', "
 end
 
 ## parse everything else

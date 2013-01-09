@@ -8,8 +8,7 @@ require("pyplot")
 using pyplot
 
 figure()
-plotfile("3-plotfile.txt", :delimiter, " ", :cols, (0, 1), :marker, "^")
+plotfile("3-plotfile.txt", :delimiter, " ", :cols, (0, 1))
 title("Plot data from file")
 
 savefig("3-plotfile.png")
-#savefig("3-plotfile.pdf")
