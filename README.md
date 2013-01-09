@@ -9,7 +9,6 @@
     plot(x, y)
     title(E"$sin(x)$")
     savefig("sin.png")
-    # savefig("sin.pdf")
 
 ![screenshot](https://github.com/autozimu/pyplot.jl/raw/screenshot/sin.png)
 
