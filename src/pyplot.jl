@@ -9,6 +9,7 @@ module pyplot
 # get src location
 PYPLOT_JL_HOME = dirname(find_in_path("pyplot.jl"))
 
+# TODO: 'include()' will deal with relative path in recent commit
 include("$PYPLOT_JL_HOME/send.jl")
 include("$PYPLOT_JL_HOME/parse.jl")
 include("$PYPLOT_JL_HOME/funcs.jl")
