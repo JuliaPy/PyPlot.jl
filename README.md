@@ -14,7 +14,7 @@
     polar(theta, x)
     savefig("demo.png")
 
-![screenshot](https://github.com/autozimu/pyplot.jl/raw/gh-pages/demo.png)
+![screenshot](https://github.com/autozimu/pyplot.jl/raw/master/demo/demo.png)
 
 
 ## What
