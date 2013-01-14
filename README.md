@@ -3,12 +3,16 @@
     require("pyplot")
     using pyplot
 
-    x = linspace(-pi, pi)
-    y = sin(x)
+    # create new figure
+    figure()
 
-    plot(x, y)
-    title(E"$sin(x)$")
-    savefig("sin.png")
+    # generate data
+    r = linspace(0, pi, 301)
+    theta = 2 * pi * x
+
+    # plot
+    polar(theta, x)
+    savefig("demo.png")
 
 ![screenshot](https://github.com/autozimu/pyplot.jl/raw/gh-pages/demo.png)
 
