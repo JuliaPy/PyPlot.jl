@@ -10,7 +10,7 @@
     title(E"$sin(x)$")
     savefig("sin.png")
 
-![screenshot](https://github.com/autozimu/pyplot.jl/raw/screenshot/sin.png)
+![screenshot](https://github.com/autozimu/pyplot.jl/raw/gh-pages/demo.png)
 
 
 ## What
