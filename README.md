@@ -34,7 +34,7 @@ emerge. I just cannot wait that long, so I started my own.
 
 * [Julia](https://github.com/JuliaLang/julia): recent versions
 (> 2013-01-10) may be needed.
-* [zmq](http://www.zeromq.org/): version 2.x only due to [ZMQ.jl](https://github.com/aviks/ZMQ.jl)
+* [zmq](http://www.zeromq.org/): version 2.x only due to limitation of [ZMQ.jl](https://github.com/aviks/ZMQ.jl)
 * [daemon](http://libslack.org/daemon/)
 * [ipython](http://ipython.org/) +
 [matplotlib](http://matplotlib.org/) +
