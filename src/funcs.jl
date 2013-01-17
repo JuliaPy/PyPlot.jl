@@ -50,7 +50,6 @@ funcs = (
 :fignum_exists,
 :figtext,
 :figure,
-:fill,
 :fill_between,
 :fill_betweenx,
 :findobj,
