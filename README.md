@@ -51,17 +51,23 @@ emerge. I just cannot wait that long, so I started my own.
 
 In julia session, install module dependencies by
 
-    require("Pkg")
-    Pkg.add("ZMQ")
+```julia
+require("Pkg")
+Pkg.add("ZMQ")
+```
 
 Install this module by
 
-    git clone https://github.com/autozimu/pyplot.jl ~/.julia/pyplot
+```shell
+git clone https://github.com/autozimu/pyplot.jl ~/.julia/pyplot
+```
 
 Now in julia session,
 
-    require("pyplot")
-    pyplot.figure()
+```julia
+require("pyplot")
+pyplot.figure()
+```
 
 If matplotlib window opened up, then it should be a successful
 installation.
@@ -77,7 +83,7 @@ support [kwargs][]:
 * kwargs: use `:color, "red"` for `color="red"`
 * escaping characters: use `\\n` for `\n`
 
-[Demo][demo] should be enough for elementary and medium usages.
+[Demo][demo] should be enough for elementary and medium usage.
 
 [demo]: https://github.com/autozimu/pyplot.jl/tree/master/demo
 
