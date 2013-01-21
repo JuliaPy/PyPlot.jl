@@ -40,7 +40,7 @@ def run_code(code):
 # ZMQ server
 context = zmq.Context()
 socket = context.socket(zmq.REP)
-socket.bind("tcp://*:1989")
+socket.bind("ipc:///tmp/zmq_pyplot")
 
 while True:
     #  Wait for next request from client

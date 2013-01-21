@@ -30,7 +30,7 @@ global ctx, socket
 function start_socket()
     global ctx = ZMQContext(1)
     global socket = ZMQSocket(ctx, ZMQ_REQ)
-    ZMQ.connect(socket, "tcp://localhost:1989")
+    ZMQ.connect(socket, "ipc:///tmp/zmq_pyplot")
 end
 
 function stop_socket()
