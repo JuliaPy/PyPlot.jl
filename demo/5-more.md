@@ -11,9 +11,9 @@ the plotting functions and available parameters, matplotlib's
 to show how powerful it could be. If you need some functions has not yet
 been wrapped (this is quite probably, since I only implemented the
 functions that I think I will use in my work), a special function
-`mrun()` could be utilized to send any matplotlib commands. Also, it is
-quite easy to wrap those functions, take `src/alias.jl` as example and
-make your own.
+`psend()` could be utilized to send arbitrary matplotlib commands. Also,
+it is quite easy to wrap those functions, take `src/alias.jl` as example
+and make your own.
 
 [mpl]: http://matplotlib.org/
 [gallery]: http://matplotlib.org/gallery.html

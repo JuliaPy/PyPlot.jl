@@ -81,9 +81,13 @@ support [kwargs][]:
 * kwargs: use `:color, "red"` for `color="red"`
 * escaping characters: use `\\n` for `\n`
 
-[Demo][demo] should be enough for elementary and medium usage.
+[Demos][demo] should be enough for elementary and medium usage.
 
 [demo]: https://github.com/autozimu/pyplot.jl/tree/master/demo
+
+## Limitation
+
+* Cannot send non-ASCII string
 
 ## Support and Contact
 
