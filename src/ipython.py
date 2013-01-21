@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-exec /usr/local/bin/ipython kernel --pylab
+ipy=`which ipython`
+exec $ipy kernel --pylab
