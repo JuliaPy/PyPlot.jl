@@ -17,7 +17,7 @@ legend(loc::String, args...) = legend(:loc, loc, args...)
 
 ## fix savefig path problem
 function savefig(file::String, args...)
-    file = cwd() + '/' + file
+    file = pwd() + '/' + file
 
     args_str = parse(file)
     for arg in args
