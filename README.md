@@ -1,18 +1,20 @@
 ## Example
 
-    require("pyplot")
-    using pyplot
+```julia
+require("pyplot")
+using pyplot
 
-    # create new figure
-    figure()
+# create new figure
+figure()
 
-    # generate data
-    r = linspace(0, pi, 301)
-    theta = 2 * pi * x
+# generate data
+r = linspace(0, pi, 301)
+theta = 2 * pi * x
 
-    # plot
-    polar(theta, x)
-    savefig("demo.png")
+# plot
+polar(theta, x)
+savefig("demo.png")
+```
 
 ![screenshot](https://github.com/autozimu/pyplot.jl/raw/master/demo/demo.png)
 
