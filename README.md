@@ -34,10 +34,21 @@ savefig("demo.png")
 
 ![screenshot](https://github.com/autozimu/pyplot.jl/raw/master/demo/demo.png)
 
+## Features
+
+
+* perfect 2D plot
+* interactive usage
+* excellent math symbol support
+* multiple backends (PNG, PDF, JPEG, ...)
+
+Since this module is simply a wrapper for matplotlib, all credit goes
+to matplotlib developers.
+
 ## Prerequirements
 
 * [Julia](https://github.com/JuliaLang/julia): recent versions
-(> 2013-01-10) may be needed.
+(> 2013-01-10) may be required.
 * [zmq](http://www.zeromq.org/): version 2.x only due to [ZMQ.jl](https://github.com/aviks/ZMQ.jl)
 * [daemon](http://libslack.org/daemon/)
 * [ipython](http://ipython.org/) +
