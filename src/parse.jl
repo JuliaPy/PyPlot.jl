@@ -37,33 +37,36 @@ end
 
 ## parse Array
 function parse(arr::Array)
+    # deal with empty
     if arr == []
+        println("Warning: Empty array!")
         return ""
-    else
-        # generate warning when plot complex arrays
-        if eltype(arr) <: Complex
-            println("ComplexWarning: Casting complex values to real discards the imaginary part!")
-            arr = real(arr)
-        end
-
-        str = "["
-        for a in arr
-            str += parse(a)
-        end
-        return str + "], "
     end
+
+    # deal with complex arrays
+    if eltype(arr) <: Complex
+        println("ComplexWarning: Casting complex values to real discards the imaginary part!")
+        arr = real(arr)
+    end
+
+    str = "["
+    for a in arr
+        str += parse(a)
+    end
+    return str + "], "
 end
 
 ## parse Tuple
 function parse(tuple::Tuple)
-    # return empty string when tuple is empty
+    # deal with empty
     if tuple == ()
+        println("Warning: Empty tuple!")
         return ""
-    else
-        str = "("
-        for t in tuple
-            str += parse(t)
-        end
-        return str + "), "
     end
+
+    str = "("
+    for t in tuple
+        str += parse(t)
+    end
+    return str + "), "
 end
