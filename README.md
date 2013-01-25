@@ -84,21 +84,23 @@ installation.
 ## Usage
 
 Mostly, the function signature is the same as calling pyplot in python /
-ipython, except some semantic differences due to Julia's reluctance to
-support [kwargs][]:
+ipython, except some semantic differences due to the implementation:
 
-[kwargs]: http://rosettacode.org/wiki/Named_parameters
-
-* kwargs: use `:color, "red"` for `color="red"`
-* escaping characters: use `\\n` for `\n`
+* [kwargs][]: use `:color, "red"` for `color="red"`
+* escaping characters: use `\\` for `\` to escape characters.
+  Alternatively, prefix string with `E`, `I`, or `L` accordingly to
+  prevent Julia perform escaping and/or interpolation.
+  [[1][Julia_non_standard_string]]
 
 [Demos][demo] should be enough for elementary and medium usage.
 
+[kwargs]: http://rosettacode.org/wiki/Named_parameters
 [demo]: https://github.com/autozimu/pyplot.jl/tree/master/demo
+[Julia_non_standard_string]: http://docs.julialang.org/en/latest/manual/strings/#non-standard-string-literals
 
 ## Limitation
 
-* Cannot send non-ASCII string
+* UTF-8 string is not supported.
 
 ## Support and Contact
 
