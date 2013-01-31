@@ -25,14 +25,14 @@ figure()
 
 # generate data
 r = linspace(0, pi, 301)
-theta = 2 * pi * x
+theta = 2 * pi * r
 
 # plot
-polar(theta, x)
-savefig("demo.png")
+polar(theta, r)
+savefig("demo/demo.png")
 ```
 
-![screenshot](https://github.com/autozimu/pyplot.jl/raw/master/demo/demo.png)
+![screenshot](demo/demo.png)
 
 ## Features
 
