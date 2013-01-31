@@ -32,7 +32,8 @@ polar(theta, r)
 savefig("demo/demo.png")
 ```
 
-![screenshot](demo/demo.png)
+![screenshot](https://github.com/autozimu/pyplot.jl/raw/master/demo/demo.png)
+
 
 ## Features
 
