@@ -11,7 +11,7 @@ README.md: $(SRC) 5-more.md
 		tail -n+7 ${file} >> README.md; \
 		echo '```' >> README.md; \
 		echo >> README.md; \
-		echo "[$(subst jl,png,${file})]($(subst jl,png,${file}))" >> README.md; \
+		echo "![$(subst jl,png,${file})]($(subst jl,png,${file}))" >> README.md; \
 		echo >> README.md; \
 		)
 	cat 5-more.md >> README.md
