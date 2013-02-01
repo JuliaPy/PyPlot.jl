@@ -20,7 +20,7 @@ legend()            # show legend
 savefig("1-plot.png")
 ```
 
-[](1-plot.png)
+[1-plot.png](1-plot.png)
 
 ## 2-subplot.jl
 
@@ -53,7 +53,7 @@ plot(cos, -pi, pi)  # plot a function
 savefig("2-subplot.png")
 ```
 
-[](2-subplot.png)
+[2-subplot.png](2-subplot.png)
 
 ## 3-plotfile.jl
 
@@ -68,7 +68,7 @@ title("Plot data from file")
 savefig("3-plotfile.png")
 ```
 
-[](3-plotfile.png)
+[3-plotfile.png](3-plotfile.png)
 
 ## 4-control-details.jl
 
@@ -90,7 +90,7 @@ ticklabel_format(:scilimits, (-3, 3))     # set scientific limit
 savefig("4-control-details.png")
 ```
 
-[](4-control-details.png)
+[4-control-details.png](4-control-details.png)
 
 ## Want More?
 
