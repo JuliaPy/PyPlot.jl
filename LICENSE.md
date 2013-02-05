@@ -1,5 +1,5 @@
     pyplot.jl: Graphics solution for Julia based on pyplot.
-    Copyright (C) 2012-2013 Junfeng Li <li424@mcmaster.ca>
+    Copyright (C) 2013 Junfeng Li <li424@mcmaster.ca>
 
     Permission is hereby granted, free of charge, to any person
     obtaining a copy of this software and associated documentation files
