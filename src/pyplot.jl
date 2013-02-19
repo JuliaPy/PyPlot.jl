@@ -7,8 +7,9 @@
 module pyplot
 
 # get src location
-PYPLOT_JL_HOME = "$(Pkg.dir())/pyplot/src"
+PYPLOT_JL_HOME = Pkg.dir("pyplot", "src")
 
+# relative include
 include("send.jl")
 include("parse.jl")
 include("funcs.jl")
