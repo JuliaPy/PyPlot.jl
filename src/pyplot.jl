@@ -7,13 +7,13 @@
 module pyplot
 
 # get src location
-PYPLOT_JL_HOME = dirname(find_in_path("pyplot.jl"))
+PYPLOT_JL_HOME = "$(Pkg.dir())/pyplot/src"
 
-include("$PYPLOT_JL_HOME/send.jl")
-include("$PYPLOT_JL_HOME/parse.jl")
-include("$PYPLOT_JL_HOME/funcs.jl")
-include("$PYPLOT_JL_HOME/wrap.jl")
-include("$PYPLOT_JL_HOME/alias.jl")
+include("send.jl")
+include("parse.jl")
+include("funcs.jl")
+include("wrap.jl")
+include("alias.jl")
 
 # start ipython and zmq server
 start_daemon()

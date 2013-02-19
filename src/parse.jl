@@ -7,7 +7,7 @@
 ## concatenate strings
 import Base.+
 function +(a::String, b::Any)
-    return strcat(a, string(b))
+    return string(a, string(b))
 end
 
 ## parse Char
