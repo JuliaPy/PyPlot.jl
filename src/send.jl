@@ -16,7 +16,11 @@ end
 
 function stop_daemon()
     pid = readchomp(`cat $pidfile`)
-    run(`kill -9 $pid`)
+    try
+        run(`kill -2 $pid`)
+    catch ErrorException
+        Nothing
+    end
     stop_socket()
 end
 

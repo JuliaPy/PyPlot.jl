@@ -8,7 +8,7 @@ import subprocess
 from IPython.lib.kernel import find_connection_file
 from IPython.zmq.blockingkernelmanager import BlockingKernelManager
 import zmq
-import sys, os, time, atexit
+import sys, os, time, signal
 
 pid = str(os.getpid())
 pidfile = '/tmp/pyplot.pid'
@@ -16,16 +16,20 @@ pidfile = '/tmp/pyplot.pid'
 # ensure one instance
 if os.path.isfile(pidfile):
     try:
-        old_pid = int(file(pidfile, 'r').readlines()[0])
+        f = open(pidfile, 'r')
+        old_pid = int(f.readlines()[0])
         os.kill(old_pid, 0)
+    # old process is not valid
     except IndexError and OSError:
         old_pid = 0
+        f.close()
     else:
         sys.exit()
 
-with open(pidfile, 'w') as f:
-    f.write(pid)
-    f.write('\n')
+f = open(pidfile, 'w')
+f.write(pid)
+f.write('\n')
+f.close()
 
 # ipython subprocess
 ipy = subprocess.Popen(['/usr/bin/env', 'ipython', 'kernel', '--pylab'])
@@ -43,11 +47,14 @@ socket = context.socket(zmq.REP)
 socket.bind("ipc:///tmp/zmq_pyplot")
 
 # cleanup at exit
-def cleanup():
-    ipy.kill()
+def cleanup(signum, fname):
+    ipy.terminate()
+    os.remove(pidfile)
+    sys.exit()
 
-atexit.register(cleanup)
-
+signal.signal(signal.SIGINT,  cleanup)
+signal.signal(signal.SIGQUIT, cleanup)
+signal.signal(signal.SIGTERM, cleanup)
 
 # main loop
 while True:
