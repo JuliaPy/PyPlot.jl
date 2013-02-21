@@ -56,7 +56,6 @@ to matplotlib developers.
 
 * [Julia](https://github.com/JuliaLang/julia): recent versions (>= 0.1) may be required.
 * [zmq](http://www.zeromq.org/): version 2.x only due to [ZMQ.jl](https://github.com/aviks/ZMQ.jl)
-* [daemon](http://libslack.org/daemon/)
 * [ipython](http://ipython.org/) +
 [matplotlib](http://matplotlib.org/) +
 [pyzmq](https://github.com/zeromq/pyzmq)
@@ -84,8 +83,7 @@ require("pyplot")
 pyplot.figure()
 ```
 
-If matplotlib window opened up, then it should be a successful
-installation.
+If matplotlib window open up, it should be a successful installation.
 
 ## Usage
 

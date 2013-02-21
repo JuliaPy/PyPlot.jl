@@ -6,6 +6,7 @@
 
 module pyplot
 
+
 # get src location
 PYPLOT_JL_HOME = Pkg.dir("pyplot", "src")
 
@@ -16,8 +17,7 @@ include("funcs.jl")
 include("wrap.jl")
 include("alias.jl")
 
-# start ipython and zmq server
+# start
 start_daemon()
-# start zmq client
-start_socket()
+
 end # end module

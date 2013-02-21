@@ -4,16 +4,20 @@
 # Description: send python code to ipython
 # Created: December 19, 2012
 
-# daemon: ipyton, zmq server
+using ZMQ
+
+pidfile = "/tmp/pyplot.pid"
+
+# daemon: ipyton server
 function start_daemon()
-    run(`daemon --name=ipython $PYPLOT_JL_HOME/ipython.py`)
-    sleep(5)
-    run(`daemon --name=pyplot $PYPLOT_JL_HOME/pyplot.py`)
+    spawn(`$PYPLOT_JL_HOME/pyplot.py`)
+    start_socket()
 end
 
 function stop_daemon()
-    run(`daemon --name=ipython --stop`)
-    run(`daemon --name=pyplot --stop`)
+    pid = readchomp(`cat $pidfile`)
+    run(`kill -9 $pid`)
+    stop_socket()
 end
 
 function restart_daemon()
@@ -22,11 +26,6 @@ function restart_daemon()
 end
 
 ## zmq client
-require("ZMQ")
-using ZMQ
-
-global ctx, socket
-
 function start_socket()
     global ctx = ZMQContext(1)
     global socket = ZMQSocket(ctx, ZMQ_REQ)
