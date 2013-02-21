@@ -17,19 +17,25 @@ emerge. I just cannot wait that long, so I started my own.
 ## Example
 
 ```julia
-require("pyplot")
+# load module
 using pyplot
 
-# create new figure
+# generate data
+x = linspace(0, pi, 300)
+s = sin(x)
+
+# pop new figure window
 figure()
 
-# generate data
-r = linspace(0, pi, 301)
-theta = 2 * pi * r
-
 # plot
-polar(theta, r)
-savefig("demo/demo.png")
+plot(x, s, :label, L"$sin(x)$")
+legend("upper left")
+title(L"$sin(x)$")
+xlabel(L"$x$")
+ylabel(L"$y$")
+
+# save the plot
+savefig("demo.png")
 ```
 
 ![screenshot](https://github.com/autozimu/pyplot.jl/raw/master/demo/demo.png)
