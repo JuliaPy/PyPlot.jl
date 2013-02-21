@@ -1,3 +1,5 @@
+    The MIT License
+
     pyplot.jl: Graphics solution for Julia based on pyplot.
     Copyright (C) 2013 Junfeng Li <li424@mcmaster.ca>
 
