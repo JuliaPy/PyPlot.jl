@@ -48,8 +48,7 @@ to matplotlib developers.
 
 ## Prerequirements
 
-* [Julia](https://github.com/JuliaLang/julia): recent versions
-(> 2013-01-10) may be required.
+* [Julia](https://github.com/JuliaLang/julia): recent versions (>= 0.1) may be required.
 * [zmq](http://www.zeromq.org/): version 2.x only due to [ZMQ.jl](https://github.com/aviks/ZMQ.jl)
 * [daemon](http://libslack.org/daemon/)
 * [ipython](http://ipython.org/) +
