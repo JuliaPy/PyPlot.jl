@@ -20,8 +20,7 @@ include("alias.jl")
 # start
 start_daemon()
 
-
-end # end module
-
 # release resouces when exit
 atexit(pyplot.stop_daemon)
+
+end # end module
