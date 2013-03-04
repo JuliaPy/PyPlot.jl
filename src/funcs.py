@@ -12,7 +12,12 @@ blacklists = [
         'savefig',
         'fill',
         'isinteractive',
-        'close'
+        'close',
+        'connect',
+        'get',
+        'hist',
+        'step',
+        'xcorr',
         ]
 
 funcs = inspect.getmembers(plt, inspect.isfunction)
