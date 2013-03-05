@@ -70,3 +70,19 @@ function parse(tuple::Tuple)
     end
     return str + "), "
 end
+
+## expose macro
+macro psend(cmds...)
+    cmds2 = ""
+    for cmd in cmds
+        if typeof(cmd) == Expr
+            cmds2 += string(cmd)[3:end-1]
+        else
+            cmds2 += string(cmd)
+        end
+        cmds2 += " "
+    end
+    send(cmds2)
+end
+
+export @psend
