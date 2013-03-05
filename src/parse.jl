@@ -72,7 +72,7 @@ function parse(tuple::Tuple)
 end
 
 ## expose macro
-macro psend(cmds...)
+macro pyplot(cmds...)
     cmds2 = ""
     for cmd in cmds
         if typeof(cmd) == Expr
@@ -85,4 +85,4 @@ macro psend(cmds...)
     send(cmds2)
 end
 
-export @psend
+export @pyplot
