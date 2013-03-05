@@ -11,7 +11,7 @@ module pyplot
 PYPLOT_JL_HOME = Pkg.dir("pyplot", "src")
 
 # relative include
-include("send.jl")
+include("aux.jl")
 include("parse.jl")
 include("funcs.jl")
 include("wrap.jl")
