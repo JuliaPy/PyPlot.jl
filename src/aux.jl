@@ -15,8 +15,8 @@ function start_daemon()
 end
 
 function stop_daemon()
-    pid = readchomp(`cat $pidfile`)
     try
+        pid = readchomp(`cat $pidfile`)
         run(`kill -2 $pid`)
     catch ErrorException
         Nothing
