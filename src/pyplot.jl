@@ -19,8 +19,10 @@ include("alias.jl")
 
 # start
 start_daemon()
+start_socket()
 
 # release resouces when exit
 atexit(pyplot.stop_daemon)
+atexit(pyplot.stop_socket)
 
 end # end module

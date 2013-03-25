@@ -11,7 +11,6 @@ pidfile = "/tmp/pyplot.pid"
 # daemon: ipyton server
 function start_daemon()
     spawn(`$PYPLOT_JL_HOME/pyplot.py`)
-    start_socket()
 end
 
 function stop_daemon()
@@ -21,7 +20,6 @@ function stop_daemon()
     catch ErrorException
         Nothing
     end
-    stop_socket()
 end
 
 function restart_daemon()
