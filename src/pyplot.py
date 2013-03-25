@@ -44,7 +44,7 @@ km.start_channels()
 # start ZMQ server
 context = zmq.Context()
 socket = context.socket(zmq.REP)
-socket.bind("ipc:///tmp/zmq_pyplot")
+socket.bind("ipc:///tmp/pyplot_jl")
 
 # cleanup at exit
 def cleanup(signum, fname):
