@@ -58,9 +58,17 @@ end
 
 ## eval / send commands
 function send(cmd::String)
-    ZMQ.send(socket, ZMQMessage(cmd))
-    msg = ZMQ.recv(socket)
+    # print cmd that is to be send
     if DEBUG
         println(cmd)
+    end
+
+    ZMQ.send(socket, ZMQMessage(cmd))
+    msg = ZMQ.recv(socket)
+    msg = ASCIIString[msg]
+
+    # print traceback info
+    if msg != ""
+        print(msg)
     end
 end

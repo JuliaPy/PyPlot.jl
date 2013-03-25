@@ -61,14 +61,15 @@ while True:
     #  Wait for next request from client
     cmd = socket.recv()
 
-    #  Send reply back to client
-    socket.send("Recieve!")
-
     # execution is immediate and async, returning a UUID
-    msg = km.shell_channel.execute(cmd)
-    # get_meg can block for a reply
+    km.shell_channel.execute(cmd)
+    # get execute result
     reply = km.shell_channel.get_msg()
 
-    if reply['content']['status'] == 'error':
+    if reply['content']['status'] == 'ok':
+        socket.send("")
+    else:
+        msg = ""
         for line in reply['content']['traceback']:
-            print >>sys.stderr, line
+            msg += line
+        socket.send_unicode(msg)
