@@ -1,1 +1,1 @@
-- [] Update keyword arguments style.
+- Update keyword arguments style.
