@@ -6,20 +6,13 @@
 
 using ZMQ
 
-pidfile = "/tmp/pyplot.pid"
-
 # daemon: ipyton server
 function start_daemon()
-    spawn(`$PYPLOT_JL_HOME/pyplot.py`)
+    global daemon = spawn(`$PYPLOT_JL_HOME/pyplot.py`)
 end
 
 function stop_daemon()
-    try
-        pid = readchomp(`cat $pidfile`)
-        run(`kill -2 $pid`)
-    catch ErrorException
-        Nothing
-    end
+    kill(daemon)
 end
 
 function restart_daemon()
