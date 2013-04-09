@@ -6,6 +6,12 @@
 
 using ZMQ
 
+global daemon
+global ctx
+global socket
+
+global DEBUG = false
+
 # daemon: ipyton server
 function start_daemon()
     global daemon = spawn(`$PYPLOT_JL_HOME/pyplot.py`)
@@ -38,7 +44,6 @@ function restart_socket()
 end
 
 ## Toggle debug
-global DEBUG = false
 function debug(b::Bool)
     global DEBUG = b
 end
