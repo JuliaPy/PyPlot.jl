@@ -43,7 +43,6 @@ savefig("demo.png")
 
 ## Features
 
-
 * perfect 2D plot
 * interactive usage
 * excellent math symbol support
@@ -54,11 +53,11 @@ to matplotlib developers.
 
 ## Prerequirements
 
-* [Julia](https://github.com/JuliaLang/julia): recent versions (>= 0.1) may be required.
-* [zmq](http://www.zeromq.org/): version 2.x only due to [ZMQ.jl](https://github.com/aviks/ZMQ.jl)
-* [ipython](http://ipython.org/) +
-[matplotlib](http://matplotlib.org/) +
-[pyzmq](https://github.com/zeromq/pyzmq)
+* [Julia](https://github.com/JuliaLang/julia): recent versions (>= 0.1)
+  may be required.
+* [zmq](http://www.zeromq.org/)
+* [ipython](http://ipython.org/) + [matplotlib](http://matplotlib.org/)
+  + [pyzmq](http://www.zeromq.org/bindings:python)
 * patience :)
 
 ## Setup
@@ -66,7 +65,6 @@ to matplotlib developers.
 In julia session, install module dependencies by
 
 ```julia
-require("Pkg")
 Pkg.add("ZMQ")
 ```
 
@@ -79,11 +77,11 @@ git clone https://github.com/autozimu/pyplot.jl ~/.julia/pyplot
 Now in julia session,
 
 ```julia
-require("pyplot")
-pyplot.figure()
+using pyplot
+figure()
 ```
 
-If matplotlib window open up, it should be a successful installation.
+If a matplotlib window opened up, it should be a successful installation.
 
 ## Usage
 
