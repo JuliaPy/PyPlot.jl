@@ -59,7 +59,7 @@ signal.signal(signal.SIGTERM, cleanup)
 # main loop
 while True:
     #  Wait for next request from client
-    cmd = socket.recv()
+    cmd = socket.recv_string()
 
     # execution is immediate and async, returning a UUID
     km.shell_channel.execute(cmd)
@@ -67,9 +67,9 @@ while True:
     reply = km.shell_channel.get_msg()
 
     if reply['content']['status'] == 'ok':
-        socket.send("")
+        socket.send_string("")
     else:
         msg = ""
         for line in reply['content']['traceback']:
             msg += line
-        socket.send_unicode(msg)
+        socket.send_string(msg)
