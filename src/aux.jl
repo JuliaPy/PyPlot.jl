@@ -59,7 +59,7 @@ function send(cmd::String)
         println(cmd)
     end
 
-    ZMQ.send(socket, ZMQMessage(cmd))
+    ZMQ.send(socket, cmd)
     msg = ZMQ.recv(socket)
     msg = ASCIIString[msg]
 
