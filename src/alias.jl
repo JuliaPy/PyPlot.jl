@@ -38,6 +38,16 @@ function showfig(args...)
 end
 export showfig
 
+## fix close() namespace conflicting
+function closefig(args...)
+    args_str = ""
+    for arg in args
+        args_str += parse(arg)
+    end
+    send("close($args_str)")
+end
+export closefig
+
 ## set locators
 function xloc_major(loc::Real)
     send("gca().xaxis.set_major_locator(MultipleLocator($loc))")
