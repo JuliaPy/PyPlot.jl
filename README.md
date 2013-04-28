@@ -43,10 +43,9 @@ savefig("demo.png")
 
 ## Features
 
-* perfect 2D plot
-* interactive usage
-* excellent math symbol support
-* multiple backends (PNG, PDF, JPEG, ...)
+* Dynamically plot
+* Excellent math/TeX symbol support
+* Multiple export (PNG, PDF, JPEG, ...)
 
 Since this module is simply a wrapper for matplotlib, all credit goes
 to matplotlib developers.
