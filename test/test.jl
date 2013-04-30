@@ -5,4 +5,8 @@
 # Created: Apr 13, 2013
 
 using pyplot
+
+# turn off intactive usage
+ioff()
+
 include("basic.jl")
