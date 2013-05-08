@@ -4,52 +4,25 @@
 # Description: evalulate plot commands
 # Created: November 20, 2012
 
-import subprocess
-from IPython.lib.kernel import find_connection_file
 from IPython.zmq.blockingkernelmanager import BlockingKernelManager
+from subprocess import PIPE
 import zmq
-import sys, os, time, signal
+import sys, signal
 
-pid = str(os.getpid())
-pidfile = '/tmp/pyplot.pid'
-
-# ensure one instance
-if os.path.isfile(pidfile):
-    try:
-        f = open(pidfile, 'r')
-        old_pid = int(f.readlines()[0])
-        os.kill(old_pid, 0)
-    # old process is not valid
-    except IndexError and OSError:
-        old_pid = 0
-        f.close()
-    else:
-        sys.exit()
-
-f = open(pidfile, 'w')
-f.write(pid)
-f.write('\n')
-f.close()
-
-# ipython subprocess
-ipy = subprocess.Popen(['/usr/bin/env', 'ipython', 'kernel', '--pylab'])
-
-# startup channel
-time.sleep(3) # wait for kernel startup
+# init plot kernel
 km = BlockingKernelManager()
-km.connection_file = find_connection_file(str(ipy.pid))
-km.load_connection_file()
+km.start_kernel(stdout=PIPE, stderr=PIPE, extra_arguments=['--pylab'])
 km.start_channels()
 
-# start ZMQ server
-context = zmq.Context()
-socket = context.socket(zmq.REP)
-socket.bind("ipc:///tmp/pyplot_jl")
+# start ZMQ REP
+ctx = zmq.Context()
+rep = ctx.socket(zmq.REP)
+rep.bind('ipc:///tmp/pyplot_jl')
 
 # cleanup at exit
 def cleanup(signum, fname):
-    ipy.terminate()
-    os.remove(pidfile)
+    km.stop_channels()
+    km.shutdown_kernel()
     sys.exit()
 
 signal.signal(signal.SIGINT,  cleanup)
@@ -58,8 +31,8 @@ signal.signal(signal.SIGTERM, cleanup)
 
 # main loop
 while True:
-    #  Wait for next request from client
-    cmd = socket.recv_string()
+    # retrieve request from client
+    cmd = rep.recv_string()
 
     # execution is immediate and async, returning a UUID
     km.shell_channel.execute(cmd)
@@ -67,9 +40,6 @@ while True:
     reply = km.shell_channel.get_msg()
 
     if reply['content']['status'] == 'ok':
-        socket.send_string("")
+        rep.send_unicode('')
     else:
-        msg = ""
-        for line in reply['content']['traceback']:
-            msg += line
-        socket.send_string(msg)
+        rep.send_unicode(''.join(reply['content']['traceback']))
