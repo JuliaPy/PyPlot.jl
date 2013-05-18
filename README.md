@@ -14,7 +14,11 @@ emerge. I just cannot wait that long, so I started my own.
 [graphics-wiki]: https://github.com/JuliaLang/julia/wiki/Graphics
 [graphics-gg]: https://groups.google.com/forum/?fromgroups=#!searchin/julia-dev/plot$20interface/julia-dev/Mi44lkCusCw/u3B3KZx0BO0J
 
-## Example
+## Demo
+
+Video version on [YouTube]
+(https://www.youtube.com/watch?v=zrPr46xTqbU).
+
 
 ```julia
 # load module
@@ -39,6 +43,7 @@ savefig("demo.png")
 ```
 
 ![screenshot](https://github.com/autozimu/pyplot.jl/raw/master/demo/demo.png)
+
 
 
 ## Features
