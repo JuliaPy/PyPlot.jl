@@ -50,6 +50,16 @@ function closefig(args...)
 end
 export closefig
 
+## fix hist() namespace conflicting
+function phist(args...)
+    args_str = ""
+    for arg in args
+        args_str += parse(arg)
+    end
+    send("hist($args_str)")
+end
+export phist
+
 ## set locators
 function xloc_major(loc::Real)
     send("gca().xaxis.set_major_locator(MultipleLocator($loc))")

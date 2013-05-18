@@ -95,6 +95,11 @@ ipython, except some semantic differences due to the implementation:
 [demo]: https://github.com/autozimu/pyplot.jl/tree/master/demo
 [Julia_non_standard_string]: http://docs.julialang.org/en/latest/manual/strings/#non-standard-string-literals
 
+NOTE: the keyword syntax will be changed shortly in the future, with the
+introduce of keyword argument in Julia itself. And The string prefix
+`E`, `I` and `L` may not work with latest Julia, while the double slash
+`\\` will always work.
+
 ## Support and Contact
 
 If any questions or comments, feel free to contact <autozimu@gmail.com>.
