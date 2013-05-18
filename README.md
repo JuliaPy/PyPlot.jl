@@ -50,22 +50,18 @@ savefig("demo.png")
 Since this module is simply a wrapper for matplotlib, all credit goes
 to matplotlib developers.
 
-## Prerequirements
+## Dependencies
 
-* [Julia](https://github.com/JuliaLang/julia): recent versions (>= 0.1)
+- [Julia](https://github.com/JuliaLang/julia): recent versions (>= 0.1)
   may be required.
-* [zmq](http://www.zeromq.org/)
-* [ipython](http://ipython.org/) + [matplotlib](http://matplotlib.org/)
-  + [pyzmq](http://www.zeromq.org/bindings:python)
-* patience :)
+- [zmq](http://www.zeromq.org/)
+- [ipython](http://ipython.org/)
+- [matplotlib](http://matplotlib.org/)
+- [pyzmq](http://www.zeromq.org/bindings:python)
+- [ZMQ.jl](https://github.com/aviks/ZMQ.jl)
+- patience :)
 
 ## Setup
-
-In julia session, install module dependencies by
-
-```julia
-Pkg.add("ZMQ")
-```
 
 Install this module by
 
@@ -73,7 +69,7 @@ Install this module by
 git clone https://github.com/autozimu/pyplot.jl ~/.julia/pyplot
 ```
 
-Now in julia session,
+Now in a Julia session, type
 
 ```julia
 using pyplot
@@ -98,10 +94,6 @@ ipython, except some semantic differences due to the implementation:
 [kwargs]: http://rosettacode.org/wiki/Named_parameters
 [demo]: https://github.com/autozimu/pyplot.jl/tree/master/demo
 [Julia_non_standard_string]: http://docs.julialang.org/en/latest/manual/strings/#non-standard-string-literals
-
-## Limitation
-
-* UTF-8 string is not supported.
 
 ## Support and Contact
 
