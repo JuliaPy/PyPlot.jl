@@ -22,17 +22,17 @@ using pyplot
 
 # generate data
 x = linspace(0, pi, 300)
-s = sin(x)
+y = sin(x)
 
 # pop new figure window
 figure()
 
 # plot
-plot(x, s, :label, L"$sin(x)$")
+plot(x, y, :label, L"$sin(x)$")
 legend("upper left")
-title(L"$sin(x)$")
-xlabel(L"$x$")
-ylabel(L"$y$")
+title("\$sin(x)\$")
+xlabel("\$x\$")
+ylabel("\$y\$")
 
 # save the plot
 savefig("demo.png")
@@ -43,20 +43,20 @@ savefig("demo.png")
 
 ## Features
 
-* Dynamically plot
+* Dynamic usage from Julia terminal
 * Excellent math/TeX symbol support
-* Multiple export (PNG, PDF, JPEG, ...)
+* Multiple export formats (EPS, PDF, PNG, JPEG, ...)
 
-Since this module is simply a wrapper for matplotlib, all credit goes
+Since this module is simply a wrapper around matplotlib, all credit goes
 to matplotlib developers.
 
 ## Dependencies
 
 - [Julia](https://github.com/JuliaLang/julia): recent versions (>= 0.1)
-  may be required.
-- [zmq](http://www.zeromq.org/)
+  may be required
 - [ipython](http://ipython.org/)
 - [matplotlib](http://matplotlib.org/)
+- [zmq](http://www.zeromq.org/)
 - [pyzmq](http://www.zeromq.org/bindings:python)
 - [ZMQ.jl](https://github.com/aviks/ZMQ.jl)
 - patience :)
@@ -80,8 +80,8 @@ If a matplotlib window opened up, it should be a successful installation.
 
 ## Usage
 
-Mostly, the function signature is the same as calling pyplot in python /
-ipython, except some semantic differences due to the implementation:
+Most function signatures are same to corresponding functions in pyplot,
+except some semantic differences due to the implementation:
 
 * [kwargs][]: use `:color, "red"` for `color="red"`
 * escaping characters: use `\\` for `\` to escape characters.
