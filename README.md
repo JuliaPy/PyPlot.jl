@@ -39,10 +39,10 @@ xlabel("\$x\$")
 ylabel("\$y\$")
 
 # save the plot
-savefig("demo.png")
+savefig("test/demo.png")
 ```
 
-![screenshot](https://github.com/autozimu/pyplot.jl/raw/master/demo/demo.png)
+![screenshot](https://github.com/autozimu/pyplot.jl/raw/master/test/demo.png)
 
 
 
