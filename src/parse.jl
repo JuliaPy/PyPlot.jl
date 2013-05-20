@@ -57,6 +57,16 @@ function parse(arr::Array)
     return str + "]"
 end
 
+## parse Tuple
+function parse(tuple::Tuple)
+    str = "("
+    for t in tuple
+        str += parse(t)
+        str += ", "
+    end
+    return str + ")"
+end
+
 ## parse args and kargs
 function parse_args(args, kargs)
     str  = ""
@@ -72,21 +82,6 @@ function parse_args(args, kargs)
     end
 
     return str
-end
-
-## parse Tuple
-function parse(tuple::Tuple)
-    # deal with empty
-    if tuple == ()
-        println("Warning: Empty tuple!")
-        return ""
-    end
-
-    str = "("
-    for t in tuple
-        str += parse(t)
-    end
-    return str + "), "
 end
 
 ## expose macro

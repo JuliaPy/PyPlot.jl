@@ -1,4 +1,11 @@
+all: test README.md
+
 SRC = 1-plot.jl 2-subplot.jl 3-plotfile.jl 4-control-details.jl
+
+test: $(SRC)
+	$(foreach file,$(SRC), \
+		./${file} \
+		)
 
 README.md: $(SRC) 5-more.md
 	echo > README.md

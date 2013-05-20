@@ -4,11 +4,10 @@
 # Description: plot file
 # Created: November 24, 2012
 
-require("pyplot")
 using pyplot
 
 figure()
-plotfile("3-plotfile.txt", :delimiter, " ", :cols, (0, 1))
+plotfile("3-plotfile.txt", delimiter=" ", cols=(0, 1))
 title("Plot data from file")
 
 savefig("3-plotfile.png")

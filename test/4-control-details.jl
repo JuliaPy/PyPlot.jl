@@ -4,7 +4,6 @@
 # Description: example to show how to control details in figure
 # Created: November 24, 2012
 
-require("pyplot")
 using pyplot
 
 x = linspace(-pi, pi)
@@ -16,6 +15,6 @@ plot(x, y)
 title("control details in figure")
 xloc(0.0002)            # set x axis (major) ticks
 xloc_minor(0.0001)      # set x axis minor ticks
-ticklabel_format(:scilimits, (-3, 3))     # set scientific limit
+ticklabel_format(scilimits=(-3, 3))     # set scientific limit
 
 savefig("4-control-details.png")

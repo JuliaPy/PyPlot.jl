@@ -85,9 +85,10 @@ If a matplotlib window opened up, it should be a successful installation.
 
 ## Usage
 
-Most function signatures are same to the corresponding functions in pyplot. [Demos][demo] should be enough for elementary and medium usage.
+Most function signatures are same to the corresponding functions in
+pyplot. [Tests][test] should be enough for elementary and medium usage.
 
-[demo]: https://github.com/autozimu/pyplot.jl/tree/master/demo
+[test]: https://github.com/autozimu/pyplot.jl/tree/master/test
 
 ## Support and Contact
 

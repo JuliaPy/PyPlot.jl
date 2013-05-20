@@ -4,7 +4,6 @@
 # Description: subplot
 # Created: November 24, 2012
 
-require("pyplot")
 using pyplot
 
 x = linspace(-pi, pi, 20)
