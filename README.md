@@ -32,8 +32,8 @@ y = sin(x)
 figure()
 
 # plot
-plot(x, y, :label, L"$sin(x)$")
-legend("upper left")
+plot(x, y, label = "\$sin(x)\$")
+legend(loc="upper left")
 title("\$sin(x)\$")
 xlabel("\$x\$")
 ylabel("\$y\$")
@@ -85,25 +85,9 @@ If a matplotlib window opened up, it should be a successful installation.
 
 ## Usage
 
-Most function signatures are same to corresponding functions in pyplot,
-except some semantic differences due to the implementation:
+Most function signatures are same to the corresponding functions in pyplot. [Demos][demo] should be enough for elementary and medium usage.
 
-* [kwargs][]: use `:color, "red"` for `color="red"`
-* escaping characters: use `\\` for `\` to escape characters.
-  Alternatively, prefix string with `E`, `I`, or `L` accordingly to
-  prevent Julia perform escaping and/or interpolation.
-  [[1][Julia_non_standard_string]]
-
-[Demos][demo] should be enough for elementary and medium usage.
-
-[kwargs]: http://rosettacode.org/wiki/Named_parameters
 [demo]: https://github.com/autozimu/pyplot.jl/tree/master/demo
-[Julia_non_standard_string]: http://docs.julialang.org/en/latest/manual/strings/#non-standard-string-literals
-
-NOTE: the keyword syntax will be changed shortly in the future, with the
-introduce of keyword argument in Julia itself. And The string prefix
-`E`, `I` and `L` may not work with latest Julia, while the double slash
-`\\` will always work.
 
 ## Support and Contact
 

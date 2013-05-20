@@ -7,13 +7,13 @@
 x = linspace(-pi, pi)
 
 figure("basic")
-plot(x, sin(x), :label, E"$sin(x)$")
+plot(x, sin(x), label = "\$sin(x)\$")
 grid()
 xlim(-2pi, 2pi)     # set xrange
 ylim(-2, 2)         # set yrange
-title(E"$sin(x)$")
-xlabel(E"$x$")
-ylabel(E"$y$")
+title("\$sin(x)\$")
+xlabel("\$x\$")
+ylabel("\$y\$")
 legend()            # show legend
 # source_path() wil probably detect the source path
 savefig("basic.pdf")

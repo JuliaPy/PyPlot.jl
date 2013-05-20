@@ -6,17 +6,14 @@
 
 for func in funcs
     @eval begin
-        function ($func)(args...)
-            cmd = string($func)
+        function ($func)(args...; kargs...)
+            # translate function calls to strings
+            cmd_str = string($func)
+            args_str = parse_args(args, kargs)
 
-            args_str = ""
-            for arg in args
-                args_str += parse(arg)
-            end
-
-            ## send code to ipython
-            send("$cmd($args_str)")
+            # send commands to ipython
+            send("$cmd_str($args_str)")
         end
     end
-    eval(expr(:export, func))
+    eval(Expr(:export, func))
 end

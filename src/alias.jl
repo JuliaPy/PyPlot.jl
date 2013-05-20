@@ -5,57 +5,42 @@
 # Created: December 19, 2012
 
 ## add plot function
-function plot(f::Function, xmin::Real, xmax::Real, args...)
+function plot(f::Function, xmin::Real, xmax::Real, args...; kargs...)
     _PLOTPOINTS_ = 100
     x = linspace(float(xmin), float(xmax), _PLOTPOINTS_ + 1)
     y = [f(i) for i in x]
-    plot(x, y, args...)
+    plot(x, y, args..., kargs...)
 end
 
-## legend: take string argument as location, not label
-legend(loc::String, args...) = legend(:loc, loc, args...)
-
 ## fix savefig path problem
-function savefig(file::String, args...)
-    if file[1] != '/'
-        file = pwd() + '/' + file
+function savefig(filename::String, args...; kargs...)
+    if filename[1] != '/'
+        filename = pwd() + '/' + filename
     end
 
-    args_str = parse(file)
-    for arg in args
-        args_str += parse(arg)
-    end
+    args_str = parse_args(args, kargs)
 
-    send("savefig($args_str transparent=True)")
+    send("savefig('$filename', $args_str transparent=True)")
 end
 export savefig
 
 ## fix show() namespace conflicting
-function showfig(args...)
-    args_str = ""
-    for arg in args
-        args_str += parse(arg)
-    end
+function showfig(args...; kargs...)
+    args_str = parse_args(args, kargs)
     send("show($args_str)")
 end
 export showfig
 
 ## fix close() namespace conflicting
-function closefig(args...)
-    args_str = ""
-    for arg in args
-        args_str += parse(arg)
-    end
+function closefig(args...; kargs...)
+    args_str = parse_args(args, kargs)
     send("close($args_str)")
 end
 export closefig
 
 ## fix hist() namespace conflicting
-function phist(args...)
-    args_str = ""
-    for arg in args
-        args_str += parse(arg)
-    end
+function phist(args...; kargs...)
+    args_str = parse_args(args, kargs)
     send("hist($args_str)")
 end
 export phist

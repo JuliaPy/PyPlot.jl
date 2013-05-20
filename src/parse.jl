@@ -12,12 +12,12 @@ end
 
 ## parse Char
 function parse(ch::Char)
-    return "'$ch', "
+    return "'$ch'"
 end
 
 ## parse Symbol
 function parse(sym::Symbol)
-    return string(sym) + "="
+    return string(sym)
 end
 
 ## parse Bool
@@ -27,12 +27,12 @@ end
 
 ## parse String
 function parse(str::String)
-    return "'$str', "
+    return "'$str'"
 end
 
 ## parse everything else
 function parse(i::Any)
-    return string(i) + ", "
+    return string(i)
 end
 
 ## parse Array
@@ -52,8 +52,26 @@ function parse(arr::Array)
     str = "["
     for a in arr
         str += parse(a)
+        str += ", "
     end
-    return str + "], "
+    return str + "]"
+end
+
+## parse args and kargs
+function parse_args(args, kargs)
+    str  = ""
+    for arg in args
+        str += parse(arg)
+        str += ", "
+    end
+    for karg in kargs
+        str += parse(karg[1])
+        str += "="
+        str += parse(karg[2])
+        str += ", "
+    end
+
+    return str
 end
 
 ## parse Tuple
