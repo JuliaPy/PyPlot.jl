@@ -3,7 +3,7 @@
 ## 1-plot.jl
 
 ```julia
-using pyplot
+using Pyplot
 
 x = linspace(-pi, pi)
 
@@ -25,7 +25,7 @@ savefig("1-plot.png")
 ## 2-subplot.jl
 
 ```julia
-using pyplot
+using Pyplot
 
 x = linspace(-pi, pi, 20)
 y = sin(x)
@@ -57,7 +57,7 @@ savefig("2-subplot.png")
 ## 3-plotfile.jl
 
 ```julia
-using pyplot
+using Pyplot
 
 figure()
 plotfile("3-plotfile.txt", delimiter=" ", cols=(0, 1))
@@ -71,7 +71,7 @@ savefig("3-plotfile.png")
 ## 4-control-details.jl
 
 ```julia
-using pyplot
+using Pyplot
 
 x = linspace(-pi, pi)
 y = cos(x)
@@ -91,14 +91,14 @@ savefig("4-control-details.png")
 
 ## Want More?
 
-As mentioned before, this module is simply a wrapper around matplotlib,
+As mentioned before, this package is simply a wrapper around matplotlib,
 the powerful python plot library. If you want find more details on the
 plotting functions and available parameters, matplotlib's [website][mpl]
 is a good place. And there is also a [gallery][] page to show how
 powerful it could be. If you need some functions that have not yet been
 wrapped by this module (this is highly possible, since I only exported
 the functions that I think I will use in my simple research work), a
-special function `pyplot.send()` could be utilized to send arbitrary
+special function `pyplot.pyplot()` could be used to send arbitrary
 matplotlib commands.  Also, it is quite easy to wrap those functions,
 take `src/alias.jl` as example and make your own.
 
