@@ -5,9 +5,8 @@ module.
 
 ## Demo
 
-[](https://www.youtube.com/watch?v=zrPr46xTqbU).
-<a href="https://www.youtube.com/watch?v=zrPr46xTqbU"><img
-src="https://raw.github.com/autozimu/pyplot.jl/master/youtube.png"/></a>
+<a href="http://youtu.be/XCQeqiHixQ0"><img
+src="https://raw.github.com/autozimu/pyplot.jl/master/youtube-screenshot.png"/></a>
 
 
 ## Features
