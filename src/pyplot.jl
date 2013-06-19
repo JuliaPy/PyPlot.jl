@@ -1,10 +1,9 @@
 #!/usr/bin/env julia
-# File: pyplot.jl
+# File: Pyplot.jl
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: module's main file
-# Created: November 29, 2012
 
-module pyplot
+module Pyplot
 
 
 # get src location

@@ -2,7 +2,6 @@
 # File: parser.jl
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: translate julia type to python code string
-# Created: December 19, 2012
 
 ## concatenate strings
 import Base.+

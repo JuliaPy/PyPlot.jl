@@ -2,7 +2,6 @@
 # File: alias.jl
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: more calling signatures
-# Created: December 19, 2012
 
 ## add plot function
 function plot(f::Function, xmin::Real, xmax::Real, args...; kargs...)

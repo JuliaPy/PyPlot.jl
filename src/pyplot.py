@@ -2,7 +2,6 @@
 # File: pyplot.py
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: evalulate plot commands
-# Created: November 20, 2012
 
 from IPython.zmq.blockingkernelmanager import BlockingKernelManager
 from subprocess import PIPE

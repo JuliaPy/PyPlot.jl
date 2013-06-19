@@ -2,7 +2,6 @@
 # File: funcs.py
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: generate function finger
-# Created: December 19, 2012
 
 import matplotlib.pyplot as plt
 import inspect

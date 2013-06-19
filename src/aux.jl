@@ -2,7 +2,6 @@
 # File: send.jl
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: send python code to ipython
-# Created: December 19, 2012
 
 using ZMQ
 
