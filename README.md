@@ -16,34 +16,9 @@ emerge. I just cannot wait that long, so I started my own.
 
 ## Demo
 
-Video version on [YouTube]
-(https://www.youtube.com/watch?v=zrPr46xTqbU).
-
-
-```julia
-# load module
-using pyplot
-
-# generate data
-x = linspace(0, pi, 300)
-y = sin(x)
-
-# pop new figure window
-figure()
-
-# plot
-plot(x, y, label = "\$sin(x)\$")
-legend(loc="upper left")
-title("\$sin(x)\$")
-xlabel("\$x\$")
-ylabel("\$y\$")
-
-# save the plot
-savefig("test/demo.png")
-```
-
-![screenshot](https://github.com/autozimu/pyplot.jl/raw/master/test/demo.png)
-
+[](https://www.youtube.com/watch?v=zrPr46xTqbU).
+<a href="https://www.youtube.com/watch?v=zrPr46xTqbU"><img
+src="https://raw.github.com/autozimu/pyplot.jl/master/youtube.png"/></a>
 
 
 ## Features
