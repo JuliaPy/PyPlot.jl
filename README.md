@@ -3,17 +3,6 @@
 Graphics solution for [Julia][] based on [matploblib][], mainly the pyplot
 module.
 
-
-## Why
-
-The Julia community seems to be having a discussion over which approach
-should be used as the default graphics solution [[1][graphics-wiki]]
-[[2][graphics-gg]], and it may take a longer time for a mature solution to
-emerge. I just cannot wait that long, so I started my own.
-
-[graphics-wiki]: https://github.com/JuliaLang/julia/wiki/Graphics
-[graphics-gg]: https://groups.google.com/forum/?fromgroups=#!searchin/julia-dev/plot$20interface/julia-dev/Mi44lkCusCw/u3B3KZx0BO0J
-
 ## Demo
 
 [](https://www.youtube.com/watch?v=zrPr46xTqbU).
