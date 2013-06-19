@@ -2,9 +2,8 @@
 # File: 1-plot.jl
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: simple plot
-# Created: November 24, 2012
 
-using pyplot
+using Pyplot
 
 x = linspace(-pi, pi)
 

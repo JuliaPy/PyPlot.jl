@@ -1,6 +1,6 @@
 ## Want More?
 
-As mentioned before, this module is simply a wrapper around matplotlib,
+As mentioned before, this package is simply a wrapper around matplotlib,
 the powerful python plot library. If you want find more details on the
 plotting functions and available parameters, matplotlib's [website][mpl]
 is a good place. And there is also a [gallery][] page to show how

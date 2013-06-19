@@ -21,7 +21,7 @@ start_daemon()
 start_socket()
 
 # release resouces when exit
-atexit(pyplot.stop_daemon)
-atexit(pyplot.stop_socket)
+atexit(Pyplot.stop_daemon)
+atexit(Pyplot.stop_socket)
 
 end # end module

@@ -2,9 +2,8 @@
 # File: 2-subplot.jl
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: subplot
-# Created: November 24, 2012
 
-using pyplot
+using Pyplot
 
 x = linspace(-pi, pi, 20)
 y = sin(x)

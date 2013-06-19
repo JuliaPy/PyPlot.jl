@@ -2,9 +2,8 @@
 # File: 3-plotfile.jl
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: plot file
-# Created: November 24, 2012
 
-using pyplot
+using Pyplot
 
 figure()
 plotfile("3-plotfile.txt", delimiter=" ", cols=(0, 1))
