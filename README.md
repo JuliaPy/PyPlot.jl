@@ -6,7 +6,7 @@ module.
 ## Demo
 
 <a href="http://youtu.be/XCQeqiHixQ0"><img
-src="https://raw.github.com/autozimu/Pyplot.jl/master/youtube-screenshot.png"/></a>
+src="https://raw.github.com/autozimu/PyPlot.jl/master/youtube-screenshot.png"/></a>
 
 
 ## Features
@@ -34,13 +34,13 @@ to matplotlib developers.
 Install this module by
 
 ```bash
-git clone https://github.com/autozimu/Pyplot.jl ~/.julia/Pyplot
+git clone https://github.com/autozimu/PyPlot.jl ~/.julia/PyPlot
 ```
 
 Now in a Julia session, type
 
 ```julia
-using Pyplot
+using PyPlot
 figure()
 ```
 
@@ -51,7 +51,7 @@ If a matplotlib window opened up, it should be a successful installation.
 Most function signatures are same to the corresponding functions in
 pyplot. [Tests][test] should be enough for elementary and medium usage.
 
-[test]: https://github.com/autozimu/Pyplot.jl/tree/master/test
+[test]: https://github.com/autozimu/PyPlot.jl/tree/master/test
 
 ## Support and Contact
 

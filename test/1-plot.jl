@@ -3,7 +3,7 @@
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: simple plot
 
-using Pyplot
+using PyPlot
 
 x = linspace(-pi, pi)
 

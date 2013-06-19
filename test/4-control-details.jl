@@ -3,7 +3,7 @@
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: example to show how to control details in figure
 
-using Pyplot
+using PyPlot
 
 x = linspace(-pi, pi)
 y = cos(x)

@@ -8,6 +8,7 @@ test: $(SRC)
 		)
 
 README.md: $(SRC) 5-more.md
+	rm -f README.md
 	echo > README.md
 	echo "# demo" > README.md
 	echo >> README.md

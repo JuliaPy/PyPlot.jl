@@ -3,7 +3,7 @@
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: subplot
 
-using Pyplot
+using PyPlot
 
 x = linspace(-pi, pi, 20)
 y = sin(x)

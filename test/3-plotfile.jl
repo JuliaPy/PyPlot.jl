@@ -3,7 +3,7 @@
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: plot file
 
-using Pyplot
+using PyPlot
 
 figure()
 plotfile("3-plotfile.txt", delimiter=" ", cols=(0, 1))

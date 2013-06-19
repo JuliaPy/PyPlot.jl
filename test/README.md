@@ -3,7 +3,7 @@
 ## 1-plot.jl
 
 ```julia
-using Pyplot
+using PyPlot
 
 x = linspace(-pi, pi)
 
@@ -25,7 +25,7 @@ savefig("1-plot.png")
 ## 2-subplot.jl
 
 ```julia
-using Pyplot
+using PyPlot
 
 x = linspace(-pi, pi, 20)
 y = sin(x)
@@ -57,7 +57,7 @@ savefig("2-subplot.png")
 ## 3-plotfile.jl
 
 ```julia
-using Pyplot
+using PyPlot
 
 figure()
 plotfile("3-plotfile.txt", delimiter=" ", cols=(0, 1))
@@ -71,7 +71,7 @@ savefig("3-plotfile.png")
 ## 4-control-details.jl
 
 ```julia
-using Pyplot
+using PyPlot
 
 x = linspace(-pi, pi)
 y = cos(x)

@@ -3,11 +3,10 @@
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: module's main file
 
-module Pyplot
-
+module PyPlot
 
 # get src location
-PYPLOT_JL_HOME = Pkg.dir("pyplot", "src")
+PYPLOT_JL_HOME = Pkg.dir("PyPlot", "src")
 
 # relative include
 include("aux.jl")
@@ -21,7 +20,7 @@ start_daemon()
 start_socket()
 
 # release resouces when exit
-atexit(Pyplot.stop_daemon)
-atexit(Pyplot.stop_socket)
+atexit(PyPlot.stop_daemon)
+atexit(PyPlot.stop_socket)
 
 end # end module
