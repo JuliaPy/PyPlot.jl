@@ -13,7 +13,7 @@ global DEBUG = false
 
 # daemon: ipyton server
 function start_daemon()
-    global daemon = spawn(`$PYPLOT_JL_HOME/pyplot.py`)
+    global daemon = spawn(`$PYPLOT_JL_HOME/pyplot.py` .> STDERR)
 end
 
 function stop_daemon()

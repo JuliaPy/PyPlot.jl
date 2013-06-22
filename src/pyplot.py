@@ -3,9 +3,9 @@
 # Author: Junfeng Li <li424@mcmaster.ca>
 # Description: evalulate plot commands
 
+import zmq
 from IPython.zmq.blockingkernelmanager import BlockingKernelManager
 from subprocess import PIPE
-import zmq
 import sys, signal
 
 # init plot kernel
