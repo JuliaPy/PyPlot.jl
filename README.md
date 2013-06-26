@@ -57,3 +57,6 @@ pyplot. [Tests][] should be enough for elementary and medium usage.
 
 If any questions or comments, feel free to contact <autozimu@gmail.com>.
 
+## TODO
+
+- doc.
