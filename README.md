@@ -9,7 +9,7 @@ module.
 ## Demo
 
 <a href="http://youtu.be/XCQeqiHixQ0"><img
-src="https://raw.github.com/autozimu/PyPlot.jl/master/youtube-screenshot.png"/></a>
+src="https://raw.github.com/autozimu/PyPlot.jl/gh-pages/youtube-screenshot.png"/></a>
 
 
 ## Features
