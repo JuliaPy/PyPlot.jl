@@ -31,7 +31,7 @@ signal.signal(signal.SIGTERM, cleanup)
 # main loop
 while True:
     # retrieve request from client
-    cmd = rep.recv_string()
+    cmd = rep.recv_unicode()
 
     # execution is immediate and async, returning a UUID
     km.shell_channel.execute(cmd)
