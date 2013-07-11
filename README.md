@@ -1,4 +1,4 @@
-## What
+# PyPlot.jl
 
 Graphics solution for [Julia][] based on [matploblib][], mainly the pyplot
 module.
