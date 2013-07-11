@@ -12,6 +12,7 @@
 # serve to show the default.
 
 import sys, os
+import juliadoc
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -26,7 +27,8 @@ import sys, os
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.todo', 'sphinx.ext.coverage',
-'sphinx.ext.mathjax', 'sphinx.ext.ifconfig']
+'sphinx.ext.mathjax', 'sphinx.ext.ifconfig', 'juliadoc.julia',
+'juliadoc.jlhelp']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -95,7 +97,9 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme_path = ['JuliaDoc/juliadoc/theme']
+#html_theme_path = ['JuliaDoc/juliadoc/theme']
+html_theme_path = [juliadoc.get_theme_dir()]
+html_sidebars = juliadoc.default_sidebars()
 html_theme = 'julia'
 
 # Theme options are theme-specific and customize the look and feel of a theme
