@@ -99,7 +99,6 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 #html_theme_path = ['JuliaDoc/juliadoc/theme']
 html_theme_path = [juliadoc.get_theme_dir()]
-html_sidebars = juliadoc.default_sidebars()
 html_theme = 'julia'
 
 # Theme options are theme-specific and customize the look and feel of a theme
