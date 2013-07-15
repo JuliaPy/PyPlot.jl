@@ -4,14 +4,26 @@
 # Description: evalulate plot commands
 
 import zmq
-from IPython.zmq.blockingkernelmanager import BlockingKernelManager
+
+# 1.0 introduced KernelManager
+try:
+    from IPython.kernel import KernelManager
+except ImportError:
+    # Backwards compatability for versions < 1.0
+    from IPython.zmq.blockingkernelmanager import BlockingKernelManager as KernelManager
+
 from subprocess import PIPE
 import sys, signal
 
 # init plot kernel
-km = BlockingKernelManager()
+km = KernelManager()
 km.start_kernel(stdout=PIPE, stderr=PIPE, extra_arguments=['--pylab'])
-km.start_channels()
+try:
+    kc = km.client()
+except AttributeError:
+    # Backwards compatability for versions < 1.0
+    kc = km
+kc.start_channels()
 
 # start ZMQ REP
 ctx = zmq.Context()
@@ -20,7 +32,7 @@ rep.bind('ipc:///tmp/PyPlot_jl')
 
 # cleanup at exit
 def cleanup(signum, fname):
-    km.stop_channels()
+    kc.stop_channels()
     km.shutdown_kernel()
     sys.exit()
 
@@ -34,9 +46,9 @@ while True:
     cmd = rep.recv_unicode()
 
     # execution is immediate and async, returning a UUID
-    km.shell_channel.execute(cmd)
+    kc.shell_channel.execute(cmd)
     # get execute result
-    reply = km.shell_channel.get_msg()
+    reply = kc.shell_channel.get_msg()
 
     if reply['content']['status'] == 'ok':
         rep.send_unicode('')
