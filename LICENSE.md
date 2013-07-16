@@ -1,7 +1,6 @@
-    The MIT License
+    The MIT License (MIT)
 
-    PyPlot.jl: Graphics solution for Julia based on matplotlib.pyplot.
-    Copyright (C) 2013 Junfeng Li <li424@mcmaster.ca>
+    Copyright (c) 2013 Junfeng Li <li424@mcmaster.ca>
 
     Permission is hereby granted, free of charge, to any person
     obtaining a copy of this software and associated documentation files
