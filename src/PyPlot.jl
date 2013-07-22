@@ -19,8 +19,13 @@ include("alias.jl")
 start_daemon()
 start_socket()
 
-# release resouces when exit
+# release resources when exit
 atexit(PyPlot.stop_daemon)
 atexit(PyPlot.stop_socket)
+
+# turn off interactive when julia is not interactive
+if !isinteractive()
+    ioff()
+end
 
 end # end module
