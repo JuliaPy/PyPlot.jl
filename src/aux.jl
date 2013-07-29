@@ -27,8 +27,8 @@ end
 
 ## zmq client
 function start_socket()
-    global ctx = ZMQContext(1)
-    global socket = ZMQSocket(ctx, ZMQ_REQ)
+    global ctx = Context(1)
+    global socket = Socket(ctx, REQ)
     ZMQ.connect(socket, "ipc:///tmp/PyPlot_jl")
 end
 
@@ -58,9 +58,8 @@ function send(cmd::String)
         println(cmd)
     end
 
-    ZMQ.send(socket, ZMQMessage(cmd))
+    ZMQ.send(socket, ZMQ.Message(cmd))
     msg = ZMQ.recv(socket)
-    msg = ASCIIString[msg]
 
     # print traceback info
     if msg != ""
