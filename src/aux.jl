@@ -60,7 +60,6 @@ function send(cmd::String)
 
     ZMQ.send(socket, ZMQ.Message(cmd))
     msg = ZMQ.recv(socket)
-    msg = ASCIIString[msg]
 
     # print traceback info
     if msg != ""
