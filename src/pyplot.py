@@ -13,7 +13,8 @@ except ImportError:
     from IPython.zmq.blockingkernelmanager import BlockingKernelManager as KernelManager
 
 from subprocess import PIPE
-import sys, signal
+import sys
+import signal
 
 # init plot kernel
 km = KernelManager()
@@ -29,6 +30,7 @@ kc.start_channels()
 ctx = zmq.Context()
 rep = ctx.socket(zmq.REP)
 rep.bind('ipc:///tmp/PyPlot_jl')
+
 
 # cleanup at exit
 def cleanup(signum, fname):
