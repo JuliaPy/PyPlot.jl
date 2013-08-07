@@ -1,3 +1,9 @@
+# Deprecated!!!
+
+This package is deprecated. Keep an eye on the development of
+[IJulia](https://github.com/JuliaLang/IJulia.jl), which will have a `PyPlot`
+module builtin (or might be a separate package).
+
 # PyPlot.jl
 
 Graphics solution for [Julia][] based on [matploblib][], mainly the pyplot
