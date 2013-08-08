@@ -1,68 +1,89 @@
-# Deprecated!!!
+# The PyPlot module for Julia
 
-This package is deprecated. Keep an eye on the development of
-[IJulia](https://github.com/JuliaLang/IJulia.jl), which will have a `PyPlot`
-module builtin (or might be a separate package).
+This module provides a Julia interface to the
+[matplotlib](http://matplotlib.org/) plotting library from Python, and
+specifically to the `matplotlib.pyplot` module.
 
-# PyPlot.jl
+PyPlot uses the Julia [PyCall](https://github.com/stevengj/PyCall.jl)
+package to call matplotlib directly from Julia with little or no
+overhead (arrays are passed without making a copy).
 
-Graphics solution for [Julia][] based on [matploblib][], mainly the pyplot
-module.
+This package takes advantage of Julia's [multimedia
+I/O](http://docs.julialang.org/en/latest/stdlib/base/#multimedia-i-o)
+API to display plots in any Julia graphical backend, including as
+inline graphics in [IJulia](https://github.com/JuliaLang/IJulia.jl).
+Alternatively, you can use a Python-based graphical matplotlib
+backend to support interactive plot zooming etcetera.
 
-[Julia]: http://julialang.org/ "The Julia Language"
-[matploblib]: http://matplotlib.org/ "matplotlib"
+(This PyPlot package replaces an earlier package of the same name by
+[Junfeng Li](https://github.com/autozimu/), which used PyPlot over a
+ZeroMQ socket with IPython.)
 
-## Demo
+## Installation
 
-<a href="http://youtu.be/XCQeqiHixQ0"><img
-src="https://raw.github.com/autozimu/PyPlot.jl/gh-pages/youtube-screenshot.png"/></a>
+You will need to have the Python [matplotlib](http://matplotlib.org/)
+library installed on your machine in order to use PyPlot.
 
+Once matplotlib is installed, then you can just use
+`Pkg.add("PyPlot")` in Julia to install PyPlot and its dependencies.
 
-## Features
+**Note:** Julia version 0.2 (or a recent pre-release version thereof)
+is required to use PyPlot.
 
-- Interactive usage from Julia REPL
-- Excellent math/TeX symbols support
-- Multiple export formats (EPS, PDF, PNG, JPEG, ...)
+## Basic usage
 
-Since this module is simply a wrapper around matplotlib, all credit goes
-to matplotlib developers.
+Once matplotlib and PyPlot is installed, and you are using a
+graphics-capable Julia environment such as IJulia, you can simply type
+`using PyPlot` and begin calling functions in the
+[matplotlib.pyplot](http://matplotlib.org/api/pyplot_api.html) API.
+For example:
 
-## Dependencies
-
-- [zmq](http://www.zeromq.org/)
-- [pyzmq](https://github.com/zeromq/pyzmq)
-- [matplotlib](http://matplotlib.org/)
-- [ipython](http://ipython.org/)
-- patience :)
-
-## Install
-
-Typing following lines in a Julia session,
-
-```julia
-Pkg.add("PyPlot")
+```
+Using PyPlot
+x = linspace(0,2*pi,1000); y = sin(3*x + 4*cos(2*x));
+plot(x, y, color="red", linewidth=2.0, linestyle="--")
+title("A sinusoidally modulated sinusoid")
 ```
 
-Now, typing
+In general, all of the arguments, including keyword arguments, are
+exactly the same as in Python.  (With minor translations, of course,
+e.g. Julia uses `true` and `nothing` instead of Python's `True` and
+`None`.)
 
-```julia
-using PyPlot
-figure()
+The full matplotlib.pyplot API is far too extensive to describe here;
+see the [matplotlib.pyplot documentation for more
+information](http://matplotlib.org/api/pyplot_api.html)
+
+## Changing the graphics backend
+
+PyPlot can use any Julia graphics backend capable of displaying PNG,
+SVG, or PDF images, such as the IJulia environment.  To use a
+different backend, simply call `pushdisplay` with the desired
+`Display`; see the [Julia multimedia display
+API](http://docs.julialang.org/en/latest/stdlib/base/#multimedia-i-o)
+for more detail.
+
+On the other hand, you may wish to use one of the Python matplotlib
+backends to open an interactive window for each plot (for interactive
+zooming, panning, etcetera).  You can do this by importing the PyCall
+module and using its `pygui` function to set a Python backend:
 ```
+using PyCall
+pygui(:qt)
+```
+This must be done *before* importing the PyPlot module.  (The `pygui`
+argument can currently be `:wx`, `:gtk`, or `:qt` in order to specify
+the [wxWidgets](http://www.wxwidgets.org/),
+[GTK+](http://www.gtk.org/), or [Qt](http://qt-project.org/) (via the
+[PyQt4](http://wiki.python.org/moin/PyQt4) or
+[PySide](http://qt-project.org/wiki/PySide) Python modules) GUI
+libraries (which must be installed for Python).
 
-If a matplotlib window opened up, it should be a successful installation.
+If no Julia graphics backend is available, PyPlot will default to
+a `pygui` backend.  Conversely, if you have started a `pygui` backend
+for some other reason, but wish to use PyPlot with Julia graphics,
+just run `pygui(:default)` before importing PyPlot.
 
-## Usage
+## Author
 
-Most function signatures are same to the corresponding functions in
-pyplot. [Tests][] should be enough for elementary and medium usage.
-
-[Tests]: https://github.com/autozimu/PyPlot.jl/tree/master/test
-
-## Support and Contact
-
-If any questions or comments, feel free to contact <autozimu@gmail.com>.
-
-## TODO
-
-- doc.
+This module was written by [Steven G. Johnson](http://math.mit.edu/~stevenj/).
