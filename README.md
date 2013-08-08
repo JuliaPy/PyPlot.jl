@@ -60,6 +60,18 @@ as `plt.foo(...)`.  For example, `plt.plot(x, y)` also works.  (And
 the raw `PyObject`s for the matplotlib and pyplot modules are accessible
 as `PyPlot.matplotlib` and `PyPlot.pltm`, respectively.)
 
+## Figure objects
+
+You can get the current figure as a `PyFigure` object (a wrapper
+around `matplotlib.pyplot.Figure`) by calling `gcf()`.  
+
+The `PyFigure` type supports Julia's [multimedia I/O
+API](http://docs.julialang.org/en/latest/stdlib/base/#multimedia-i-o),
+so you can use `display(fig)` to show a `fig::PyFigure` and
+`writemime(io, mime, fig)` to write it to a given `mime` type string
+(e.g. `"image/png"` or `"application/pdf"`) that is supported by the
+matplotlib backend.
+
 ## Changing the graphics backend
 
 PyPlot can use any Julia graphics backend capable of displaying PNG,
@@ -73,17 +85,20 @@ On the other hand, you may wish to use one of the Python matplotlib
 backends to open an interactive window for each plot (for interactive
 zooming, panning, etcetera).  You can do this by importing the PyCall
 module and using its `pygui` function to set a Python backend:
+
 ```
 using PyCall
-pygui(:qt)
+pygui()
 ```
-This must be done *before* importing the PyPlot module.  (The `pygui`
-argument can currently be `:wx`, `:gtk`, or `:qt` in order to specify
-the [wxWidgets](http://www.wxwidgets.org/),
+
+This must be done *before* importing the PyPlot module, and picks a
+default Python GUI toolkit.  You can also call `pygui(gui)` to pick a
+specific toolkit; `gui` can currently be one of `:wx`, `:gtk`, or
+`:qt` in order to specify [wxWidgets](http://www.wxwidgets.org/),
 [GTK+](http://www.gtk.org/), or [Qt](http://qt-project.org/) (via the
 [PyQt4](http://wiki.python.org/moin/PyQt4) or
-[PySide](http://qt-project.org/wiki/PySide) Python modules) GUI
-libraries (which must be installed for Python).
+[PySide](http://qt-project.org/wiki/PySide), respectively.  (Obviously,
+you must have installed one of these toolkits for Python first.)
 
 If no Julia graphics backend is available, PyPlot will default to
 a `pygui` backend.  Conversely, if you have started a `pygui` backend
