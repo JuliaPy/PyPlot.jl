@@ -60,12 +60,17 @@ as `plt.foo(...)`.  For example, `plt.plot(x, y)` also works.  (And
 the raw `PyObject`s for the matplotlib and pyplot modules are accessible
 as `PyPlot.matplotlib` and `PyPlot.pltm`, respectively.)
 
+You must also use `plt` to access some functions that conflict with
+built-in Julia functions.  In particular, `plt.hist` and `plt.xcorr`
+must be used to access `matplotlib.pyplot.hist` and
+`matplotlib.pyplot.xcorr`, respectively.
+
 ## Figure objects
 
-You can get the current figure as a `PyFigure` object (a wrapper
+You can get the current figure as a `Figure` object (a wrapper
 around `matplotlib.pyplot.Figure`) by calling `gcf()`.  
 
-The `PyFigure` type supports Julia's [multimedia I/O
+The `Figure` type supports Julia's [multimedia I/O
 API](http://docs.julialang.org/en/latest/stdlib/base/#multimedia-i-o),
 so you can use `display(fig)` to show a `fig::PyFigure` and
 `writemime(io, mime, fig)` to write it to a given `mime` type string

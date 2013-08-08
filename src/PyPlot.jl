@@ -3,7 +3,7 @@ module PyPlot
 using PyCall
 import PyCall: PyObject
 import Base: convert, isequal, hash, writemime
-export PyPlotFigure, plt, matplotlib
+export Figure, plt, matplotlib
 
 ###########################################################################
 # file formats supported by Agg backend, from MIME types
@@ -51,19 +51,19 @@ const pltm = pyimport("matplotlib.pyplot") # raw Python module
 ###########################################################################
 # Wrapper around matplotlib Figure, supporting graphics I/O and pretty display
 
-type PyPlotFigure
+type Figure
     o::PyObject
 end
 
-PyObject(f::PyPlotFigure) = f.o
-convert(::Type{PyPlotFigure}, o::PyObject) = PyPlotFigure(o)
-isequal(f::PyPlotFigure, g::PyPlotFigure) = isequal(f.o, g.o)
-hash(f::PyPlotFigure) = hash(f.o)
+PyObject(f::Figure) = f.o
+convert(::Type{Figure}, o::PyObject) = Figure(o)
+isequal(f::Figure, g::Figure) = isequal(f.o, g.o)
+hash(f::Figure) = hash(f.o)
 
-pytype_mapping(pltm["Figure"], PyPlotFigure)
+pytype_mapping(pltm["Figure"], Figure)
 
 for (mime,fmt) in aggformats
-    @eval function writemime(io::IO, m::@MIME($mime), f::PyPlotFigure)
+    @eval function writemime(io::IO, m::@MIME($mime), f::Figure)
         if !haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict),
                    $fmt)
             throw(MethodError(writemime, (io, m, f)))
@@ -84,7 +84,7 @@ if isjulia_display
         if pltm[:isinteractive]()
             manager = Gcf[:get_active]()
             if manager != nothing
-                fig = PyPlotFigure(manager["canvas"]["figure"])
+                fig = Figure(manager["canvas"]["figure"])
                 redisplay(fig)
                 drew_something[1] = true
             end
@@ -97,7 +97,7 @@ if isjulia_display
         @eval function $s()
             if drew_something[1]
                 for manager in Gcf[:get_all_fig_managers]()
-                    $d(PyPlotFigure(manager["canvas"]["figure"]))
+                    $d(Figure(manager["canvas"]["figure"]))
                 end
                 $(d == :redisplay ? :(pltm[:close]("all")) : nothing)
                 drew_something[1] = false # reset until next drawing command
@@ -128,9 +128,9 @@ end
 const plt = pywrap(pltm)
 
 # export documented pyplot API (http://matplotlib.org/api/pyplot_api.html)
-export acorr,annotate,arrow,autoscale,autumn,axes,axhline,axhspan,axis,axvline,axvspan,bar,barbs,barh,bone,box,boxplot,broken_barh,cla,clabel,clf,clim,close,cohere,colorbar,colors,connect,contour,contourf,cool,copper,csd,delaxes,disconnect,draw,errorbar,eventplot,figimage,figlegend,figtext,figure,fill,fill_between,fill_betweenx,findobj,flag,gca,gcf,gci,get_current_fig_manager,get_figlabels,get_fignums,get_plot_commands,ginput,gray,grid,hexbin,hist,hist2d,hlines,hold,hot,hsv,imread,imsave,imshow,ioff,ion,ishold,isinteractive,jet,legend,locator_params,loglog,margins,matshow,minorticks_off,minorticks_on,over,pause,pcolor,pcolormesh,pie,pink,plot,plot_date,plotfile,polar,prism,psd,quiver,quiverkey,rc,rc_context,rcdefaults,rgrids,savefig,sca,scatter,sci,semilogx,semilogy,set_cmap,setp,show,specgram,spectral,spring,spy,stackplot,stem,step,streamplot,subplot,subplot2grid,subplot_tool,subplots,subplots_adjust,summer,suptitle,switch_backend,table,text,thetagrids,tick_params,ticklabel_format,tight_layout,title,tricontour,tricontourf,tripcolor,triplot,twinx,twiny,vlines,waitforbuttonpress,winter,xcorr,xkcd,xlabel,xlim,xscale,xticks,ylabel,ylim,yscale,yticks
+export acorr,annotate,arrow,autoscale,autumn,axes,axhline,axhspan,axis,axvline,axvspan,bar,barbs,barh,bone,box,boxplot,broken_barh,cla,clabel,clf,clim,cohere,colorbar,colors,contour,contourf,cool,copper,csd,delaxes,disconnect,draw,errorbar,eventplot,figimage,figlegend,figtext,figure,fill_between,fill_betweenx,findobj,flag,gca,gcf,gci,get_current_fig_manager,get_figlabels,get_fignums,get_plot_commands,ginput,gray,grid,hexbin,hist2d,hlines,hold,hot,hsv,imread,imsave,imshow,ioff,ion,ishold,isinteractive,jet,legend,locator_params,loglog,margins,matshow,minorticks_off,minorticks_on,over,pause,pcolor,pcolormesh,pie,pink,plot,plot_date,plotfile,polar,prism,psd,quiver,quiverkey,rc,rc_context,rcdefaults,rgrids,savefig,sca,scatter,sci,semilogx,semilogy,set_cmap,setp,show,specgram,spectral,spring,spy,stackplot,stem,step,streamplot,subplot,subplot2grid,subplot_tool,subplots,subplots_adjust,summer,suptitle,switch_backend,table,text,thetagrids,tick_params,ticklabel_format,tight_layout,title,tricontour,tricontourf,tripcolor,triplot,twinx,twiny,vlines,waitforbuttonpress,winter,xkcd,xlabel,xlim,xscale,xticks,ylabel,ylim,yscale,yticks
 
-for f in (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:axis,:axvline,:axvspan,:bar,:barbs,:barh,:bone,:box,:boxplot,:broken_barh,:cla,:clabel,:clf,:clim,:close,:cohere,:colorbar,:colors,:connect,:contour,:contourf,:cool,:copper,:csd,:delaxes,:disconnect,:draw,:errorbar,:eventplot,:figimage,:figlegend,:figtext,:figure,:fill,:fill_between,:fill_betweenx,:findobj,:flag,:gca,:gcf,:gci,:get_current_fig_manager,:get_figlabels,:get_fignums,:get_plot_commands,:ginput,:gray,:grid,:hexbin,:hist,:hist2d,:hlines,:hold,:hot,:hsv,:imread,:imsave,:imshow,:ioff,:ion,:ishold,:isinteractive,:jet,:legend,:locator_params,:loglog,:margins,:matshow,:minorticks_off,:minorticks_on,:over,:pause,:pcolor,:pcolormesh,:pie,:pink,:plot,:plot_date,:plotfile,:polar,:prism,:psd,:quiver,:quiverkey,:rc,:rc_context,:rcdefaults,:rgrids,:savefig,:sca,:scatter,:sci,:semilogx,:semilogy,:set_cmap,:setp,:show,:specgram,:spectral,:spring,:spy,:stackplot,:stem,:step,:streamplot,:subplot,:subplot2grid,:subplot_tool,:subplots,:subplots_adjust,:summer,:suptitle,:switch_backend,:table,:text,:thetagrids,:tick_params,:ticklabel_format,:tight_layout,:title,:tricontour,:tricontourf,:tripcolor,:triplot,:twinx,:twiny,:vlines,:waitforbuttonpress,:winter,:xcorr,:xkcd,:xlabel,:xlim,:xscale,:xticks,:ylabel,:ylim,:yscale,:yticks)
+for f in (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:axis,:axvline,:axvspan,:bar,:barbs,:barh,:bone,:box,:boxplot,:broken_barh,:cla,:clabel,:clf,:clim,:cohere,:colorbar,:colors,:contour,:contourf,:cool,:copper,:csd,:delaxes,:disconnect,:draw,:errorbar,:eventplot,:figimage,:figlegend,:figtext,:figure,:fill_between,:fill_betweenx,:findobj,:flag,:gca,:gcf,:gci,:get_current_fig_manager,:get_figlabels,:get_fignums,:get_plot_commands,:ginput,:gray,:grid,:hexbin,:hist2d,:hlines,:hold,:hot,:hsv,:imread,:imsave,:imshow,:ioff,:ion,:ishold,:isinteractive,:jet,:legend,:locator_params,:loglog,:margins,:matshow,:minorticks_off,:minorticks_on,:over,:pause,:pcolor,:pcolormesh,:pie,:pink,:plot,:plot_date,:plotfile,:polar,:prism,:psd,:quiver,:quiverkey,:rc,:rc_context,:rcdefaults,:rgrids,:savefig,:sca,:scatter,:sci,:semilogx,:semilogy,:set_cmap,:setp,:show,:specgram,:spectral,:spring,:spy,:stackplot,:stem,:step,:streamplot,:subplot,:subplot2grid,:subplot_tool,:subplots,:subplots_adjust,:summer,:suptitle,:switch_backend,:table,:text,:thetagrids,:tick_params,:ticklabel_format,:tight_layout,:title,:tricontour,:tricontourf,:tripcolor,:triplot,:twinx,:twiny,:vlines,:waitforbuttonpress,:winter,:xkcd,:xlabel,:xlim,:xscale,:xticks,:ylabel,:ylim,:yscale,:yticks)
     py_f = symbol(string("py_", f))
     sf = string(f)
     if haskey(pltm, sf)
@@ -143,5 +143,25 @@ for f in (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:ax
                                           " does not have pyplot.$sf")
     end
 end
+
+# The following pyplot functions must be handled specially since they
+# overlap with standard Julia functions:
+#          close, connect, fill, hist, xcorr
+
+import Base: close, connect, fill
+
+const py_close = pltm["close"]
+close(f::Union(Figure,String,Integer)) = pycall(py_close, PyAny, f)
+close() = pycall(py_close, PyAny)
+
+const py_connect = pltm["connect"]
+connect(s::String, f::Function) = pycall(py_connect, PyAny, s, f)
+
+const py_fill = pltm["fill"]
+fill(x::AbstractArray,y::AbstractArray, args...; kws...) =
+    pycall(py_fill, PyAny, x, y, args...; kws...)
+
+# no way to use method dispatch for hist or xcorr, since their
+# argument signatures look too much like Julia's
 
 end # module PyPlot
