@@ -136,11 +136,11 @@ for f in (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:ax
     if haskey(pltm, sf)
         @eval begin
             const $py_f = pltm[$sf]
-            $f(args...) = pycall($py_f, PyAny, args...)
+            $f(args...; kws...) = pycall($py_f, PyAny, args...; kws...)
         end
     else # using a different (older?) version of matplotlib
-        @eval $f(args...) = error("matplotlib ", m[:__version__],
-                                  " does not have pyplot.$sf")
+        @eval $f(args...; kws...) = error("matplotlib ", m[:__version__],
+                                          " does not have pyplot.$sf")
     end
 end
 
