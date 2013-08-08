@@ -63,8 +63,13 @@ hash(f::PyPlotFigure) = hash(f.o)
 pytype_mapping(pltm["Figure"], PyPlotFigure)
 
 for (mime,fmt) in aggformats
-    @eval writemime(io::IO, ::@MIME($mime), f::PyPlotFigure) =
+    @eval function writemime(io::IO, m::@MIME($mime), f::PyPlotFigure)
+        if !haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict),
+                   $fmt)
+            throw(MethodError(writemime, (io, m, f)))
+        end
         f.o["canvas"][:print_figure](io, format=$fmt, bbox_inches="tight")
+    end
 end
 
 ###########################################################################
