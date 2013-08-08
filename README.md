@@ -54,6 +54,12 @@ The full matplotlib.pyplot API is far too extensive to describe here;
 see the [matplotlib.pyplot documentation for more
 information](http://matplotlib.org/api/pyplot_api.html)
 
+Only the currently documented matplotlib.pyplot API is exported.  To use
+other functions in the module, you can also call `matplotlib.pyplot.foo(...)`
+as `plt.foo(...)`.  For example, `plt.plot(x, y)` also works.  (And
+the raw `PyObject`s for the matplotlib and pyplot modules are accessible
+as `PyPlot.matplotlib` and `PyPlot.pltm`, respectively.)
+
 ## Changing the graphics backend
 
 PyPlot can use any Julia graphics backend capable of displaying PNG,
