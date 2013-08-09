@@ -2,7 +2,7 @@ module PyPlot
 
 using PyCall
 import PyCall: PyObject
-import Base: convert, isequal, hash, writemime
+import Base: convert, isequal, hash, writemime, getindex, setindex!, haskey
 export Figure, plt, matplotlib
 
 ###########################################################################
@@ -59,6 +59,10 @@ PyObject(f::Figure) = f.o
 convert(::Type{Figure}, o::PyObject) = Figure(o)
 isequal(f::Figure, g::Figure) = isequal(f.o, g.o)
 hash(f::Figure) = hash(f.o)
+
+getindex(f::Figure, x) = getindex(f.o, x)
+setindex!(f::Figure, v, x) = setindex!(f.o, v, x)
+haskey(f::Figure, x) = haskey(f.o, x)
 
 pytype_mapping(pltm["Figure"], Figure)
 
