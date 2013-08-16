@@ -83,7 +83,7 @@ so you can use `display(fig)` to show a `fig::PyFigure` and
 (e.g. `"image/png"` or `"application/pdf"`) that is supported by the
 matplotlib backend.
 
-## Changing the graphics backend
+## Interactive versus Julia graphics
 
 PyPlot can use any Julia graphics backend capable of displaying PNG,
 SVG, or PDF images, such as the IJulia environment.  To use a
@@ -94,27 +94,36 @@ for more detail.
 
 On the other hand, you may wish to use one of the Python matplotlib
 backends to open an interactive window for each plot (for interactive
-zooming, panning, etcetera).  You can do this by importing the PyCall
-module and using its `pygui` function to set a Python backend:
+zooming, panning, etcetera).  You can do this at any time by running:
+```
+pygui(true)
+```
+to turn on the Python-based GUI (if possible) for subsequent plots,
+while `pygui(false)` will return to the Julia backend.  Even when a
+Python GUI is running, you can display the current figure with the
+Julia backend by running `display(gcf())`.
 
+If no Julia graphics backend is available when PyPlot is imported, then
+`pygui(true)` is the default.
+
+### Choosing a Python GUI toolkit
+
+Only the [wxWidgets](http://www.wxwidgets.org/),
+[GTK+](http://www.gtk.org/), and [Qt](http://qt-project.org/) (via the
+[PyQt4](http://wiki.python.org/moin/PyQt4) or
+[PySide](http://qt-project.org/wiki/PySide), Python GUI backends are
+supported by PyPlot.  (Obviously, you must have installed one of these
+toolkits for Python first.)  By default, PyPlot picks one of these
+when it starts up (based on what you have installed), but you can
+force a specific toolkit to be chosen by importing the PyCall module
+and using its `pygui` function to set a Python backend *before*
+importing PyPlot:
 ```
 using PyCall
-pygui()
+pygui(gui)
+using PyPlot
 ```
-
-This must be done *before* importing the PyPlot module, and picks a
-default Python GUI toolkit.  You can also call `pygui(gui)` to pick a
-specific toolkit; `gui` can currently be one of `:wx`, `:gtk`, or
-`:qt` in order to specify [wxWidgets](http://www.wxwidgets.org/),
-[GTK+](http://www.gtk.org/), or [Qt](http://qt-project.org/) (via the
-[PyQt4](http://wiki.python.org/moin/PyQt4) or
-[PySide](http://qt-project.org/wiki/PySide), respectively.  (Obviously,
-you must have installed one of these toolkits for Python first.)
-
-If no Julia graphics backend is available, PyPlot will default to
-a `pygui` backend.  Conversely, if you have started a `pygui` backend
-for some other reason, but wish to use PyPlot with Julia graphics,
-just run `pygui(:default)` before importing PyPlot.
+where `gui` can currently be one of `:wx`, `:gtk`, or `:qt`.
 
 ## Author
 

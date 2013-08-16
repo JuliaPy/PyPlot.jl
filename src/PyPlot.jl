@@ -1,9 +1,9 @@
 module PyPlot
 
 using PyCall
-import PyCall: PyObject
+import PyCall: PyObject, pygui
 import Base: convert, isequal, hash, writemime, getindex, setindex!, haskey
-export Figure, plt, matplotlib
+export Figure, plt, matplotlib, pygui
 
 ###########################################################################
 # file formats supported by Agg backend, from MIME types
@@ -23,10 +23,12 @@ function isdisplayok()
 end
 
 ###########################################################################
-# Display backend: use built-in Julia display mechanism if images
-# are displayable and PyCall.gui == :default, or pygui otherwise.
+# We allow the user to turn on or off the Python gui interactively via
+# pygui(true/false).  This is done by loading pyplot with a GUI backend
+# if possible, then switching to a Julia-display backend (if available),
+# hooking into pyplot via a monkey-patched draw_if_interactive.
 
-const isjulia_display = PyCall.gui == :default && isdisplayok()
+const isjulia_display = Bool[isdisplayok()]
 const matplotlib = pyimport("matplotlib")
 
 pymodule_exists(s::String) = try 
@@ -36,10 +38,7 @@ catch
     false
 end
 
-if isjulia_display
-    matplotlib[:use]("Agg") # make sure no GUI windows pop up
-    matplotlib[:interactive](true)
-else
+const backend, gui = begin
     const gui2matplotlib = [ :wx=>"WXAgg", :gtk=>"GTKAgg", :qt=>"Qt4Agg" ]
     try
         local gui::Symbol
@@ -51,7 +50,6 @@ else
                     matplotlib[:use](gui2matplotlib[g])
                     if pymodule_exists(string("matplotlib.backends.backend_", 
                                               lowercase(gui2matplotlib[g])))
-                        println("found matplotlib GUI $g")
                         gui = g
                         break
                     end
@@ -61,17 +59,40 @@ else
             gui = pygui()
             matplotlib[:use](gui2matplotlib[gui])
         end
-        pygui_start(gui)
+        if !isjulia_display[1]
+            pygui_start(gui)
+        end
         matplotlib[:interactive](true)
+        (gui2matplotlib[gui], gui)
     catch
-        warn("No working GUI backend found for matplotlib.")
+        if !isjulia_display[1]
+            warn("No working GUI backend found for matplotlib.")
+            isjulia_display[1] = true
+        end
         pygui(:default)
         matplotlib[:use]("Agg") # GUI not available
-        matplotlib[:interactive](false)
+        matplotlib[:interactive](isdisplayok())
+        ("Agg", gui)
     end
 end
 
 const pltm = pyimport("matplotlib.pyplot") # raw Python module
+
+function pygui(b::Bool)
+    if !b != isjulia_display[1]
+        if backend != "Agg"
+            pltm[:switch_backend](b ? backend : "Agg")
+            monkeypatch()
+            if b
+                pygui_start(gui) # make sure event loop is started
+            end
+        elseif b
+            error("No working GUI backend found for matplotlib.")
+        end
+        isjulia_display[1] = !b
+    end
+    return b
+end
 
 ###########################################################################
 # Wrapper around matplotlib Figure, supporting graphics I/O and pretty display
@@ -102,14 +123,15 @@ for (mime,fmt) in aggformats
 end
 
 ###########################################################################
-# For Julia displays, monkey-patch pylab to call redisplay after each
-# drawing command (which calls draw_if_interactive)
+# Monkey-patch pylab to call redisplay after each drawing command
+# (which calls draw_if_interactive) for Julia displays.
 
-if isjulia_display
-    const Gcf = pyimport("matplotlib._pylab_helpers")["Gcf"]
-    const drew_something = [false]
+const Gcf = pyimport("matplotlib._pylab_helpers")["Gcf"]
+const drew_something = [false]
+const orig_draw = pltm["draw_if_interactive"]
 
-    function draw_if_interactive()
+function draw_if_interactive()
+    if isjulia_display[1]
         if pltm[:isinteractive]()
             manager = Gcf[:get_active]()
             if manager != nothing
@@ -118,38 +140,38 @@ if isjulia_display
                 drew_something[1] = true
             end
         end
+    else
+        pycall(orig_draw, PyObject)
+    end
+    nothing
+end
+
+for d in (:display, :redisplay)
+    s = symbol(string(d, "_figs"))
+    @eval function $s()
+        if drew_something[1] && isjulia_display[1]
+            for manager in Gcf[:get_all_fig_managers]()
+                $d(Figure(manager["canvas"]["figure"]))
+            end
+            $(d == :redisplay ? :(pltm[:close]("all")) : nothing)
+            drew_something[1] = false # reset until next drawing command
+        end
         nothing
     end
-    
-    for d in (:display, :redisplay)
-        s = symbol(string(d, "_figs"))
-        @eval function $s()
-            if drew_something[1]
-                for manager in Gcf[:get_all_fig_managers]()
-                    $d(Figure(manager["canvas"]["figure"]))
-                end
-                $(d == :redisplay ? :(pltm[:close]("all")) : nothing)
-                drew_something[1] = false # reset until next drawing command
-            end
-            nothing
-        end
-    end
-    
+end
+
+function monkeypatch()
     pltm["draw_if_interactive"] = draw_if_interactive
     pltm["show"] = display_figs
-    
-    if isdefined(Main,:IJulia)
-        Main.IJulia.push_postexecute_hook(redisplay_figs)
-    end
-elseif PyCall.gui != :default # pygui display
-    # We monkey-patch pylab.show to ensure that it is non-blocking, as
-    # matplotlib does not reliably detect that our event-loop is running.
-    # (Note that some versions of show accept a "block" keyword or directly
-    # as a boolean argument, so we must accept the same arguments.)
-    function show_noop(b=false; block=false)
-        nothing # no-op
-    end
-    pltm[:show] = show_noop
+end
+
+if isdefined(Main,:IJulia)
+    Main.IJulia.push_postexecute_hook(redisplay_figs)
+end
+
+if isjulia_display[1] && backend != "Agg"
+    pltm[:switch_backend]("Agg")
+    monkeypatch()
 end
 
 ###########################################################################
@@ -159,7 +181,7 @@ const plt = pywrap(pltm)
 # export documented pyplot API (http://matplotlib.org/api/pyplot_api.html)
 export acorr,annotate,arrow,autoscale,autumn,axes,axhline,axhspan,axis,axvline,axvspan,bar,barbs,barh,bone,box,boxplot,broken_barh,cla,clabel,clf,clim,cohere,colorbar,colors,contour,contourf,cool,copper,csd,delaxes,disconnect,draw,errorbar,eventplot,figimage,figlegend,figtext,figure,fill_between,fill_betweenx,findobj,flag,gca,gcf,gci,get_current_fig_manager,get_figlabels,get_fignums,get_plot_commands,ginput,gray,grid,hexbin,hist2d,hlines,hold,hot,hsv,imread,imsave,imshow,ioff,ion,ishold,isinteractive,jet,legend,locator_params,loglog,margins,matshow,minorticks_off,minorticks_on,over,pause,pcolor,pcolormesh,pie,pink,plot,plot_date,plotfile,polar,prism,psd,quiver,quiverkey,rc,rc_context,rcdefaults,rgrids,savefig,sca,scatter,sci,semilogx,semilogy,set_cmap,setp,show,specgram,spectral,spring,spy,stackplot,stem,step,streamplot,subplot,subplot2grid,subplot_tool,subplots,subplots_adjust,summer,suptitle,switch_backend,table,text,thetagrids,tick_params,ticklabel_format,tight_layout,title,tricontour,tricontourf,tripcolor,triplot,twinx,twiny,vlines,waitforbuttonpress,winter,xkcd,xlabel,xlim,xscale,xticks,ylabel,ylim,yscale,yticks
 
-for f in (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:axis,:axvline,:axvspan,:bar,:barbs,:barh,:bone,:box,:boxplot,:broken_barh,:cla,:clabel,:clf,:clim,:cohere,:colorbar,:colors,:contour,:contourf,:cool,:copper,:csd,:delaxes,:disconnect,:draw,:errorbar,:eventplot,:figimage,:figlegend,:figtext,:figure,:fill_between,:fill_betweenx,:findobj,:flag,:gca,:gcf,:gci,:get_current_fig_manager,:get_figlabels,:get_fignums,:get_plot_commands,:ginput,:gray,:grid,:hexbin,:hist2d,:hlines,:hold,:hot,:hsv,:imread,:imsave,:imshow,:ioff,:ion,:ishold,:isinteractive,:jet,:legend,:locator_params,:loglog,:margins,:matshow,:minorticks_off,:minorticks_on,:over,:pause,:pcolor,:pcolormesh,:pie,:pink,:plot,:plot_date,:plotfile,:polar,:prism,:psd,:quiver,:quiverkey,:rc,:rc_context,:rcdefaults,:rgrids,:savefig,:sca,:scatter,:sci,:semilogx,:semilogy,:set_cmap,:setp,:show,:specgram,:spectral,:spring,:spy,:stackplot,:stem,:step,:streamplot,:subplot,:subplot2grid,:subplot_tool,:subplots,:subplots_adjust,:summer,:suptitle,:switch_backend,:table,:text,:thetagrids,:tick_params,:ticklabel_format,:tight_layout,:title,:tricontour,:tricontourf,:tripcolor,:triplot,:twinx,:twiny,:vlines,:waitforbuttonpress,:winter,:xkcd,:xlabel,:xlim,:xscale,:xticks,:ylabel,:ylim,:yscale,:yticks)
+for f in (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:axis,:axvline,:axvspan,:bar,:barbs,:barh,:bone,:box,:boxplot,:broken_barh,:cla,:clabel,:clf,:clim,:cohere,:colorbar,:colors,:contour,:contourf,:cool,:copper,:csd,:delaxes,:disconnect,:draw,:errorbar,:eventplot,:figimage,:figlegend,:figtext,:figure,:fill_between,:fill_betweenx,:findobj,:flag,:gca,:gcf,:gci,:get_current_fig_manager,:get_figlabels,:get_fignums,:get_plot_commands,:ginput,:gray,:grid,:hexbin,:hist2d,:hlines,:hold,:hot,:hsv,:imread,:imsave,:imshow,:ioff,:ion,:ishold,:isinteractive,:jet,:legend,:locator_params,:loglog,:margins,:matshow,:minorticks_off,:minorticks_on,:over,:pause,:pcolor,:pcolormesh,:pie,:pink,:plot,:plot_date,:plotfile,:polar,:prism,:psd,:quiver,:quiverkey,:rc,:rc_context,:rcdefaults,:rgrids,:savefig,:sca,:scatter,:sci,:semilogx,:semilogy,:set_cmap,:setp,:specgram,:spectral,:spring,:spy,:stackplot,:stem,:step,:streamplot,:subplot,:subplot2grid,:subplot_tool,:subplots,:subplots_adjust,:summer,:suptitle,:switch_backend,:table,:text,:thetagrids,:tick_params,:ticklabel_format,:tight_layout,:title,:tricontour,:tricontourf,:tripcolor,:triplot,:twinx,:twiny,:vlines,:waitforbuttonpress,:winter,:xkcd,:xlabel,:xlim,:xscale,:xticks,:ylabel,:ylim,:yscale,:yticks)
     py_f = symbol(string("py_", f))
     sf = string(f)
     if haskey(pltm, sf)
@@ -172,6 +194,8 @@ for f in (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:ax
                                           " does not have pyplot.$sf")
     end
 end
+
+const show = display_figs
 
 # The following pyplot functions must be handled specially since they
 # overlap with standard Julia functions:
