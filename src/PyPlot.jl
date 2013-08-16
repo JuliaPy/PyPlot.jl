@@ -29,17 +29,42 @@ end
 const isjulia_display = PyCall.gui == :default && isdisplayok()
 const matplotlib = pyimport("matplotlib")
 
+pymodule_exists(s::String) = try 
+    pyimport(s)
+    true
+catch
+    false
+end
+
 if isjulia_display
     matplotlib[:use]("Agg") # make sure no GUI windows pop up
     matplotlib[:interactive](true)
 else
     const gui2matplotlib = [ :wx=>"WXAgg", :gtk=>"GTKAgg", :qt=>"Qt4Agg" ]
     try
-        gui = pygui()
+        local gui::Symbol
+        if PyCall.gui == :default
+            # try to ensure that GUI both exists and has a matplotlib backend
+            for g in (:qt, :wx, :gtk)
+                if PyCall.pygui_works(g)
+                    # must call matplotlib.use *before* loading backends module
+                    matplotlib[:use](gui2matplotlib[g])
+                    if pymodule_exists(string("matplotlib.backends.backend_", 
+                                              lowercase(gui2matplotlib[g])))
+                        println("found matplotlib GUI $g")
+                        gui = g
+                        break
+                    end
+                end
+            end
+        else
+            gui = pygui()
+            matplotlib[:use](gui2matplotlib[gui])
+        end
         pygui_start(gui)
-        matplotlib[:use](gui2matplotlib[gui])
         matplotlib[:interactive](true)
     catch
+        warn("No working GUI backend found for matplotlib.")
         pygui(:default)
         matplotlib[:use]("Agg") # GUI not available
         matplotlib[:interactive](false)
