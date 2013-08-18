@@ -103,7 +103,8 @@ register_cmap(n::String, c::ColorMap) = pycall(cm_register_cmap, PyAny, n,c)
 get_cmaps() =
     ColorMap[get_cmap(c) for c in
              sort(filter!(c -> !endswith(c, "_r"),
-                          String[c for (c,v) in PyDict(PyPlot.cm["datad"])]))]
+                          String[c for (c,v) in PyDict(PyPlot.cm["datad"])]),
+                  by=lowercase)]
 
 ########################################################################
 # display of ColorMaps as a horizontal color bar in SVG
