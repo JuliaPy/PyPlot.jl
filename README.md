@@ -141,7 +141,7 @@ colors in various plot types).  In particular:
 
   * `ColorMap(name::String)` returns an existing (registered) colormap, equivalent to [matplotlib.cm.get_cmap](http://matplotlib.org/api/cm_api.html#matplotlib.cm.get_cmap)(`name`).
 
-  * `matplotlib.colors.Colormap` objects returned by Python functions are automatically converted to the `Colormap` type.
+  * `matplotlib.colors.Colormap` objects returned by Python functions are automatically converted to the `ColorMap` type.
 
 * `get_cmap(name::String)` or `get_cmap(name::String, lut::Integer)` call the [matplotlib.cm.get_cmap](http://matplotlib.org/api/cm_api.html#matplotlib.cm.get_cmap) function.
 
