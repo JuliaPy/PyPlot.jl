@@ -125,6 +125,31 @@ using PyPlot
 ```
 where `gui` can currently be one of `:wx`, `:gtk`, or `:qt`.
 
+## Color maps
+
+The PyPlot module also exports some functions and types based on the
+[matplotlib.colors](http://matplotlib.org/api/colors_api.html) and
+[matplotlib.cm](http://matplotlib.org/api/cm_api.html) modules to
+simplify management of color maps (which are used to assign values to
+colors in various plot types).  In particular:
+
+* `ColorMap`: a wrapper around the [matplotlib.colors.Colormap](http://matplotlib.org/api/colors_api.html#matplotlib.colors.Colormap) type.  The following constructors are provided:
+** `ColorMap{T<:ColorValue}(name::String, c::AbstractVector{T}, n=256, gamma=1.0)` constructs an `n`-component colormap by [linearly interpolating](http://matplotlib.org/api/colors_api.html#matplotlib.colors.LinearSegmentedColormap) the colors in the array `c` of `ColorValue`s (from the [Color.jl](https://github.com/JuliaLang/Color.jl) package).  If you want a `name` to be constructed automatically, call ``ColorMap(c, n=256, gamma=1.0)` instead.
+** Even more general color maps may be defined by passing arrays of (x,y0,y1) tuples for the red, green, blue, and (optionally) alpha components, as defined by the [matplotlib.colors.LinearSegmentedColormap](http://matplotlib.org/api/colors_api.html#matplotlib.colors.LinearSegmentedColormap) constructor, via: `ColorMap{T<:Real}(name::String, r::AbstractVector{(T,T,T)}, g::AbstractVector{(T,T,T)}, b::AbstractVector{(T,T,T)}, n=256, gamma=1.0)` or `ColorMap{T<:Real}(name::String, r::AbstractVector{(T,T,T)}, g::AbstractVector{(T,T,T)}, b::AbstractVector{(T,T,T)}, alpha::AbstractVector{(T,T,T)}, n=256, gamma=1.0)`
+** `ColorMap(name::String)` returns an existing (registered) colormap, equivalent to [matplotlib.cm.get_cmap](http://matplotlib.org/api/cm_api.html#matplotlib.cm.get_cmap)(`name`).
+** `matplotlib.colors.Colormap` objects returned by Python functions are automatically converted to the `Colormap` type.
+
+* `get_cmap(name::String)` or `get_cmap(name::String, lut::Integer)` call the [matplotlib.cm.get_cmap](http://matplotlib.org/api/cm_api.html#matplotlib.cm.get_cmap) function.
+
+* `register_cmap(c::ColorMap)` or `register_cmap(name::String, c::ColorMap)` call the [matplotlib.cm.register_cmap](http://matplotlib.org/api/cm_api.html#matplotlib.cm.register_cmap) function.
+
+* `get_cmaps()` returns a `Vector{ColorMap}` of the currently
+  registered colormaps.
+
+Note that, given an SVG-supporting display environment like IJulia,
+`ColorMap` and `Vector{ColorMap}` objects are displayed graphically;
+try `get_cmaps()`!
+
 ## Author
 
 This module was written by [Steven G. Johnson](http://math.mit.edu/~stevenj/).

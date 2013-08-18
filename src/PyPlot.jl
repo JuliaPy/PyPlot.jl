@@ -2,7 +2,7 @@ module PyPlot
 
 using PyCall
 import PyCall: PyObject, pygui
-import Base: convert, isequal, hash, writemime, getindex, setindex!, haskey
+import Base: convert, isequal, hash, writemime, getindex, setindex!, haskey, keys, show
 export Figure, plt, matplotlib, pygui
 
 ###########################################################################
@@ -109,6 +109,7 @@ hash(f::Figure) = hash(f.o)
 getindex(f::Figure, x) = getindex(f.o, x)
 setindex!(f::Figure, v, x) = setindex!(f.o, v, x)
 haskey(f::Figure, x) = haskey(f.o, x)
+keys(f::Figure) = keys(f.o)
 
 pytype_mapping(pltm["Figure"], Figure)
 
@@ -195,13 +196,13 @@ for f in (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:ax
     end
 end
 
-const show = display_figs
-
 # The following pyplot functions must be handled specially since they
 # overlap with standard Julia functions:
 #          close, connect, fill, hist, xcorr
 
 import Base: close, connect, fill
+
+show() = display_figs()
 
 const py_close = pltm["close"]
 close(f::Union(Figure,String,Integer)) = pycall(py_close, PyAny, f)
@@ -216,5 +217,7 @@ fill(x::AbstractArray,y::AbstractArray, args...; kws...) =
 
 # no way to use method dispatch for hist or xcorr, since their
 # argument signatures look too much like Julia's
+
+include("colormaps.jl")
 
 end # module PyPlot
