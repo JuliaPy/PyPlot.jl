@@ -48,6 +48,9 @@ const backend, gui = begin
                 if PyCall.pygui_works(g)
                     # must call matplotlib.use *before* loading backends module
                     matplotlib[:use](gui2matplotlib[g])
+                    if g == :qt && !PyCall.pyexists("PyQt4")
+                        PyDict(matplotlib["rcParams"])["backend.qt4"]="PySide"
+                    end
                     if pymodule_exists(string("matplotlib.backends.backend_", 
                                               lowercase(gui2matplotlib[g])))
                         gui = g
