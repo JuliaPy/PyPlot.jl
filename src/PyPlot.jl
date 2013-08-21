@@ -171,6 +171,12 @@ end
 
 if isdefined(Main,:IJulia)
     Main.IJulia.push_postexecute_hook(redisplay_figs)
+    Main.IJulia.push_posterror_hook(() -> begin
+        if drew_something[1] && isjulia_display[1] 
+            pltm[:close]("all")
+            drew_something[1] = false # reset until next drawing command
+        end
+    end)
 end
 
 if isjulia_display[1] && backend != "Agg"
