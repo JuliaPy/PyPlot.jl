@@ -229,4 +229,49 @@ fill(x::AbstractArray,y::AbstractArray, args...; kws...) =
 
 include("colormaps.jl")
 
+###########################################################################
+# Include mplot3d for 3d plotting.
+
+export art3d, Axes3D, surf, mesh, bar3d, contour3D, contourf3D, plot3D, plot_surface, plot_trisurf, plot_wireframe, scatter3D, text2D, text3D
+
+const mplot3d = pyimport("mpl_toolkits.mplot3d")
+const axes3d = pyimport("mpl_toolkits.mplot3d.axes3d")
+
+const art3d = pywrap(pyimport("mpl_toolkits.mplot3d.art3d"))
+const Axes3D = axes3d[:Axes3D]
+
+for f in (:bar3d, :contour3D, :contourf3D, :plot3D, :plot_surface,
+          :plot_trisurf, :plot_wireframe, :scatter3D, :text2D, :text3D)
+    fs = string(f)
+    @eval function $f(args...; kws...)
+        ax = gca(projection="3d")
+        pycall(ax[$fs], PyAny, args...; kws...)
+    end
+end
+const bar3D = bar3d # correct for annoying mplot3d inconsistency
+
+# export Matlab-like names
+
+function surf(Z::AbstractMatrix; kws...)
+    plot_surface([1:size(Z,1)]*ones(1,size(Z,2)), 
+                 ones(size(Z,1))*[1:size(Z,2)]', Z; kws...)
+end
+
+function surf(X, Y, Z::AbstractMatrix, args...; kws...)
+    plot_surface(X, Y, Z, args...; kws...)
+end
+
+function surf(X, Y, Z::AbstractVector, args...; kws...)
+    plot_trisurf(X, Y, Z, args...; kws...)
+end
+
+mesh(args...; kws...) = plot_wireframe(args...; kws...)
+
+function mesh(Z::AbstractMatrix; kws...)
+    plot_wireframe([1:size(Z,1)]*ones(1,size(Z,2)), 
+                   ones(size(Z,1))*[1:size(Z,2)]', Z; kws...)
+end
+
+###########################################################################
+
 end # module PyPlot
