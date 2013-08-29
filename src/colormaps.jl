@@ -112,7 +112,7 @@ get_cmaps() =
 const ScalarMappable = cm["ScalarMappable"]
 const Normalize01 = colorsm[:Normalize](vmin=0,vmax=1)
 
-function writemime(io::IO, ::@MIME("image/svg+xml"), 
+function writemime(io::IO, ::MIME"image/svg+xml", 
                    cs::AbstractVector{ColorMap})
     n = 256
     nc = length(cs)
@@ -143,7 +143,7 @@ function writemime(io::IO, ::@MIME("image/svg+xml"),
     write(io, "</svg>")
 end
 
-writemime(io::IO, m::@MIME("image/svg+xml"), c::ColorMap) =
+writemime(io::IO, m::MIME"image/svg+xml", c::ColorMap) =
     writemime(io, m, [c])
 
 ########################################################################

@@ -117,7 +117,7 @@ keys(f::Figure) = keys(f.o)
 pytype_mapping(pltm["Figure"], Figure)
 
 for (mime,fmt) in aggformats
-    @eval function writemime(io::IO, m::@MIME($mime), f::Figure)
+    @eval function writemime(io::IO, m::MIME{symbol($mime)}, f::Figure)
         if !haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict),
                    $fmt)
             throw(MethodError(writemime, (io, m, f)))
