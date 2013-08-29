@@ -110,7 +110,7 @@ get_cmaps() =
 # display of ColorMaps as a horizontal color bar in SVG
 
 const ScalarMappable = cm["ScalarMappable"]
-const Normalize01 = colorsm[:Normalize](vmin=0,vmax=1)
+const Normalize01 = pycall(colorsm["Normalize"],PyAny,vmin=0,vmax=1)
 
 function writemime(io::IO, ::MIME"image/svg+xml", 
                    cs::AbstractVector{ColorMap})
