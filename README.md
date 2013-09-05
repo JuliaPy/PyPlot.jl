@@ -180,6 +180,27 @@ The `Axes3d` constructor and the
 [art3d](http://matplotlib.org/dev/mpl_toolkits/mplot3d/api.html#art3d)
 module are also exported.
 
+## LaTeX plot labels
+
+Matplotlib allows you to [use LaTeX equations in plot
+labels](http://matplotlib.org/users/mathtext.html), titles, and so on
+simply by enclosing the equations in dollar signs (`$ ... $`) within
+the string.  However, typing LaTeX equations in Julia string literals
+is awkward because escaping is necessary to prevent Julia from
+interpreting the dollar signs and backslashes itself; for example, the
+LaTeX equation `$\alpha + \beta$` would be the literal string
+`"\$\\alpha + \\beta\$"` in Julia.
+
+To simplify this, PyPlot provides a new `LaTeXString` type which can
+be constructed via `L"...."` without escaping backslashes or dollar
+signs.  For example, one can simply write `L"$\alpha + \beta$"` for the
+abovementioned equation, and thus you can do things like:
+```
+title(L"Plot of $\Gamma_3(x)$")
+```
+(As an added benefit, a `LaTeXString` is
+automatically displayed as a rendered equation in IJulia.) 
+
 ## Author
 
 This module was written by [Steven G. Johnson](http://math.mit.edu/~stevenj/).
