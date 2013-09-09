@@ -1,18 +1,18 @@
 # The PyPlot module for Julia
 
 This module provides a Julia interface to the
-[matplotlib](http://matplotlib.org/) plotting library from Python, and
+[Matplotlib](http://matplotlib.org/) plotting library from Python, and
 specifically to the `matplotlib.pyplot` module.
 
 PyPlot uses the Julia [PyCall](https://github.com/stevengj/PyCall.jl)
-package to call matplotlib directly from Julia with little or no
+package to call Matplotlib directly from Julia with little or no
 overhead (arrays are passed without making a copy).
 
 This package takes advantage of Julia's [multimedia
 I/O](http://docs.julialang.org/en/latest/stdlib/base/#multimedia-i-o)
 API to display plots in any Julia graphical backend, including as
 inline graphics in [IJulia](https://github.com/JuliaLang/IJulia.jl).
-Alternatively, you can use a Python-based graphical matplotlib
+Alternatively, you can use a Python-based graphical Matplotlib
 backend to support interactive plot zooming etcetera.
 
 (This PyPlot package replaces an earlier package of the same name by
@@ -21,10 +21,10 @@ ZeroMQ socket with IPython.)
 
 ## Installation
 
-You will need to have the Python [matplotlib](http://matplotlib.org/)
+You will need to have the Python [Matplotlib](http://matplotlib.org/)
 library installed on your machine in order to use PyPlot.
 
-Once matplotlib is installed, then you can just use
+Once Matplotlib is installed, then you can just use
 `Pkg.add("PyPlot")` in Julia to install PyPlot and its dependencies.
 
 **Note:** Julia version 0.2 (or a recent pre-release version thereof)
@@ -32,7 +32,7 @@ is required to use PyPlot.
 
 ## Basic usage
 
-Once matplotlib and PyPlot is installed, and you are using a
+Once Matplotlib and PyPlot is installed, and you are using a
 graphics-capable Julia environment such as IJulia, you can simply type
 `using PyPlot` and begin calling functions in the
 [matplotlib.pyplot](http://matplotlib.org/api/pyplot_api.html) API.
@@ -50,16 +50,16 @@ exactly the same as in Python.  (With minor translations, of course,
 e.g. Julia uses `true` and `nothing` instead of Python's `True` and
 `None`.)
 
-The full matplotlib.pyplot API is far too extensive to describe here;
+The full `matplotlib.pyplot` API is far too extensive to describe here;
 see the [matplotlib.pyplot documentation for more
 information](http://matplotlib.org/api/pyplot_api.html)
 
 ### Exported functions
 
-Only the currently documented matplotlib.pyplot API is exported.  To use
+Only the currently documented `matplotlib.pyplot` API is exported.  To use
 other functions in the module, you can also call `matplotlib.pyplot.foo(...)`
 as `plt.foo(...)`.  For example, `plt.plot(x, y)` also works.  (And
-the raw `PyObject`s for the matplotlib and pyplot modules are accessible
+the raw `PyObject`s for the `matplotlib` and `pyplot` modules are accessible
 as `PyPlot.matplotlib` and `PyPlot.pltm`, respectively.)
 
 You must also use `plt` to access some functions that conflict with
@@ -81,7 +81,7 @@ API](http://docs.julialang.org/en/latest/stdlib/base/#multimedia-i-o),
 so you can use `display(fig)` to show a `fig::PyFigure` and
 `writemime(io, mime, fig)` to write it to a given `mime` type string
 (e.g. `"image/png"` or `"application/pdf"`) that is supported by the
-matplotlib backend.
+Matplotlib backend.
 
 ## Interactive versus Julia graphics
 
@@ -92,7 +92,7 @@ different backend, simply call `pushdisplay` with the desired
 API](http://docs.julialang.org/en/latest/stdlib/base/#multimedia-i-o)
 for more detail.
 
-On the other hand, you may wish to use one of the Python matplotlib
+On the other hand, you may wish to use one of the Python Matplotlib
 backends to open an interactive window for each plot (for interactive
 zooming, panning, etcetera).  You can do this at any time by running:
 ```
@@ -153,6 +153,53 @@ colors in various plot types).  In particular:
 Note that, given an SVG-supporting display environment like IJulia,
 `ColorMap` and `Vector{ColorMap}` objects are displayed graphically;
 try `get_cmaps()`!
+
+## 3d Plotting
+
+The PyPlot package also imports functions from Matplotlib's
+[mplot3d](http://matplotlib.org/dev/mpl_toolkits/mplot3d/) toolkit.
+Unlike Matplotlib, however, you can create 3d plots directly without
+first creating an
+[Axes3d](http://matplotlib.org/dev/mpl_toolkits/mplot3d/api.html#axes3d)
+object, simply by calling one of: `bar3D, `contour3D`, `contourf3D`,
+`plot3D`, `plot_surface`, `plot_trisurf`, `plot_wireframe`, or
+`scatter3D` (as well as `text2D`, `text3D`), exactly like the
+correspondingly named methods of
+[Axes3d](http://matplotlib.org/dev/mpl_toolkits/mplot3d/api.html#axes3d).
+We also export the Matlab-like synonyms `surf` for `plot_surface` (or
+`plot_trisurf` for 1d-array arguments) and `mesh` for
+`plot_wireframe`.  For example, you can do:
+```
+surf(rand(30,40))
+```
+to plot a random 30×40 surface mesh.
+
+You can also explicitly create a subplot with 3d axes via, for
+example, `subplot(111, projection="3d")`, exactly as in Matplotlib.
+The `Axes3d` constructor and the
+[art3d](http://matplotlib.org/dev/mpl_toolkits/mplot3d/api.html#art3d)
+module are also exported.
+
+## LaTeX plot labels
+
+Matplotlib allows you to [use LaTeX equations in plot
+labels](http://matplotlib.org/users/mathtext.html), titles, and so on
+simply by enclosing the equations in dollar signs (`$ ... $`) within
+the string.  However, typing LaTeX equations in Julia string literals
+is awkward because escaping is necessary to prevent Julia from
+interpreting the dollar signs and backslashes itself; for example, the
+LaTeX equation `$\alpha + \beta$` would be the literal string
+`"\$\\alpha + \\beta\$"` in Julia.
+
+To simplify this, PyPlot provides a new `LaTeXString` type which can
+be constructed via `L"...."` without escaping backslashes or dollar
+signs.  For example, one can simply write `L"$\alpha + \beta$"` for the
+abovementioned equation, and thus you can do things like:
+```
+title(L"Plot of $\Gamma_3(x)$")
+```
+(As an added benefit, a `LaTeXString` is
+automatically displayed as a rendered equation in IJulia.) 
 
 ## Author
 
