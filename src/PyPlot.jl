@@ -78,7 +78,7 @@ const backend, gui = begin
         pygui(:default)
         matplotlib[:use]("Agg") # GUI not available
         matplotlib[:interactive](isdisplayok())
-        ("Agg", gui)
+        ("Agg", :none)
     end
 end
 
