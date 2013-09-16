@@ -179,8 +179,10 @@ if isdefined(Main,:IJulia)
     end)
 end
 
-if isjulia_display[1] && backend != "Agg"
-    pltm[:switch_backend]("Agg")
+if isjulia_display[1]
+    if backend != "Agg"
+        pltm[:switch_backend]("Agg")
+    end
     monkeypatch()
 end
 
