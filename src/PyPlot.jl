@@ -41,7 +41,7 @@ end
 const backend, gui = begin
     const gui2matplotlib = [ :wx=>"WXAgg", :gtk=>"GTKAgg", :qt=>"Qt4Agg" ]
     try
-        local gui::Symbol
+        local gui::Symbol = :none
         if PyCall.gui == :default
             # try to ensure that GUI both exists and has a matplotlib backend
             for g in (:qt, :wx, :gtk)
@@ -57,6 +57,9 @@ const backend, gui = begin
                         break
                     end
                 end
+            end
+            if gui == :none
+                error("no gui found") # go to catch clause below
             end
         else
             gui = pygui()
@@ -75,7 +78,7 @@ const backend, gui = begin
         pygui(:default)
         matplotlib[:use]("Agg") # GUI not available
         matplotlib[:interactive](isdisplayok())
-        ("Agg", gui)
+        ("Agg", :none)
     end
 end
 
