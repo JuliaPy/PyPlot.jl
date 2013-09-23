@@ -278,6 +278,40 @@ function mesh(Z::AbstractMatrix; kws...)
 end
 
 ###########################################################################
+# Allow plots with 2 independent variables (contour, surf, ...)
+# to accept either 2 1d arrays or a row vector and a 1d array,
+# to simplify construction of such plots via broadcasting operations.
+# (Matplotlib is inconsistent about this.)
+
+for f in (:contour, :contourf)
+    @eval function $f(X::AbstractMatrix, Y::AbstractVector, args...; kws...)
+        if size(X,1) == 1 || size(X,2) == 1
+            $f(reshape(X, length(X)), Y, args...; kws...)
+        else
+            throw(ArgumentError("if 2nd arg is column vector, 1st arg must be row or column vector"))
+        end
+    end
+end
+
+for f in (:surf,:mesh,:plot_surface,:plot_wireframe,:contour3D,:contourf3D)
+    @eval begin
+        function $f(X::AbstractVector, Y::AbstractVector, Z::AbstractMatrix, args...; kws...)
+            m, n = length(X), length(Y)
+            $f(repmat(reshape(X,1,m),n,1), repmat(Y,1,m), Z, args...; kws...)
+        end
+        function $f(X::AbstractMatrix, Y::AbstractVector, Z::AbstractMatrix, args...; kws...)
+            if size(X,1) != 1 && size(X,2) != 1
+                throw(ArgumentError("if 2nd arg is column vector, 1st arg must be row or column vector"))
+            end
+            m, n = length(X), length(Y)
+            $f(repmat(reshape(X,1,m),n,1), repmat(Y,1,m), Z, args...; kws...)
+        end
+    end
+end
+
+# Already work: barbs, pcolor, pcolormesh, quiver
+
+###########################################################################
 
 include("latex.jl")
 
