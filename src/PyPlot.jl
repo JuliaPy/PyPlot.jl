@@ -41,6 +41,15 @@ end
 const backend, gui = begin
     const gui2matplotlib = [ :wx=>"WXAgg", :gtk=>"GTKAgg", :qt=>"Qt4Agg" ]
     try
+        # We will get an exception when we import pyplot below
+        # (on Unix) if an X server is not available, even though
+        # pygui_works and matplotlib.use(backend) succeed, at
+        # which point it will be too late to switch backends.  So,
+        # throw exception (drop to catch block below) if DISPLAY is not set.
+        # [Might be more reliable to test success(`xdpyinfo`), but only
+        #  if xdpyinfo is installed.]
+        @unix_only (@osx ? nothing : ENV["DISPLAY"])
+
         local gui::Symbol = :none
         if PyCall.gui == :default
             # try to ensure that GUI both exists and has a matplotlib backend
