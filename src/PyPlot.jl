@@ -246,7 +246,7 @@ include("colormaps.jl")
 ###########################################################################
 # Include mplot3d for 3d plotting.
 
-export art3d, Axes3D, surf, mesh, bar3d, contour3D, contourf3D, plot3D, plot_surface, plot_trisurf, plot_wireframe, scatter3D, text2D, text3D
+export art3d, Axes3D, surf, mesh, bar3d, contour3D, contourf3D, plot3D, plot_surface, plot_trisurf, plot_wireframe, scatter3D, text2D, text3D, zlabel, zlim, zscale, zticks
 
 const mplot3d = pyimport("mpl_toolkits.mplot3d")
 const axes3d = pyimport("mpl_toolkits.mplot3d.axes3d")
@@ -263,6 +263,15 @@ for f in (:bar3d, :contour3D, :contourf3D, :plot3D, :plot_surface,
     end
 end
 const bar3D = bar3d # correct for annoying mplot3d inconsistency
+
+# it's annoying to have xlabel etc. but not zlabel
+for f in (:zlabel, :zlim, :zscale, :zticks)
+    fs = string("set_", f)
+    @eval function $f(args...; kws...)
+        ax = gca(projection="3d")
+        pycall(ax[$fs], PyAny, args...; kws...)
+    end
+end
 
 # export Matlab-like names
 
