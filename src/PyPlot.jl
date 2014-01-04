@@ -199,6 +199,20 @@ if isjulia_display[1]
 end
 
 ###########################################################################
+# Base.Help.FUNCTION_DICT is undocumented, but it is better than nothing
+# until Julia gets a documented docstring-like facility.
+
+function addhelp(f::String, o::PyObject)
+    try
+        Base.Help.init_help()
+        if haskey(o, "__doc__")
+            Base.Help.FUNCTION_DICT[f] = [convert(String, o["__doc__"])]
+        end
+    end
+end
+addhelp(f::Symbol, o::PyObject) = addhelp(string(f), o)
+    
+###########################################################################
 
 const plt = pywrap(pltm)
 
@@ -213,6 +227,7 @@ for f in (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:ax
             const $py_f = pltm[$sf]
             $f(args...; kws...) = pycall($py_f, PyAny, args...; kws...)
         end
+        addhelp(f, pltm[sf])
     else # using a different (older?) version of matplotlib
         @eval $f(args...; kws...) = error("matplotlib ", m[:__version__],
                                           " does not have pyplot.$sf")
@@ -229,17 +244,21 @@ show() = display_figs()
 
 const py_step = pltm["step"]
 step(x, y; kws...) = pycall(py_step, PyAny, x, y; kws...)
+addhelp("PyPlot.step", py_step)
 
 const py_close = pltm["close"]
 close(f::Union(Figure,String,Integer)) = pycall(py_close, PyAny, f)
 close() = pycall(py_close, PyAny)
+addhelp("PyPlot.close", py_close)
 
 const py_connect = pltm["connect"]
 connect(s::String, f::Function) = pycall(py_connect, PyAny, s, f)
+addhelp("PyPlot.connect", py_connect)
 
 const py_fill = pltm["fill"]
 fill(x::AbstractArray,y::AbstractArray, args...; kws...) =
     pycall(py_fill, PyAny, x, y, args...; kws...)
+addhelp("PyPlot.fill", py_fill)
 
 # no way to use method dispatch for hist or xcorr, since their
 # argument signatures look too much like Julia's
@@ -265,7 +284,7 @@ end
 ###########################################################################
 # Include mplot3d for 3d plotting.
 
-export art3d, Axes3D, surf, mesh, bar3d, contour3D, contourf3D, plot3D, plot_surface, plot_trisurf, plot_wireframe, scatter3D, text2D, text3D, zlabel, zlim, zscale, zticks
+export art3d, Axes3D, surf, mesh, bar3d, bar3D, contour3D, contourf3D, plot3D, plot_surface, plot_trisurf, plot_wireframe, scatter3D, text2D, text3D, zlabel, zlim, zscale, zticks
 
 const mplot3d = pyimport("mpl_toolkits.mplot3d")
 const axes3d = pyimport("mpl_toolkits.mplot3d.axes3d")
@@ -280,8 +299,10 @@ for f in (:bar3d, :contour3D, :contourf3D, :plot3D, :plot_surface,
         ax = gca(projection="3d")
         pycall(ax[$fs], PyAny, args...; kws...)
     end
+    addhelp(fs, axes3d["Axes3D"][fs])
 end
 const bar3D = bar3d # correct for annoying mplot3d inconsistency
+addhelp("bar3D", axes3d["Axes3D"]["bar3d"])
 
 # it's annoying to have xlabel etc. but not zlabel
 for f in (:zlabel, :zlim, :zscale, :zticks)
@@ -290,6 +311,7 @@ for f in (:zlabel, :zlim, :zscale, :zticks)
         ax = gca(projection="3d")
         pycall(ax[$fs], PyAny, args...; kws...)
     end
+    addhelp(f, axes3d["Axes3D"][fs])
 end
 
 # export Matlab-like names
@@ -313,6 +335,9 @@ function mesh(Z::AbstractMatrix; kws...)
     plot_wireframe([1:size(Z,1)]*ones(1,size(Z,2)), 
                    ones(size(Z,1))*[1:size(Z,2)]', Z; kws...)
 end
+
+addhelp(:surf, axes3d["Axes3D"]["plot_surface"])
+addhelp(:mesh, axes3d["Axes3D"]["plot_wireframe"])
 
 ###########################################################################
 # Allow plots with 2 independent variables (contour, surf, ...)
