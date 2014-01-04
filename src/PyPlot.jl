@@ -247,6 +247,22 @@ fill(x::AbstractArray,y::AbstractArray, args...; kws...) =
 include("colormaps.jl")
 
 ###########################################################################
+# Support array of string labels in bar chart
+
+function bar{T<:String}(x::AbstractVector{T}, y; kws...)
+    xi = 1:length(x)
+    if !any(kw -> kw[1] == :align, kws)
+        push!(kws, (:align, "center"))
+    end
+    p = bar(xi, y; kws...)
+    ax = any(kw -> kw[1] == :orientation && lowercase(kw[2]) == "horizontal",
+             kws) ? gca()["yaxis"] : gca()["xaxis"]
+    ax[:set_ticks](xi)
+    ax[:set_ticklabels](x)
+    return p
+end
+
+###########################################################################
 # Include mplot3d for 3d plotting.
 
 export art3d, Axes3D, surf, mesh, bar3d, contour3D, contourf3D, plot3D, plot_surface, plot_trisurf, plot_wireframe, scatter3D, text2D, text3D, zlabel, zlim, zscale, zticks
