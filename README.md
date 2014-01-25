@@ -201,6 +201,29 @@ title(L"Plot of $\Gamma_3(x)$")
 (As an added benefit, a `LaTeXString` is
 automatically displayed as a rendered equation in IJulia.) 
 
+## SVG output in IJulia
+
+By default, plots in IJulia are sent to the notebook as PNG images.
+Optionally, you can tell PyPlot to display plots in the browser as
+[SVG](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics) images,
+which have the advantage of being resolution-independent (so that they
+display without pixellation at high-resolutions, for example if you
+convert an IJulia notebook to PDF), by running:
+```
+PyPlot.svg(true)
+```
+This is not the default because SVG plots in the browser are much
+slower to display (especially for complex plots) and may display
+inaccurately in some browsers with buggy SVG support.  The `PyPlot.svg()`
+method returns whether SVG display is currently enabled.
+
+Note that this entirely separate from manually exporting plots to SVG
+or any other format.  Regardless of whether PyPlot uses SVG for
+browser display, you can export a plot to SVG at any time by using the
+Matplotlib
+[savefig](http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.savefig)
+command, e.g. `savefig("plot.svg")`.
+
 ## Author
 
 This module was written by [Steven G. Johnson](http://math.mit.edu/~stevenj/).

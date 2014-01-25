@@ -2,7 +2,7 @@ module PyPlot
 
 using PyCall
 import PyCall: PyObject, pygui
-import Base: convert, isequal, hash, writemime, getindex, setindex!, haskey, keys, show
+import Base: convert, isequal, hash, writemime, getindex, setindex!, haskey, keys, show, mimewritable
 export Figure, plt, matplotlib, pygui
 
 ###########################################################################
@@ -136,7 +136,17 @@ for (mime,fmt) in aggformats
         end
         f.o["canvas"][:print_figure](io, format=$fmt, bbox_inches="tight")
     end
+    if fmt != "svg"
+        @eval mimewritable(::MIME{symbol($mime)}, f::Figure) = haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict), $fmt)
+    end
 end
+
+# disable SVG output by default, since displaying large SVGs (large datasets)
+# in IJulia is slow, and browser SVG display is buggy.  (Similar to IPython.)
+const SVG = [false]
+mimewritable(::MIME"image/svg+xml", f::Figure) = SVG[1] && haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict), "svg")
+svg() = SVG[1]
+svg(b::Bool) = (SVG[1] = b)
 
 ###########################################################################
 # Monkey-patch pylab to call redisplay after each drawing command
