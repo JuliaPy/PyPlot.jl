@@ -221,6 +221,7 @@ function addhelp(f::String, o::PyObject)
     end
 end
 addhelp(f::Symbol, o::PyObject) = addhelp(string(f), o)
+addhelp(f, o::PyObject, key::String) = haskey(o, key) && addhelp(f, o[key])
     
 ###########################################################################
 
@@ -309,10 +310,10 @@ for f in (:bar3d, :contour3D, :contourf3D, :plot3D, :plot_surface,
         ax = gca(projection="3d")
         pycall(ax[$fs], PyAny, args...; kws...)
     end
-    addhelp(fs, axes3d["Axes3D"][fs])
+    addhelp(fs, axes3d["Axes3D"], fs)
 end
 const bar3D = bar3d # correct for annoying mplot3d inconsistency
-addhelp("bar3D", axes3d["Axes3D"]["bar3d"])
+addhelp("bar3D", axes3d["Axes3D"], "bar3d")
 
 # it's annoying to have xlabel etc. but not zlabel
 for f in (:zlabel, :zlim, :zscale, :zticks)
@@ -321,7 +322,7 @@ for f in (:zlabel, :zlim, :zscale, :zticks)
         ax = gca(projection="3d")
         pycall(ax[$fs], PyAny, args...; kws...)
     end
-    addhelp(f, axes3d["Axes3D"][fs])
+    addhelp(f, axes3d["Axes3D"], fs)
 end
 
 # export Matlab-like names
@@ -346,8 +347,8 @@ function mesh(Z::AbstractMatrix; kws...)
                    ones(size(Z,1))*[1:size(Z,2)]', Z; kws...)
 end
 
-addhelp(:surf, axes3d["Axes3D"]["plot_surface"])
-addhelp(:mesh, axes3d["Axes3D"]["plot_wireframe"])
+addhelp(:surf, axes3d["Axes3D"], "plot_surface")
+addhelp(:mesh, axes3d["Axes3D"], "plot_wireframe")
 
 ###########################################################################
 # Allow plots with 2 independent variables (contour, surf, ...)
