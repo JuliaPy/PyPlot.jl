@@ -275,6 +275,15 @@ addhelp("PyPlot.fill", py_fill)
 # no way to use method dispatch for hist or xcorr, since their
 # argument signatures look too much like Julia's
 
+# add temporary functions for hist and xcorr
+
+export hist_pyplot,xcorr_pyplot
+
+hist_pyplot(args...; kws...)=pycall(pltm["hist"], PyAny, args...; kws...)
+addhelp(:hist_pyplot, pltm["hist"])
+xcorr_pyplot(args...; kws...)=pycall(pltm["xcorr"], PyAny, args...; kws...)
+addhelp(:xcorr_pyplot, pltm["xcorr"])
+
 include("colormaps.jl")
 
 ###########################################################################
