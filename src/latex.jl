@@ -4,13 +4,14 @@
 # this, we add a new string type with a macro constructor, so that
 # one can simply do L"$\alpha + \beta$".
 
-export LaTeXString, @L_str
+export LaTeXString, @L_str, @L_mstr
 import Base: writemime, show, write, endof, getindex, sizeof, search, rsearch, isvalid, next, length
 
 immutable LaTeXString <: String
     s::ByteString
 end
 macro L_str(s, flags...) LaTeXString(s) end
+macro L_mstr(s, flags...) LaTeXString(s) end
 
 write(io::IO, s::LaTeXString) = write(io, s.s)
 writemime(io::IO, ::MIME"application/x-latex", s::LaTeXString) = write(io, s)
