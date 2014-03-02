@@ -222,7 +222,17 @@ function addhelp(f::String, o::PyObject)
 end
 addhelp(f::Symbol, o::PyObject) = addhelp(string(f), o)
 addhelp(f, o::PyObject, key::String) = haskey(o, key) && addhelp(f, o[key])
-    
+
+###########################################################################
+# Rewire for prettyplotlib
+const pplFunctions = (:bar, :barh, :boxplot, :colors, :fill_between,  :fill_betweenx, :hist, :legend, :plot, :scatter, :subplots, :subplot2grid) # :pcolormesh
+const usePPL = pymodule_exists("prettyplotlib")
+const pplm = if usePPL
+   pyimport("prettyplotlib")
+else
+   Dict()
+end
+
 ###########################################################################
 
 const plt = pywrap(pltm)
@@ -233,7 +243,13 @@ export acorr,annotate,arrow,autoscale,autumn,axes,axhline,axhspan,axis,axvline,a
 for f in (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:axis,:axvline,:axvspan,:bar,:barbs,:barh,:bone,:box,:boxplot,:broken_barh,:cla,:clabel,:clf,:clim,:cohere,:colorbar,:colors,:contour,:contourf,:cool,:copper,:csd,:delaxes,:disconnect,:draw,:errorbar,:eventplot,:figimage,:figlegend,:figtext,:figure,:fill_between,:fill_betweenx,:findobj,:flag,:gca,:gcf,:gci,:get_current_fig_manager,:get_figlabels,:get_fignums,:get_plot_commands,:ginput,:gray,:grid,:hexbin,:hist2d,:hlines,:hold,:hot,:hsv,:imread,:imsave,:imshow,:ioff,:ion,:ishold,:isinteractive,:jet,:legend,:locator_params,:loglog,:margins,:matshow,:minorticks_off,:minorticks_on,:over,:pause,:pcolor,:pcolormesh,:pie,:pink,:plot,:plot_date,:plotfile,:polar,:prism,:psd,:quiver,:quiverkey,:rc,:rc_context,:rcdefaults,:rgrids,:savefig,:sca,:scatter,:sci,:semilogx,:semilogy,:set_cmap,:setp,:specgram,:spectral,:spring,:spy,:stackplot,:stem,:streamplot,:subplot,:subplot2grid,:subplot_tool,:subplots,:subplots_adjust,:summer,:suptitle,:switch_backend,:table,:text,:thetagrids,:tick_params,:ticklabel_format,:tight_layout,:title,:tricontour,:tricontourf,:tripcolor,:triplot,:twinx,:twiny,:vlines,:waitforbuttonpress,:winter,:xkcd,:xlabel,:xlim,:xscale,:xticks,:ylabel,:ylim,:yscale,:yticks)
     py_f = symbol(string("py_", f))
     sf = string(f)
-    if haskey(pltm, sf)
+    if usePPL & (f in pplFunctions) & haskey(pplm, sf)
+        @eval begin
+            const $py_f = pplm[$sf]
+            $f(args...; kws...) = pycall($py_f, PyAny, args...; kws...)
+        end
+        addhelp(f, pplm[sf])
+    elseif haskey(pltm, sf)
         @eval begin
             const $py_f = pltm[$sf]
             $f(args...; kws...) = pycall($py_f, PyAny, args...; kws...)
