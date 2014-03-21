@@ -217,7 +217,7 @@ slower to display (especially for complex plots) and may display
 inaccurately in some browsers with buggy SVG support.  The `PyPlot.svg()`
 method returns whether SVG display is currently enabled.
 
-Note that this entirely separate from manually exporting plots to SVG
+Note that this is entirely separate from manually exporting plots to SVG
 or any other format.  Regardless of whether PyPlot uses SVG for
 browser display, you can export a plot to SVG at any time by using the
 Matplotlib
