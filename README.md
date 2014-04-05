@@ -35,20 +35,14 @@ is required to use PyPlot.
 The pre-installed version of matplotlib does not work with Julia as the
 graphics backend is not linked correctly.  To display graphics within IJulia, a
 working matplotlib (and ipython) can be installed as part of the
-[ananconda](http://continuum.io/downloads) package.  Otherwise, use the
+[anaconda](http://continuum.io/downloads) package.  Otherwise, use the
 [homebrew](http://brew.sh/) package manager as follows
 
 ```
-brew install python
-export PATH="/usr/local/bin:$PATH"
-export PYTHONPATH=/usr/local/lib/python2.7
-pip install numpy
-brew install gfortran
-pip install scipy
-brew install pyqt
-brew install freetype
+brew install python gfortran freetype pyqt
 ln -s /usr/local/Cellar/freetype/2.5.3_1/include/freetype2/ /usr/local/include/freetype
-pip install matplotlib
+export PYTHONPATH=/usr/local/lib/python2.7
+pip install numpy scipy matplotlib
 ```
 
 ## Basic usage
