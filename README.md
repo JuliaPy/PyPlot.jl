@@ -30,9 +30,30 @@ Once Matplotlib is installed, then you can just use
 **Note:** Julia version 0.2 (or a recent pre-release version thereof)
 is required to use PyPlot.
 
+### OS X specific instructions
+
+The pre-installed version of matplotlib does not work with Julia as the
+graphics backend is not linked correctly.  To display graphics within IJulia, a
+working matplotlib (and ipython) can be installed as part of the
+[ananconda](http://continuum.io/downloads) package.  Otherwise, use the
+[homebrew](http://brew.sh/) package manager as follows
+
+```
+brew install python
+export PATH="/usr/local/bin:$PATH"
+export PYTHONPATH=/usr/local/lib/python2.7
+pip install numpy
+brew install gfortran
+pip install scipy
+brew install pyqt
+brew install freetype
+ln -s /usr/local/Cellar/freetype/2.5.3_1/include/freetype2/ /usr/local/include/freetype
+pip install matplotlib
+```
+
 ## Basic usage
 
-Once Matplotlib and PyPlot is installed, and you are using a
+Once Matplotlib and PyPlot are installed, and you are using a
 graphics-capable Julia environment such as IJulia, you can simply type
 `using PyPlot` and begin calling functions in the
 [matplotlib.pyplot](http://matplotlib.org/api/pyplot_api.html) API.
