@@ -32,11 +32,11 @@ is required to use PyPlot.
 
 ### OS X specific instructions
 
-The pre-installed version of matplotlib does not work with Julia as the
-graphics backend is not linked correctly.  To display graphics within IJulia, a
-working matplotlib (and ipython) can be installed as part of the
-[anaconda](http://continuum.io/downloads) package.  Otherwise, use the
-[homebrew](http://brew.sh/) package manager as follows
+The pre-installed version of matplotlib does not work with Julia as it does not
+include the Qt, GTK, or wxWidgets backends required by PyPlot.  To display
+graphics within IJulia, a working matplotlib (and ipython) can be installed as
+part of the [anaconda](http://continuum.io/downloads) package.  Otherwise, use
+the [homebrew](http://brew.sh/) package manager as follows
 
 ```
 brew install python gfortran freetype pyqt
