@@ -22,28 +22,33 @@ ZeroMQ socket with IPython.)
 ## Installation
 
 You will need to have the Python [Matplotlib](http://matplotlib.org/)
-library installed on your machine in order to use PyPlot.
+library installed on your machine in order to use PyPlot.  You can either
+do inline plotting with [IJulia](https://github.com/JuliaLang/IJulia.jl),
+which doesn't require a GUI backend, or use the Qt, wx, or GTK+ backends
+of Matplotlib as described below.
 
 Once Matplotlib is installed, then you can just use
 `Pkg.add("PyPlot")` in Julia to install PyPlot and its dependencies.
 
-**Note:** Julia version 0.2 (or a recent pre-release version thereof)
-is required to use PyPlot.
+### OS X
 
-### OS X specific instructions
+MacOS 10.9 comes with Python and Matplotlib, but this version of
+Matplotlib only comes with the Cocoa GUI backend, which is [not
+supported by PyPlot](https://github.com/stevengj/PyPlot.jl/issues/11).
+So, unless you are running IJulia (which requires you to install
+`ipython`), you will need a different version of Matplotlib.
 
-The pre-installed version of matplotlib does not work with Julia as it does not
-include the Qt, GTK, or wxWidgets backends required by PyPlot.  To display
-graphics within IJulia, a working matplotlib (and ipython) can be installed as
-part of the [anaconda](http://continuum.io/downloads) package.  Otherwise, use
-the [homebrew](http://brew.sh/) package manager as follows
-
+For IJulia plots, a working Matplotlib is included as part of the part
+of the [Anaconda](http://continuum.io/downloads) Python distribution
+(which also includes `ipython` and other IJulia dependencies).
+Otherwise, you can use the [Homebrew](http://brew.sh/) package manager:
 ```
 brew install python gfortran freetype pyqt
 ln -s /usr/local/Cellar/freetype/2.5.3_1/include/freetype2/ /usr/local/include/freetype
 export PYTHONPATH=/usr/local/lib/python2.7
 pip install numpy scipy matplotlib
 ```
+(You may want to add the `export PYTHONPATH` to your `~/.profile` file so that it is automatically executed whenever you start a shell.)
 
 ## Basic usage
 
