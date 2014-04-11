@@ -242,7 +242,7 @@ for f in (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:ax
     else # using a different (older?) version of matplotlib
         @eval $f(args...; kws...) = error("matplotlib ", 
                                           matplotlib[:__version__],
-                                          " does not have pyplot.$sf")
+                                          " does not have pyplot.", $sf)
     end
 end
 
