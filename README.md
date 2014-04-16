@@ -45,10 +45,12 @@ Otherwise, you can use the [Homebrew](http://brew.sh/) package manager:
 ```
 brew install python gfortran freetype pyqt
 ln -s /usr/local/Cellar/freetype/2.5.3_1/include/freetype2/ /usr/local/include/freetype
+export PATH="/usr/local/bin:$PATH"
 export PYTHONPATH=/usr/local/lib/python2.7
 pip install numpy scipy matplotlib
 ```
-(You may want to add the `export PYTHONPATH` to your `~/.profile` file so that it is automatically executed whenever you start a shell.)
+(You may want to add the two `export` commands to your `~/.profile` file so that they
+are automatically executed whenever you start a shell.)
 
 ## Basic usage
 
