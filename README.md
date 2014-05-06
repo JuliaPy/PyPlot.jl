@@ -38,8 +38,8 @@ supported by PyPlot](https://github.com/stevengj/PyPlot.jl/issues/11).
 So, unless you are running IJulia (which requires you to install
 `ipython`), you will need a different version of Matplotlib.
 
-For IJulia plots, a working Matplotlib is included as part of the part
-of the [Anaconda](http://continuum.io/downloads) Python distribution
+For IJulia plots, a working Matplotlib is included as part of the
+[Anaconda](http://continuum.io/downloads) Python distribution
 (which also includes `ipython` and other IJulia dependencies).
 Otherwise, you can use the [Homebrew](http://brew.sh/) package manager:
 ```
