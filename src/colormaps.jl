@@ -17,6 +17,7 @@ end
 PyObject(c::ColorMap) = c.o
 convert(::Type{ColorMap}, o::PyObject) = ColorMap(o)
 ==(c::ColorMap, g::ColorMap) = c.o == g.o
+isequal(c::ColorMap, g::ColorMap) = c.o == g.o # Julia 0.2 compatibility
 ==(c::PyObject, g::ColorMap) = c == g.o
 ==(c::ColorMap, g::PyObject) = c.o == g
 hash(c::ColorMap) = hash(c.o)
