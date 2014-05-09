@@ -2,7 +2,7 @@ module PyPlot
 
 using PyCall
 import PyCall: PyObject, pygui
-import Base: convert, isequal, hash, writemime, getindex, setindex!, haskey, keys, show, mimewritable
+import Base: convert, ==, hash, writemime, getindex, setindex!, haskey, keys, show, mimewritable
 export Figure, plt, matplotlib, pygui
 
 ###########################################################################
@@ -118,7 +118,9 @@ end
 
 PyObject(f::Figure) = f.o
 convert(::Type{Figure}, o::PyObject) = Figure(o)
-isequal(f::Figure, g::Figure) = isequal(f.o, g.o)
+==(f::Figure, g::Figure) = f.o == g.o
+==(f::Figure, g::PyObject) = f.o == g
+==(f::PyObject, g::Figure) = f == g.o
 hash(f::Figure) = hash(f.o)
 
 getindex(f::Figure, x) = getindex(f.o, x)

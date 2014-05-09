@@ -16,7 +16,9 @@ end
 
 PyObject(c::ColorMap) = c.o
 convert(::Type{ColorMap}, o::PyObject) = ColorMap(o)
-isequal(c::ColorMap, g::ColorMap) = isequal(c.o, g.o)
+==(c::ColorMap, g::ColorMap) = c.o == g.o
+==(c::PyObject, g::ColorMap) = c == g.o
+==(c::ColorMap, g::PyObject) = c.o == g
 hash(c::ColorMap) = hash(c.o)
 
 getindex(c::ColorMap, x) = getindex(c.o, x)
