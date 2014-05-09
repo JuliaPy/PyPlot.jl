@@ -85,9 +85,9 @@ the raw `PyObject`s for the `matplotlib` and `pyplot` modules are accessible
 as `PyPlot.matplotlib` and `PyPlot.pltm`, respectively.)
 
 You must also use `plt` to access some functions that conflict with
-built-in Julia functions.  In particular, `plt.hist` and `plt.xcorr`
-must be used to access `matplotlib.pyplot.hist` and
-`matplotlib.pyplot.xcorr`, respectively.
+built-in Julia functions.  In particular, `plt.hist`, `plt.xcorr`, and
+`plt.isinteractive` must be used to access `matplotlib.pyplot.hist`
+etcetera.
 
 If you wish to access *all* of the PyPlot functions exclusively
 through `plt.somefunction(...)`, as is conventional in Python, simply
