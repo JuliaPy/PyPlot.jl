@@ -74,7 +74,8 @@ e.g. Julia uses `true` and `nothing` instead of Python's `True` and
 
 The full `matplotlib.pyplot` API is far too extensive to describe here;
 see the [matplotlib.pyplot documentation for more
-information](http://matplotlib.org/api/pyplot_api.html)
+information](http://matplotlib.org/api/pyplot_api.html).  The Matplotlib
+version number is returned by `PyPlot.version`.
 
 ### Exported functions
 

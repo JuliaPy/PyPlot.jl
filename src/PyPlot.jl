@@ -30,6 +30,7 @@ end
 
 const isjulia_display = Bool[isdisplayok()]
 const matplotlib = pyimport("matplotlib")
+const version = convert(VersionNumber, matplotlib[:__version__])
 
 pymodule_exists(s::String) = try 
     pyimport(s)
@@ -246,8 +247,7 @@ for f in (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:ax
         end
         addhelp(f, pltm[sf])
     else # using a different (older?) version of matplotlib
-        @eval $f(args...; kws...) = error("matplotlib ", 
-                                          matplotlib[:__version__],
+        @eval $f(args...; kws...) = error("matplotlib ", version,
                                           " does not have pyplot.", $sf)
     end
 end
