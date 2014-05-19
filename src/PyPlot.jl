@@ -219,7 +219,10 @@ function addhelp(f::String, o::PyObject)
     try
         Base.Help.init_help()
         if haskey(o, "__doc__")
-            Base.Help.FUNCTION_DICT[f] = [convert(String, o["__doc__"])]
+            if !haskey(Base.Help.FUNCTION_DICT, f)
+                Base.Help.FUNCTION_DICT[f] = {}
+            end
+            push!(Base.Help.FUNCTION_DICT[f], convert(String, o["__doc__"]))
         end
     end
 end
