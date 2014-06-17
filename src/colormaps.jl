@@ -40,7 +40,7 @@ const LinearSegmentedColormap = colorsm["LinearSegmentedColormap"]
 
 # most general constructors using RGB arrays of triples, defined
 # as for matplotlib.colors.LinearSegmentedColormap
-function ColorMap{T<:Real}(name::String, 
+function ColorMap{T<:Real}(name::Union(String,Symbol), 
                            r::AbstractVector{(T,T,T)},
                            g::AbstractVector{(T,T,T)},
                            b::AbstractVector{(T,T,T)},
@@ -50,7 +50,7 @@ function ColorMap{T<:Real}(name::String,
            name, [ "red" => r, "green" => g, "blue" => b ], n, gamma)
 end
 # as above, but also passing an alpha array
-function ColorMap{T<:Real}(name::String, 
+function ColorMap{T<:Real}(name::Union(String,Symbol), 
                            r::AbstractVector{(T,T,T)},
                            g::AbstractVector{(T,T,T)},
                            b::AbstractVector{(T,T,T)},
@@ -64,7 +64,8 @@ end
 
 
 # create from an array c, assuming linear mapping from [0,1] to c
-function ColorMap{T<:ColorValue}(name::String, c::AbstractVector{T},
+function ColorMap{T<:ColorValue}(name::Union(String,Symbol),
+                                 c::AbstractVector{T},
                                  n=max(256, length(c)), gamma=1.0)
     nc = length(c)
     if nc == 0
@@ -94,13 +95,13 @@ const cm_get_cmap = cm["get_cmap"]
 const cm_register_cmap = cm["register_cmap"]
 
 get_cmap() = pycall(cm_get_cmap, PyAny)
-get_cmap(name::String) = pycall(cm_get_cmap, PyAny, name)
-get_cmap(name::String, lut::Integer) = pycall(cm_get_cmap, PyAny, name, lut)
+get_cmap(name::Union(String,Symbol)) = pycall(cm_get_cmap, PyAny, name)
+get_cmap(name::Union(String,Symbol), lut::Integer) = pycall(cm_get_cmap, PyAny, name, lut)
 get_cmap(c::ColorMap) = c
-ColorMap(name::String) = get_cmap(name)
+ColorMap(name::Union(String,Symbol)) = get_cmap(name)
 
 register_cmap(c::ColorMap) = pycall(cm_register_cmap, PyAny, c)
-register_cmap(n::String, c::ColorMap) = pycall(cm_register_cmap, PyAny, n,c)
+register_cmap(n::Union(String,Symbol), c::ColorMap) = pycall(cm_register_cmap, PyAny, n,c)
 
 # convenience function to get array of registered colormaps
 get_cmaps() =

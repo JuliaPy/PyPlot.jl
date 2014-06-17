@@ -269,12 +269,12 @@ step(x, y; kws...) = pycall(py_step, PyAny, x, y; kws...)
 addhelp("PyPlot.step", py_step)
 
 const py_close = pltm["close"]
-close(f::Union(Figure,String,Integer)) = pycall(py_close, PyAny, f)
+close(f::Union(Figure,String,Symbol,Integer)) = pycall(py_close, PyAny, f)
 close() = pycall(py_close, PyAny)
 addhelp("PyPlot.close", py_close)
 
 const py_connect = pltm["connect"]
-connect(s::String, f::Function) = pycall(py_connect, PyAny, s, f)
+connect(s::Union(String,Symbol), f::Function) = pycall(py_connect, PyAny, s, f)
 addhelp("PyPlot.connect", py_connect)
 
 const py_fill = pltm["fill"]
@@ -302,6 +302,9 @@ function bar{T<:String}(x::AbstractVector{T}, y; kws...)
     ax[:set_ticklabels](x)
     return p
 end
+
+bar{T<:Symbol}(x::AbstractVector{T}, y; kws...) =
+    bar(map(string, x), y; kws...)
 
 ###########################################################################
 # Include mplot3d for 3d plotting.
