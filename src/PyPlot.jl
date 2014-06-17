@@ -30,7 +30,11 @@ end
 
 const isjulia_display = Bool[isdisplayok()]
 const matplotlib = pyimport("matplotlib")
-const version = convert(VersionNumber, matplotlib[:__version__])
+const version = try
+    convert(VersionNumber, matplotlib[:__version__])
+catch
+    v"0.0" # fallback
+end
 
 pymodule_exists(s::String) = try 
     pyimport(s)
