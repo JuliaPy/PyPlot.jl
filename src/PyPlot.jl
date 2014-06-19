@@ -43,7 +43,7 @@ catch
     false
 end
 
-const backend, gui = begin
+const (backend, gui) = begin
     const gui2matplotlib = [ :wx=>"WXAgg", :gtk=>"GTKAgg", :qt=>"Qt4Agg" ]
     try
         # We will get an exception when we import pyplot below
