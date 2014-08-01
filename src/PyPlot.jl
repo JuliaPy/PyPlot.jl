@@ -421,10 +421,14 @@ try
         # Define imshow for images
         global imshow
         Images = Main.Images
-        function imshow{T}(img::Main.Images.AbstractImageDirect{T,3}, args...; kws...)
+
+        imshow{T}(img::Main.Images.AbstractImageDirect{T,3}, args...; kws...) =
             Images.colordim(img) == 1 ? imshow(PyCall.PyObject(Images.data(img), true), args..., kws...) :
                                         imshow(PyCall.PyObject(Images.data(img)), args...; kws...)
-        end
+
+        imshow{T}(img::Main.Images.AbstractImageDirect{T,2}, args...; kws...) =
+            Images.spatialorder(img)[1] == "x" ? imshow(PyCall.PyObject(Images.data(img), true), args..., kws...) :
+                                                 imshow(PyCall.PyObject(Images.data(img)), args...; kws...)
     end
 end
 
