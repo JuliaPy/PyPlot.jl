@@ -408,6 +408,28 @@ for f in (:pcolor, :pcolormesh)
 end
 
 ###########################################################################
+# Allow imshow to images that are already in row-major order in Julia
+
+function imshow{T}(img::AbstractArray{T,3}, args...; kws...)
+    dim1 = size(img)[1]
+    dim1 == 3 || dim1 == 4 ? imshow(PyObject(img, true), args..., kws...) :
+                             imshow(PyObject(img), args...; kws...)
+end
+
+try
+    if isa(Main.Images, Module)
+        # Define imshow for images
+        global imshow
+        Images = Main.Images
+        function imshow{T}(img::Main.Images.AbstractImageDirect{T,3}, args...; kws...)
+            Images.colordim(img) == 1 ? imshow(PyCall.PyObject(Images.data(img), true), args..., kws...) :
+                                        imshow(PyCall.PyObject(Images.data(img)), args...; kws...)
+        end
+    end
+end
+
+
+###########################################################################
 
 include("latex.jl")
 
