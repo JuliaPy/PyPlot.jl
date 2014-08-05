@@ -5,7 +5,7 @@
 # one can simply do L"$\alpha + \beta$".
 
 export LaTeXString, @L_str, @L_mstr
-import Base: writemime, show, write, endof, getindex, sizeof, search, rsearch, isvalid, next, length
+import Base: writemime, show, write, endof, getindex, sizeof, search, rsearch, isvalid, next, length, bytestring
 
 immutable LaTeXString <: String
     s::ByteString
