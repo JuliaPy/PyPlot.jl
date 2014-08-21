@@ -170,8 +170,10 @@ function draw_if_interactive()
             manager = Gcf[:get_active]()
             if manager != nothing
                 fig = Figure(manager["canvas"]["figure"])
-                redisplay(fig)
-                drew_something[1] = true
+                if !isempty(fig[:get_axes]())
+                    redisplay(fig)
+                    drew_something[1] = true
+                end
             end
         end
     else
@@ -180,17 +182,57 @@ function draw_if_interactive()
     nothing
 end
 
-for d in (:display, :redisplay)
-    s = symbol(string(d, "_figs"))
-    @eval function $s()
-        if drew_something[1] && isjulia_display[1]
-            for manager in Gcf[:get_all_fig_managers]()
-                $d(Figure(manager["canvas"]["figure"]))
-            end
-            $(d == :redisplay ? :(pltm[:close]("all")) : nothing)
-            drew_something[1] = false # reset until next drawing command
+# The logic of display/redisplay/close is a bit complicated.  In
+# IJulia, we want to automatically display any figures that were
+# queued (via redisplay in draw_if_interactive) at the end of the cell
+# execution, and then close them.  However, we don't want to
+# close/display *all* figures, as there may be some other figures that
+# the user is keeping track of in some other way, e.g. for interactive
+# widgets.  So, we only want to close figures in the
+# IJulia.displayqueue.  Furthermore, if the user explicitly calls
+# display() on a figure or does so implicitly by returning a Figure
+# object from the cell, we still want to eventually close the figure
+# even though display removes it from the displayqueue, so we need to
+# keep track of it in a separate closequeue in that case.
+
+# queue of figures that need closing despite being removed from displayqueue
+const closequeue = Figure[]
+function pushclose(f::Figure)
+    if !in(f, closequeue)
+        push!(closequeue, f)
+    end
+    return f
+end
+
+function display_figs()
+    if drew_something[1] && isjulia_display[1]
+        for manager in Gcf[:get_all_fig_managers]()
+            display(pushclose(Figure(manager["canvas"]["figure"])))
         end
-        nothing
+        drew_something[1] = false # reset until next drawing command
+    end
+    nothing
+end
+
+function close_queued_figs()
+    if isjulia_display[1] && (drew_something[1] || !isempty(closequeue))
+        for f in Main.IJulia.displayqueue
+            if isa(f, Figure)
+                pltm[:close](f[:number])
+            end
+        end
+        for f in closequeue
+            pltm[:close](f[:number])
+        end
+        empty!(closequeue)
+        drew_something[1] = false # reset until next drawing command 
+
+        # if there are still open figures, we want the next IJulia
+        # cell to draw into a new figure rather than overwriting an
+        # existing one.
+        if !isempty(Gcf[:get_all_fig_managers]())
+            figure()
+        end
     end
 end
 
@@ -200,13 +242,8 @@ function monkeypatch()
 end
 
 if isdefined(Main,:IJulia)
-    Main.IJulia.push_postexecute_hook(redisplay_figs)
-    Main.IJulia.push_posterror_hook(() -> begin
-        if drew_something[1] && isjulia_display[1] 
-            pltm[:close]("all")
-            drew_something[1] = false # reset until next drawing command
-        end
-    end)
+    Main.IJulia.push_postexecute_hook(close_queued_figs)
+    Main.IJulia.push_posterror_hook(close_queued_figs)
 end
 
 if isjulia_display[1]
