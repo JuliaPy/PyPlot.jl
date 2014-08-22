@@ -3,7 +3,7 @@ module PyPlot
 using PyCall
 import PyCall: PyObject, pygui
 import Base: convert, ==, isequal, hash, writemime, getindex, setindex!, haskey, keys, show, mimewritable
-export Figure, plt, matplotlib, pygui
+export Figure, plt, matplotlib, pygui, withfig
 
 ###########################################################################
 # file formats supported by Agg backend, from MIME types
@@ -164,13 +164,15 @@ const Gcf = pyimport("matplotlib._pylab_helpers")["Gcf"]
 const drew_something = [false]
 const orig_draw = pltm["draw_if_interactive"]
 
+Base.isempty(f::Figure) = isempty(pycall(f["get_axes"], PyVector))
+
 function draw_if_interactive()
     if isjulia_display[1]
         if pltm[:isinteractive]()
             manager = Gcf[:get_active]()
             if manager != nothing
                 fig = Figure(manager["canvas"]["figure"])
-                if !isempty(fig[:get_axes]())
+                if !isempty(fig)
                     redisplay(fig)
                     drew_something[1] = true
                 end
@@ -227,10 +229,11 @@ function close_queued_figs()
         empty!(closequeue)
         drew_something[1] = false # reset until next drawing command 
 
-        # if there are still open figures, we want the next IJulia
-        # cell to draw into a new figure rather than overwriting an
-        # existing one.
-        if !isempty(Gcf[:get_all_fig_managers]())
+        # if there are still open figures and the current figure is
+        # non-empty, we want the next IJulia cell to draw into a new
+        # figure rather than overwriting an existing one.
+        manager = Gcf[:get_active]()
+        if manager != nothing && !isempty(Figure(manager["canvas"]["figure"]))
             figure()
         end
     end
@@ -442,6 +445,27 @@ for f in (:pcolor, :pcolormesh)
         $f(X::Range, Y::AbstractArray, args...; kws...) = $f([X...], Y, args...; kws...)
         $f(X::AbstractArray, Y::Range, args...; kws...) = $f(X, [Y...], args...; kws...)
     end
+end
+
+###########################################################################
+# a more pure functional style, that returns the figure but does *not*
+# have any display side-effects.  Mainly for use with @manipulate (Interact.jl)
+
+function withfig(actions::Function, f::Figure; clear=true)
+    ax_save = gca()
+    figure(f[:number])
+    try
+        if clear && !isempty(f)
+            clf()
+        end
+        actions()
+    finally
+        try
+            sca(ax_save) # may fail if axes were overwritten
+        end
+        Main.IJulia.undisplay(f)
+    end
+    return f
 end
 
 ###########################################################################
