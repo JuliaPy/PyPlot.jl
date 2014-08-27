@@ -58,7 +58,7 @@ const (backend, gui) = begin
         local gui::Symbol = :none
         if PyCall.gui == :default
             # try to ensure that GUI both exists and has a matplotlib backend
-            for g in (:qt, :wx, :gtk)
+            for g in (@linux? (:gtk, :qt, :wx) : (:qt, :wx, :gtk))
                 if PyCall.pygui_works(g)
                     # must call matplotlib.use *before* loading backends module
                     matplotlib[:use](gui2matplotlib[g])
