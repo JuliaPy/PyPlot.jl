@@ -454,11 +454,14 @@ end
 function withfig(actions::Function, f::Figure; clear=true)
     ax_save = gca()
     figure(f[:number])
+    finalizer(f, close)
     try
         if clear && !isempty(f)
             clf()
         end
         actions()
+    catch
+        rethrow()
     finally
         try
             sca(ax_save) # may fail if axes were overwritten
