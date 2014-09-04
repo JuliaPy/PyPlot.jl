@@ -40,52 +40,64 @@ const LinearSegmentedColormap = colorsm["LinearSegmentedColormap"]
 
 # most general constructors using RGB arrays of triples, defined
 # as for matplotlib.colors.LinearSegmentedColormap
-function ColorMap{T<:Real}(name::Union(String,Symbol), 
-                           r::AbstractVector{(T,T,T)},
-                           g::AbstractVector{(T,T,T)},
-                           b::AbstractVector{(T,T,T)},
-                           n=max(256, length(r), length(g), length(b)),
-                           gamma=1.0)
-    pycall(LinearSegmentedColormap, ColorMap,
-           name, [ "red" => r, "green" => g, "blue" => b ], n, gamma)
-end
+ColorMap{T<:Real}(name::Union(String,Symbol), 
+                  r::AbstractVector{(T,T,T)},
+                  g::AbstractVector{(T,T,T)},
+                  b::AbstractVector{(T,T,T)},
+                  n=max(256,length(r),length(g),length(b)), gamma=1.0) =
+    ColorMap(name, r,g,b, Array((T,T,T),0), n, gamma)
+
 # as above, but also passing an alpha array
 function ColorMap{T<:Real}(name::Union(String,Symbol), 
                            r::AbstractVector{(T,T,T)},
                            g::AbstractVector{(T,T,T)},
                            b::AbstractVector{(T,T,T)},
                            a::AbstractVector{(T,T,T)},
-                           n=max(256, length(r), length(g), length(b)),
+                           n=max(256,length(r),length(g),length(b),length(a)),
                            gamma=1.0)
+    segmentdata = [ "red" => r, "green" => g, "blue" => b ]
+    if !isempty(a)
+        segmentdata["alpha"] = a
+    end  
     pycall(LinearSegmentedColormap, ColorMap,
-           name, [ "red" => r, "green" => g, "blue" => b, "alpha" => a ],
-           n, gamma)
+           name, segmentdata, n, gamma)
 end
 
+typealias AColorValue Union(ColorValue,AbstractAlphaColorValue)
 
 # create from an array c, assuming linear mapping from [0,1] to c
-function ColorMap{T<:ColorValue}(name::Union(String,Symbol),
-                                 c::AbstractVector{T},
-                                 n=max(256, length(c)), gamma=1.0)
+function ColorMap{T<:AColorValue}(name::Union(String,Symbol),
+                                  c::AbstractVector{T},
+                                  n=max(256, length(c)), gamma=1.0)
     nc = length(c)
     if nc == 0
         throw(ArgumentError("ColorMap requires a non-empty ColorValue array"))
     end
     r = Array((Float64,Float64,Float64), nc)
-    g = Array((Float64,Float64,Float64), nc)
-    b = Array((Float64,Float64,Float64), nc)
+    g = similar(r)
+    b = similar(r)
+    a = T <: AbstractAlphaColorValue ? 
+        similar(r) : Array((Float64,Float64,Float64), 0)
     for i = 1:nc
-        rgb = convert(RGB, c[i])
         x = (i-1) / (nc-1)
-        r[i] = (x, rgb.r, rgb.r)
-        b[i] = (x, rgb.b, rgb.b)
-        g[i] = (x, rgb.g, rgb.g)
+        if T <: AbstractAlphaColorValue
+            rgba = convert(AlphaColorValue{RGB{Float64},Float64}, c[i])
+            r[i] = (x, rgba.c.r, rgba.c.r)
+            b[i] = (x, rgba.c.b, rgba.c.b)
+            g[i] = (x, rgba.c.g, rgba.c.g)
+            a[i] = (x, rgba.alpha, rgba.alpha)
+        else
+            rgb = convert(RGB{Float64}, c[i])
+            r[i] = (x, rgb.r, rgb.r)
+            b[i] = (x, rgb.b, rgb.b)
+            g[i] = (x, rgb.g, rgb.g)
+        end
     end
-    ColorMap(name, r,g,b, n, gamma)
+    ColorMap(name, r,g,b,a, n, gamma)
 end
 
-ColorMap{T<:ColorValue}(c::AbstractVector{T},
-                        n=max(256, length(c)), gamma=1.0) =
+ColorMap{T<:AColorValue}(c::AbstractVector{T},
+                         n=max(256, length(c)), gamma=1.0) =
     ColorMap(string("cm_", hash(c)), c, n, gamma)
 
 
