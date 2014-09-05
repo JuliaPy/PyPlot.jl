@@ -55,6 +55,15 @@ const (backend, gui) = begin
         #  if xdpyinfo is installed.]
         @unix_only (@osx ? nothing : ENV["DISPLAY"])
 
+        # Hack to workaround matplotlib/matplotlib#2286 (PyPlot#79):
+        # Matplotlib refuses to be interactive unless it thinks it is
+        # running from a Python interactive prompt.
+        let sys = pyimport("sys")
+            if !haskey(sys, "ps1")
+                sys["ps1"] = ">>> "
+            end
+        end
+
         local gui::Symbol = :none
         if PyCall.gui == :default
             # try to ensure that GUI both exists and has a matplotlib backend
@@ -145,14 +154,14 @@ for (mime,fmt) in aggformats
         f.o["canvas"][:print_figure](io, format=$fmt, bbox_inches="tight")
     end
     if fmt != "svg"
-        @eval mimewritable(::MIME{symbol($mime)}, f::Figure) = haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict), $fmt)
+        @eval mimewritable(::MIME{symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict), $fmt)
     end
 end
 
 # disable SVG output by default, since displaying large SVGs (large datasets)
 # in IJulia is slow, and browser SVG display is buggy.  (Similar to IPython.)
 const SVG = [false]
-mimewritable(::MIME"image/svg+xml", f::Figure) = SVG[1] && haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict), "svg")
+mimewritable(::MIME"image/svg+xml", f::Figure) = SVG[1] && !isempty(f) && haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict), "svg")
 svg() = SVG[1]
 svg(b::Bool) = (SVG[1] = b)
 
@@ -166,16 +175,15 @@ const orig_draw = pltm["draw_if_interactive"]
 
 Base.isempty(f::Figure) = isempty(pycall(f["get_axes"], PyVector))
 
+# monkey-patch draw_if_interactive to queue the figure for drawing in IJulia
 function draw_if_interactive()
     if isjulia_display[1]
-        if pltm[:isinteractive]()
+        if pycall(matplotlib["is_interactive"], Bool)
             manager = Gcf[:get_active]()
             if manager != nothing
                 fig = Figure(manager["canvas"]["figure"])
-                if !isempty(fig)
-                    redisplay(fig)
-                    drew_something[1] = true
-                end
+                redisplay(fig)
+                drew_something[1] = true
             end
         end
     else
@@ -228,23 +236,39 @@ function close_queued_figs()
         end
         empty!(closequeue)
         drew_something[1] = false # reset until next drawing command 
+    end
+end
 
-        # if there are still open figures and the current figure is
-        # non-empty, we want the next IJulia cell to draw into a new
-        # figure rather than overwriting an existing one.
-        manager = Gcf[:get_active]()
-        if manager != nothing && !isempty(Figure(manager["canvas"]["figure"]))
-            figure()
-        end
+# hook to force new IJulia cells to create new figure objects
+const gcf_isnew = [false] # true to force next gcf() to be new figure
+force_new_fig() = gcf_isnew[1] = true
+
+# monkey-patch gcf() and figure() so that we can force the creation
+# of new figures in new IJulia cells (e.g. after @manipulate commands
+# that leave the figure from the previous cell open).
+const orig_gcf = pltm["gcf"]
+const orig_figure = pltm["figure"]
+function figure(args...; kws...)
+    gcf_isnew[1] = false
+    pycall(orig_figure, PyAny, args...; kws...)
+end
+function gcf()
+    if isjulia_display[1] && gcf_isnew[1]
+        return figure()
+    else
+        return pycall(orig_gcf, PyAny)
     end
 end
 
 function monkeypatch()
     pltm["draw_if_interactive"] = draw_if_interactive
     pltm["show"] = display_figs
+    pltm["gcf"] = gcf
+    pltm["figure"] = figure
 end
 
 if isdefined(Main,:IJulia)
+    Main.IJulia.push_preexecute_hook(force_new_fig)
     Main.IJulia.push_postexecute_hook(close_queued_figs)
     Main.IJulia.push_posterror_hook(close_queued_figs)
 end
@@ -281,7 +305,7 @@ const plt = pywrap(pltm)
 # export documented pyplot API (http://matplotlib.org/api/pyplot_api.html)
 export acorr,annotate,arrow,autoscale,autumn,axes,axhline,axhspan,axis,axvline,axvspan,bar,barbs,barh,bone,box,boxplot,broken_barh,cla,clabel,clf,clim,cohere,colorbar,colors,contour,contourf,cool,copper,csd,delaxes,disconnect,draw,errorbar,eventplot,figimage,figlegend,figtext,figure,fill_between,fill_betweenx,findobj,flag,gca,gcf,gci,get_current_fig_manager,get_figlabels,get_fignums,get_plot_commands,ginput,gray,grid,hexbin,hist2d,hlines,hold,hot,hsv,imread,imsave,imshow,ioff,ion,ishold,jet,legend,locator_params,loglog,margins,matshow,minorticks_off,minorticks_on,over,pause,pcolor,pcolormesh,pie,pink,plot,plot_date,plotfile,polar,prism,psd,quiver,quiverkey,rc,rc_context,rcdefaults,rgrids,savefig,sca,scatter,sci,semilogx,semilogy,set_cmap,setp,show,specgram,spectral,spring,spy,stackplot,stem,step,streamplot,subplot,subplot2grid,subplot_tool,subplots,subplots_adjust,summer,suptitle,switch_backend,table,text,thetagrids,tick_params,ticklabel_format,tight_layout,title,tricontour,tricontourf,tripcolor,triplot,twinx,twiny,vlines,waitforbuttonpress,winter,xkcd,xlabel,xlim,xscale,xticks,ylabel,ylim,yscale,yticks
 
-for f in (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:axis,:axvline,:axvspan,:bar,:barbs,:barh,:bone,:box,:boxplot,:broken_barh,:cla,:clabel,:clf,:clim,:cohere,:colorbar,:colors,:contour,:contourf,:cool,:copper,:csd,:delaxes,:disconnect,:draw,:errorbar,:eventplot,:figimage,:figlegend,:figtext,:figure,:fill_between,:fill_betweenx,:findobj,:flag,:gca,:gcf,:gci,:get_current_fig_manager,:get_figlabels,:get_fignums,:get_plot_commands,:ginput,:gray,:grid,:hexbin,:hist2d,:hlines,:hold,:hot,:hsv,:imread,:imsave,:imshow,:ioff,:ion,:ishold,:jet,:legend,:locator_params,:loglog,:margins,:matshow,:minorticks_off,:minorticks_on,:over,:pause,:pcolor,:pcolormesh,:pie,:pink,:plot,:plot_date,:plotfile,:polar,:prism,:psd,:quiver,:quiverkey,:rc,:rc_context,:rcdefaults,:rgrids,:savefig,:sca,:scatter,:sci,:semilogx,:semilogy,:set_cmap,:setp,:specgram,:spectral,:spring,:spy,:stackplot,:stem,:streamplot,:subplot,:subplot2grid,:subplot_tool,:subplots,:subplots_adjust,:summer,:suptitle,:switch_backend,:table,:text,:thetagrids,:tick_params,:ticklabel_format,:tight_layout,:title,:tricontour,:tricontourf,:tripcolor,:triplot,:twinx,:twiny,:vlines,:waitforbuttonpress,:winter,:xkcd,:xlabel,:xlim,:xscale,:xticks,:ylabel,:ylim,:yscale,:yticks)
+for f in (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:axis,:axvline,:axvspan,:bar,:barbs,:barh,:bone,:box,:boxplot,:broken_barh,:cla,:clabel,:clf,:clim,:cohere,:colorbar,:colors,:contour,:contourf,:cool,:copper,:csd,:delaxes,:disconnect,:draw,:errorbar,:eventplot,:figimage,:figlegend,:figtext,:fill_between,:fill_betweenx,:findobj,:flag,:gca,:gci,:get_current_fig_manager,:get_figlabels,:get_fignums,:get_plot_commands,:ginput,:gray,:grid,:hexbin,:hist2d,:hlines,:hold,:hot,:hsv,:imread,:imsave,:imshow,:ioff,:ion,:ishold,:jet,:legend,:locator_params,:loglog,:margins,:matshow,:minorticks_off,:minorticks_on,:over,:pause,:pcolor,:pcolormesh,:pie,:pink,:plot,:plot_date,:plotfile,:polar,:prism,:psd,:quiver,:quiverkey,:rc,:rc_context,:rcdefaults,:rgrids,:savefig,:sca,:scatter,:sci,:semilogx,:semilogy,:set_cmap,:setp,:specgram,:spectral,:spring,:spy,:stackplot,:stem,:streamplot,:subplot,:subplot2grid,:subplot_tool,:subplots,:subplots_adjust,:summer,:suptitle,:switch_backend,:table,:text,:thetagrids,:tick_params,:ticklabel_format,:tight_layout,:title,:tricontour,:tricontourf,:tripcolor,:triplot,:twinx,:twiny,:vlines,:waitforbuttonpress,:winter,:xkcd,:xlabel,:xlim,:xscale,:xticks,:ylabel,:ylim,:yscale,:yticks)
     py_f = symbol(string("py_", f))
     sf = string(f)
     if haskey(pltm, sf)
@@ -295,6 +319,9 @@ for f in (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:ax
                                           " does not have pyplot.", $sf)
     end
 end
+
+addhelp("figure", orig_figure)
+addhelp("gcf", orig_gcf)
 
 # The following pyplot functions must be handled specially since they
 # overlap with standard Julia functions:
