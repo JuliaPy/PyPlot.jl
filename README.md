@@ -214,15 +214,18 @@ interpreting the dollar signs and backslashes itself; for example, the
 LaTeX equation `$\alpha + \beta$` would be the literal string
 `"\$\\alpha + \\beta\$"` in Julia.
 
-To simplify this, PyPlot provides a new `LaTeXString` type which can
+To simplify this, PyPlot uses the [LaTeXStrings package](https://github.com/stevengj/LaTeXStrings.jl) to provide a new `LaTeXString` type that
 be constructed via `L"...."` without escaping backslashes or dollar
 signs.  For example, one can simply write `L"$\alpha + \beta$"` for the
 abovementioned equation, and thus you can do things like:
 ```
 title(L"Plot of $\Gamma_3(x)$")
 ```
-(As an added benefit, a `LaTeXString` is
-automatically displayed as a rendered equation in IJulia.) 
+If your string contains *only* equations, you can omit the dollar
+signs, e.g. `L"\alpha + \beta"`, and they will be added automatically.
+As an added benefit, a `LaTeXString` is automatically displayed as a
+rendered equation in IJulia.  See the LaTeXStrings package for more
+information.
 
 ## SVG output in IJulia
 
