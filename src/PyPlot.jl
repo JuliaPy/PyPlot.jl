@@ -55,15 +55,6 @@ const (backend, gui) = begin
         #  if xdpyinfo is installed.]
         @unix_only (@osx ? nothing : ENV["DISPLAY"])
 
-        # Hack to workaround matplotlib/matplotlib#2286 (PyPlot#79):
-        # Matplotlib refuses to be interactive unless it thinks it is
-        # running from a Python interactive prompt.
-        let sys = pyimport("sys")
-            if !haskey(sys, "ps1")
-                sys["ps1"] = ">>> "
-            end
-        end
-
         local gui::Symbol = :none
         if PyCall.gui == :default
             # try to ensure that GUI both exists and has a matplotlib backend
