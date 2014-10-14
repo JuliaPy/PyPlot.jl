@@ -4,6 +4,17 @@
 using Color
 export ColorMap, get_cmap, register_cmap, get_cmaps
 
+# Get rid of deprecation warnings for v0.4 and greater
+if VERSION < v"0.4-"
+    macro Dict(pairs...)
+        Expr(:dict, pairs...)
+    end
+else # apply new syntax Dict( a=>b )
+    macro Dict(pairs...)
+        Expr(:call, :Dict, pairs...)
+    end
+end
+
 const colorsm = pyimport("matplotlib.colors")
 const cm = pyimport("matplotlib.cm")
 
@@ -55,7 +66,7 @@ function ColorMap{T<:Real}(name::Union(String,Symbol),
                            a::AbstractVector{(T,T,T)},
                            n=max(256,length(r),length(g),length(b),length(a)),
                            gamma=1.0)
-    segmentdata = [ "red" => r, "green" => g, "blue" => b ]
+    segmentdata = @Dict( "red" => r, "green" => g, "blue" => b )
     if !isempty(a)
         segmentdata["alpha"] = a
     end  
