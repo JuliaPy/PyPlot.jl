@@ -258,7 +258,7 @@ function monkeypatch()
     pltm["figure"] = figure
 end
 
-if isdefined(Main,:IJulia)
+if isdefined(Main, :IJulia) && Main.IJulia.inited
     Main.IJulia.push_preexecute_hook(force_new_fig)
     Main.IJulia.push_postexecute_hook(close_queued_figs)
     Main.IJulia.push_posterror_hook(close_queued_figs)
