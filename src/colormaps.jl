@@ -101,6 +101,24 @@ ColorMap{T<:AColorValue}(c::AbstractVector{T},
                          n=max(256, length(c)), gamma=1.0) =
     ColorMap(string("cm_", hash(c)), c, n, gamma)
 
+function ColorMap{T<:Real}(name::Union(String,Symbol), c::AbstractMatrix{T},
+                           n=max(256, size(c,1)), gamma=1.0)
+    if size(c,2) == 3
+        return ColorMap(name,
+                        [RGB{T}(c[i,1],c[i,2],c[i,3]) for i in 1:size(c,1)],
+                        n, gamma)
+    elseif size(c,2) == 4
+        return ColorMap(name,
+                        [AlphaColorValue(RGB{T}(c[i,1],c[i,2],c[i,3]), c[i,4])
+                         for i in 1:size(c,1)],
+                        n, gamma)
+    else
+        throw(ArgumentError("color matrix must have 3 or 4 columns"))
+    end
+end
+
+ColorMap{T<:Real}(c::AbstractMatrix{T}, n=max(256, size(c,1)), gamma=1.0) =
+    ColorMap(string("cm_", hash(c)), c, n, gamma)
 
 ########################################################################
 
