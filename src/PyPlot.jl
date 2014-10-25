@@ -1,17 +1,18 @@
 module PyPlot
 
 using PyCall
+using Compat  # handle deprecation of Dict syntax v0.4
 import PyCall: PyObject, pygui
 import Base: convert, ==, isequal, hash, writemime, getindex, setindex!, haskey, keys, show, mimewritable
 export Figure, plt, matplotlib, pygui, withfig
 
 ###########################################################################
 # file formats supported by Agg backend, from MIME types
-const aggformats = [ "application/eps" => "eps", "image/eps" => "eps",
+const aggformats = Compat.@Dict( "application/eps" => "eps", "image/eps" => "eps",
                      "application/pdf" => "pdf",
                      "image/png" => "png",
                      "application/postscript" => "ps",
-                     "image/svg+xml" => "svg" ]
+                     "image/svg+xml" => "svg" )
 
 function isdisplayok()
     for mime in keys(aggformats)
@@ -44,7 +45,7 @@ catch
 end
 
 const (backend, gui) = begin
-    const gui2matplotlib = [ :wx=>"WXAgg", :gtk=>"GTKAgg", :qt=>"Qt4Agg" ]
+    const gui2matplotlib = Compat.@Dict( :wx=>"WXAgg", :gtk=>"GTKAgg", :qt=>"Qt4Agg" )
     try
         # We will get an exception when we import pyplot below
         # (on Unix) if an X server is not available, even though
