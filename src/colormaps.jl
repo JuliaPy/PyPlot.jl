@@ -40,7 +40,7 @@ const LinearSegmentedColormap = colorsm["LinearSegmentedColormap"]
 
 # most general constructors using RGB arrays of triples, defined
 # as for matplotlib.colors.LinearSegmentedColormap
-ColorMap{T<:Real}(name::Union(String,Symbol), 
+ColorMap{T<:Real}(name::Union(AbstractString,Symbol), 
                   r::AbstractVector{(T,T,T)},
                   g::AbstractVector{(T,T,T)},
                   b::AbstractVector{(T,T,T)},
@@ -48,7 +48,7 @@ ColorMap{T<:Real}(name::Union(String,Symbol),
     ColorMap(name, r,g,b, Array((T,T,T),0), n, gamma)
 
 # as above, but also passing an alpha array
-function ColorMap{T<:Real}(name::Union(String,Symbol), 
+function ColorMap{T<:Real}(name::Union(AbstractString,Symbol), 
                            r::AbstractVector{(T,T,T)},
                            g::AbstractVector{(T,T,T)},
                            b::AbstractVector{(T,T,T)},
@@ -66,7 +66,7 @@ end
 typealias AColorValue Union(ColorValue,AbstractAlphaColorValue)
 
 # create from an array c, assuming linear mapping from [0,1] to c
-function ColorMap{T<:AColorValue}(name::Union(String,Symbol),
+function ColorMap{T<:AColorValue}(name::Union(AbstractString,Symbol),
                                   c::AbstractVector{T},
                                   n=max(256, length(c)), gamma=1.0)
     nc = length(c)
@@ -100,7 +100,7 @@ ColorMap{T<:AColorValue}(c::AbstractVector{T},
                          n=max(256, length(c)), gamma=1.0) =
     ColorMap(string("cm_", hash(c)), c, n, gamma)
 
-function ColorMap{T<:Real}(name::Union(String,Symbol), c::AbstractMatrix{T},
+function ColorMap{T<:Real}(name::Union(AbstractString,Symbol), c::AbstractMatrix{T},
                            n=max(256, size(c,1)), gamma=1.0)
     if size(c,2) == 3
         return ColorMap(name,
@@ -125,19 +125,19 @@ const cm_get_cmap = cm["get_cmap"]
 const cm_register_cmap = cm["register_cmap"]
 
 get_cmap() = pycall(cm_get_cmap, PyAny)
-get_cmap(name::Union(String,Symbol)) = pycall(cm_get_cmap, PyAny, name)
-get_cmap(name::Union(String,Symbol), lut::Integer) = pycall(cm_get_cmap, PyAny, name, lut)
+get_cmap(name::Union(AbstractString,Symbol)) = pycall(cm_get_cmap, PyAny, name)
+get_cmap(name::Union(AbstractString,Symbol), lut::Integer) = pycall(cm_get_cmap, PyAny, name, lut)
 get_cmap(c::ColorMap) = c
-ColorMap(name::Union(String,Symbol)) = get_cmap(name)
+ColorMap(name::Union(AbstractString,Symbol)) = get_cmap(name)
 
 register_cmap(c::ColorMap) = pycall(cm_register_cmap, PyAny, c)
-register_cmap(n::Union(String,Symbol), c::ColorMap) = pycall(cm_register_cmap, PyAny, n,c)
+register_cmap(n::Union(AbstractString,Symbol), c::ColorMap) = pycall(cm_register_cmap, PyAny, n,c)
 
 # convenience function to get array of registered colormaps
 get_cmaps() =
     ColorMap[get_cmap(c) for c in
              sort(filter!(c -> !endswith(c, "_r"),
-                          String[c for (c,v) in PyDict(PyPlot.cm["datad"])]),
+                          AbstractString[c for (c,v) in PyDict(PyPlot.cm["datad"])]),
                   by=lowercase)]
 
 ########################################################################

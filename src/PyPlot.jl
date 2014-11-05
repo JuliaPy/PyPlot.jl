@@ -5,13 +5,16 @@ import PyCall: PyObject, pygui
 import Base: convert, ==, isequal, hash, writemime, getindex, setindex!, haskey, keys, show, mimewritable
 export Figure, plt, matplotlib, pygui, withfig
 
+using Compat
+
 ###########################################################################
 # file formats supported by Agg backend, from MIME types
-const aggformats = [ "application/eps" => "eps", "image/eps" => "eps",
-                     "application/pdf" => "pdf",
-                     "image/png" => "png",
-                     "application/postscript" => "ps",
-                     "image/svg+xml" => "svg" ]
+const aggformats = @compat Dict("application/eps" => "eps",
+                                "image/eps" => "eps",
+                                "application/pdf" => "pdf",
+                                "image/png" => "png",
+                                "application/postscript" => "ps",
+                                "image/svg+xml" => "svg")
 
 function isdisplayok()
     for mime in keys(aggformats)
@@ -36,7 +39,7 @@ catch
     v"0.0" # fallback
 end
 
-pymodule_exists(s::String) = try 
+pymodule_exists(s::AbstractString) = try 
     pyimport(s)
     true
 catch
@@ -44,7 +47,7 @@ catch
 end
 
 const (backend, gui) = begin
-    const gui2matplotlib = [ :wx=>"WXAgg", :gtk=>"GTKAgg", :qt=>"Qt4Agg" ]
+    const gui2matplotlib = @compat Dict(:wx=>"WXAgg", :gtk=>"GTKAgg", :qt=>"Qt4Agg")
     try
         # We will get an exception when we import pyplot below
         # (on Unix) if an X server is not available, even though
@@ -275,19 +278,19 @@ end
 # Base.Help.FUNCTION_DICT is undocumented, but it is better than nothing
 # until Julia gets a documented docstring-like facility.
 
-function addhelp(f::String, o::PyObject)
+function addhelp(f::AbstractString, o::PyObject)
     try
         Base.Help.init_help()
         if haskey(o, "__doc__")
             if !haskey(Base.Help.FUNCTION_DICT, f)
                 Base.Help.FUNCTION_DICT[f] = Any[]
             end
-            push!(Base.Help.FUNCTION_DICT[f], convert(String, o["__doc__"]))
+            push!(Base.Help.FUNCTION_DICT[f], convert(AbstractString, o["__doc__"]))
         end
     end
 end
 addhelp(f::Symbol, o::PyObject) = addhelp(string(f), o)
-addhelp(f, o::PyObject, key::String) = haskey(o, key) && addhelp(f, o[key])
+addhelp(f, o::PyObject, key::AbstractString) = haskey(o, key) && addhelp(f, o[key])
     
 ###########################################################################
 
@@ -327,12 +330,12 @@ step(x, y; kws...) = pycall(py_step, PyAny, x, y; kws...)
 addhelp("PyPlot.step", py_step)
 
 const py_close = pltm["close"]
-close(f::Union(Figure,String,Symbol,Integer)) = pycall(py_close, PyAny, f)
+close(f::Union(Figure,AbstractString,Symbol,Integer)) = pycall(py_close, PyAny, f)
 close() = pycall(py_close, PyAny)
 addhelp("PyPlot.close", py_close)
 
 const py_connect = pltm["connect"]
-connect(s::Union(String,Symbol), f::Function) = pycall(py_connect, PyAny, s, f)
+connect(s::Union(AbstractString,Symbol), f::Function) = pycall(py_connect, PyAny, s, f)
 addhelp("PyPlot.connect", py_connect)
 
 const py_fill = pltm["fill"]
@@ -348,7 +351,7 @@ include("colormaps.jl")
 ###########################################################################
 # Support array of string labels in bar chart
 
-function bar{T<:String}(x::AbstractVector{T}, y; kws...)
+function bar{T<:AbstractString}(x::AbstractVector{T}, y; kws...)
     xi = 1:length(x)
     if !any(kw -> kw[1] == :align, kws)
         push!(kws, (:align, "center"))
