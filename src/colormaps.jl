@@ -4,9 +4,6 @@
 using Color
 export ColorMap, get_cmap, register_cmap, get_cmaps
 
-const colorsm = pyimport("matplotlib.colors")
-const cm = pyimport("matplotlib.cm")
-
 ########################################################################
 # Wrapper around colors.Colormap type:
 
@@ -27,16 +24,28 @@ setindex!(c::ColorMap, v, x) = setindex!(c.o, v, x)
 haskey(c::ColorMap, x) = haskey(c.o, x)
 keys(c::ColorMap) = keys(c.o)
 
-pytype_mapping(colorsm["Colormap"], ColorMap)
-
 function show(io::IO, c::ColorMap)
     print(io, "ColorMap \"$(c[:name])\"")
 end
 
+# all Python dependencies must be initialized at runtime (not when precompiled)
+function init_colormaps()
+    const colorsm = pyimport("matplotlib.colors")
+    const cm = pyimport("matplotlib.cm")
+
+    pytype_mapping(colorsm["Colormap"], ColorMap)
+
+    const LinearSegmentedColormap = colorsm["LinearSegmentedColormap"]
+
+    const cm_get_cmap = cm["get_cmap"]
+    const cm_register_cmap = cm["register_cmap"]
+
+    const ScalarMappable = cm["ScalarMappable"]
+    const Normalize01 = pycall(colorsm["Normalize"],PyAny,vmin=0,vmax=1)
+end
+
 ########################################################################
 # ColorMap constructors via colors.LinearSegmentedColormap
-
-const LinearSegmentedColormap = colorsm["LinearSegmentedColormap"]
 
 # most general constructors using RGB arrays of triples, defined
 # as for matplotlib.colors.LinearSegmentedColormap
@@ -121,9 +130,6 @@ ColorMap{T<:Real}(c::AbstractMatrix{T}, n=max(256, size(c,1)), gamma=1.0) =
 
 ########################################################################
 
-const cm_get_cmap = cm["get_cmap"]
-const cm_register_cmap = cm["register_cmap"]
-
 get_cmap() = pycall(cm_get_cmap, PyAny)
 get_cmap(name::Union(AbstractString,Symbol)) = pycall(cm_get_cmap, PyAny, name)
 get_cmap(name::Union(AbstractString,Symbol), lut::Integer) = pycall(cm_get_cmap, PyAny, name, lut)
@@ -142,9 +148,6 @@ get_cmaps() =
 
 ########################################################################
 # display of ColorMaps as a horizontal color bar in SVG
-
-const ScalarMappable = cm["ScalarMappable"]
-const Normalize01 = pycall(colorsm["Normalize"],PyAny,vmin=0,vmax=1)
 
 function writemime(io::IO, ::MIME"image/svg+xml", 
                    cs::AbstractVector{ColorMap})

@@ -7,6 +7,11 @@ export Figure, plt, matplotlib, pygui, withfig
 
 using Compat
 
+# Wrapper around matplotlib Figure, supporting graphics I/O and pretty display
+type Figure
+    o::PyObject
+end
+
 ###########################################################################
 # file formats supported by Agg backend, from MIME types
 const aggformats = @compat Dict("application/eps" => "eps",
@@ -31,14 +36,6 @@ end
 # if possible, then switching to a Julia-display backend (if available),
 # hooking into pyplot via a monkey-patched draw_if_interactive.
 
-const isjulia_display = Bool[isdisplayok()]
-const matplotlib = pyimport("matplotlib")
-const version = try
-    convert(VersionNumber, matplotlib[:__version__])
-catch
-    v"0.0" # fallback
-end
-
 pymodule_exists(s::AbstractString) = try 
     pyimport(s)
     true
@@ -46,18 +43,20 @@ catch
     false
 end
 
-const (backend, gui) = begin
-    const gui2matplotlib = @compat Dict(:wx=>"WXAgg", :gtk=>"GTKAgg", :qt=>"Qt4Agg")
+# return (backend,gui) tuple
+function find_backend()
+    gui2matplotlib = @compat Dict(:wx=>"WXAgg", :gtk=>"GTKAgg", :qt=>"Qt4Agg")
     try
-        # We will get an exception when we import pyplot below
-        # (on Unix) if an X server is not available, even though
+        # We will get an exception when we import pyplot below (on
+        # Unix) if an X server is not available, even though
         # pygui_works and matplotlib.use(backend) succeed, at
         # which point it will be too late to switch backends.  So,
-        # throw exception (drop to catch block below) if DISPLAY is not set.
-        # [Might be more reliable to test success(`xdpyinfo`), but only
-        #  if xdpyinfo is installed.]
+        # throw exception (drop to catch block below) if DISPLAY
+        # is not set.  [Might be more reliable to test
+        # success(`xdpyinfo`), but only if xdpyinfo is installed.]
+        
         @unix_only (@osx ? nothing : ENV["DISPLAY"])
-
+        
         local gui::Symbol = :none
         if PyCall.gui == :default
             # try to ensure that GUI both exists and has a matplotlib backend
@@ -99,7 +98,59 @@ const (backend, gui) = begin
     end
 end
 
-const pltm = pyimport("matplotlib.pyplot") # raw Python module
+# initialization -- anything that depends on Python has to go here,
+# so that it occurs at runtime (while the rest of PyPlot can be precompiled).
+function __init__()
+    global const isjulia_display = Bool[isdisplayok()]
+    global const matplotlib = pyimport("matplotlib")
+    global const version = try
+        convert(VersionNumber, matplotlib[:__version__])
+    catch
+        v"0.0" # fallback
+    end
+
+    backend_gui = find_backend()
+    # workaround JuliaLang/julia#8925
+    global const backend = backend_gui[1]
+    global const gui = backend_gui[2]
+
+    global const pltm = pyimport("matplotlib.pyplot") # raw Python module
+    global const plt = pywrap(pltm)
+
+    pytype_mapping(pltm["Figure"], Figure)
+
+    global const Gcf = pyimport("matplotlib._pylab_helpers")["Gcf"]
+    global const drew_something = [false]
+    global const orig_draw = pltm["draw_if_interactive"]
+
+    global const orig_gcf = pltm["gcf"]
+    global const orig_figure = pltm["figure"]
+
+    if isdefined(Main, :IJulia) && Main.IJulia.inited
+        Main.IJulia.push_preexecute_hook(force_new_fig)
+        Main.IJulia.push_postexecute_hook(close_queued_figs)
+        Main.IJulia.push_posterror_hook(close_queued_figs)
+    end
+    
+    if isjulia_display[1]
+        if backend != "Agg"
+            pltm[:switch_backend]("Agg")
+        end
+        monkeypatch()
+    end
+
+    init_pyplot_funcs()
+
+    global const mplot3d = pyimport("mpl_toolkits.mplot3d")
+    global const axes3d = pyimport("mpl_toolkits.mplot3d.axes3d")
+
+    global const art3d = pywrap(pyimport("mpl_toolkits.mplot3d.art3d"))
+    global const Axes3D = axes3d[:Axes3D]
+
+    init_mplot3d_funcs()
+o
+    init_colormaps()
+end
 
 function pygui(b::Bool)
     if !b != isjulia_display[1]
@@ -118,11 +169,7 @@ function pygui(b::Bool)
 end
 
 ###########################################################################
-# Wrapper around matplotlib Figure, supporting graphics I/O and pretty display
-
-type Figure
-    o::PyObject
-end
+# Figure methods
 
 PyObject(f::Figure) = f.o
 convert(::Type{Figure}, o::PyObject) = Figure(o)
@@ -136,8 +183,6 @@ getindex(f::Figure, x) = getindex(f.o, x)
 setindex!(f::Figure, v, x) = setindex!(f.o, v, x)
 haskey(f::Figure, x) = haskey(f.o, x)
 keys(f::Figure) = keys(f.o)
-
-pytype_mapping(pltm["Figure"], Figure)
 
 for (mime,fmt) in aggformats
     @eval function writemime(io::IO, m::MIME{symbol($mime)}, f::Figure)
@@ -162,10 +207,6 @@ svg(b::Bool) = (SVG[1] = b)
 ###########################################################################
 # Monkey-patch pylab to call redisplay after each drawing command
 # (which calls draw_if_interactive) for Julia displays.
-
-const Gcf = pyimport("matplotlib._pylab_helpers")["Gcf"]
-const drew_something = [false]
-const orig_draw = pltm["draw_if_interactive"]
 
 Base.isempty(f::Figure) = isempty(pycall(f["get_axes"], PyVector))
 
@@ -240,8 +281,6 @@ force_new_fig() = gcf_isnew[1] = true
 # monkey-patch gcf() and figure() so that we can force the creation
 # of new figures in new IJulia cells (e.g. after @manipulate commands
 # that leave the figure from the previous cell open).
-const orig_gcf = pltm["gcf"]
-const orig_figure = pltm["figure"]
 function figure(args...; kws...)
     gcf_isnew[1] = false
     pycall(orig_figure, PyAny, args...; kws...)
@@ -259,19 +298,6 @@ function monkeypatch()
     pltm["show"] = display_figs
     pltm["gcf"] = gcf
     pltm["figure"] = figure
-end
-
-if isdefined(Main, :IJulia) && Main.IJulia.inited
-    Main.IJulia.push_preexecute_hook(force_new_fig)
-    Main.IJulia.push_postexecute_hook(close_queued_figs)
-    Main.IJulia.push_posterror_hook(close_queued_figs)
-end
-
-if isjulia_display[1]
-    if backend != "Agg"
-        pltm[:switch_backend]("Agg")
-    end
-    monkeypatch()
 end
 
 ###########################################################################
@@ -294,54 +320,49 @@ addhelp(f, o::PyObject, key::AbstractString) = haskey(o, key) && addhelp(f, o[ke
     
 ###########################################################################
 
-const plt = pywrap(pltm)
-
 # export documented pyplot API (http://matplotlib.org/api/pyplot_api.html)
 export acorr,annotate,arrow,autoscale,autumn,axes,axhline,axhspan,axis,axvline,axvspan,bar,barbs,barh,bone,box,boxplot,broken_barh,cla,clabel,clf,clim,cohere,colorbar,colors,contour,contourf,cool,copper,csd,delaxes,disconnect,draw,errorbar,eventplot,figimage,figlegend,figtext,figure,fill_between,fill_betweenx,findobj,flag,gca,gcf,gci,get_current_fig_manager,get_figlabels,get_fignums,get_plot_commands,ginput,gray,grid,hexbin,hist2d,hlines,hold,hot,hsv,imread,imsave,imshow,ioff,ion,ishold,jet,legend,locator_params,loglog,margins,matshow,minorticks_off,minorticks_on,over,pause,pcolor,pcolormesh,pie,pink,plot,plot_date,plotfile,polar,prism,psd,quiver,quiverkey,rc,rc_context,rcdefaults,rgrids,savefig,sca,scatter,sci,semilogx,semilogy,set_cmap,setp,show,specgram,spectral,spring,spy,stackplot,stem,step,streamplot,subplot,subplot2grid,subplot_tool,subplots,subplots_adjust,summer,suptitle,switch_backend,table,text,thetagrids,tick_params,ticklabel_format,tight_layout,title,tricontour,tricontourf,tripcolor,triplot,twinx,twiny,vlines,waitforbuttonpress,winter,xkcd,xlabel,xlim,xscale,xticks,ylabel,ylim,yscale,yticks
-
-for f in (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:axis,:axvline,:axvspan,:bar,:barbs,:barh,:bone,:box,:boxplot,:broken_barh,:cla,:clabel,:clf,:clim,:cohere,:colorbar,:colors,:contour,:contourf,:cool,:copper,:csd,:delaxes,:disconnect,:draw,:errorbar,:eventplot,:figimage,:figlegend,:figtext,:fill_between,:fill_betweenx,:findobj,:flag,:gca,:gci,:get_current_fig_manager,:get_figlabels,:get_fignums,:get_plot_commands,:ginput,:gray,:grid,:hexbin,:hist2d,:hlines,:hold,:hot,:hsv,:imread,:imsave,:imshow,:ioff,:ion,:ishold,:jet,:legend,:locator_params,:loglog,:margins,:matshow,:minorticks_off,:minorticks_on,:over,:pause,:pcolor,:pcolormesh,:pie,:pink,:plot,:plot_date,:plotfile,:polar,:prism,:psd,:quiver,:quiverkey,:rc,:rc_context,:rcdefaults,:rgrids,:savefig,:sca,:scatter,:sci,:semilogx,:semilogy,:set_cmap,:setp,:specgram,:spectral,:spring,:spy,:stackplot,:stem,:streamplot,:subplot,:subplot2grid,:subplot_tool,:subplots,:subplots_adjust,:summer,:suptitle,:switch_backend,:table,:text,:thetagrids,:tick_params,:ticklabel_format,:tight_layout,:title,:tricontour,:tricontourf,:tripcolor,:triplot,:twinx,:twiny,:vlines,:waitforbuttonpress,:winter,:xkcd,:xlabel,:xlim,:xscale,:xticks,:ylabel,:ylim,:yscale,:yticks)
-    py_f = symbol(string("py_", f))
-    sf = string(f)
-    if haskey(pltm, sf)
-        @eval begin
-            const $py_f = pltm[$sf]
-            $f(args...; kws...) = pycall($py_f, PyAny, args...; kws...)
-        end
-        addhelp(f, pltm[sf])
-    else # using a different (older?) version of matplotlib
-        @eval $f(args...; kws...) = error("matplotlib ", version,
-                                          " does not have pyplot.", $sf)
-    end
-end
-
-addhelp("figure", orig_figure)
-addhelp("gcf", orig_gcf)
 
 # The following pyplot functions must be handled specially since they
 # overlap with standard Julia functions:
 #          close, connect, fill, hist, xcorr
-
 import Base: close, connect, fill, step
 
 show() = display_figs()
 
-const py_step = pltm["step"]
-step(x, y; kws...) = pycall(py_step, PyAny, x, y; kws...)
-addhelp("PyPlot.step", py_step)
+const plt_funcs = (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:axis,:axvline,:axvspan,:bar,:barbs,:barh,:bone,:box,:boxplot,:broken_barh,:cla,:clabel,:clf,:clim,:cohere,:colorbar,:colors,:contour,:contourf,:cool,:copper,:csd,:delaxes,:disconnect,:draw,:errorbar,:eventplot,:figimage,:figlegend,:figtext,:fill_between,:fill_betweenx,:findobj,:flag,:gca,:gci,:get_current_fig_manager,:get_figlabels,:get_fignums,:get_plot_commands,:ginput,:gray,:grid,:hexbin,:hist2d,:hlines,:hold,:hot,:hsv,:imread,:imsave,:imshow,:ioff,:ion,:ishold,:jet,:legend,:locator_params,:loglog,:margins,:matshow,:minorticks_off,:minorticks_on,:over,:pause,:pcolor,:pcolormesh,:pie,:pink,:plot,:plot_date,:plotfile,:polar,:prism,:psd,:quiver,:quiverkey,:rc,:rc_context,:rcdefaults,:rgrids,:savefig,:sca,:scatter,:sci,:semilogx,:semilogy,:set_cmap,:setp,:specgram,:spectral,:spring,:spy,:stackplot,:stem,:streamplot,:subplot,:subplot2grid,:subplot_tool,:subplots,:subplots_adjust,:summer,:suptitle,:switch_backend,:table,:text,:thetagrids,:tick_params,:ticklabel_format,:tight_layout,:title,:tricontour,:tricontourf,:tripcolor,:triplot,:twinx,:twiny,:vlines,:waitforbuttonpress,:winter,:xkcd,:xlabel,:xlim,:xscale,:xticks,:ylabel,:ylim,:yscale,:yticks)
 
-const py_close = pltm["close"]
-close(f::Union(Figure,AbstractString,Symbol,Integer)) = pycall(py_close, PyAny, f)
-close() = pycall(py_close, PyAny)
-addhelp("PyPlot.close", py_close)
+for f in plt_funcs
+    sf = string(f)
+    @eval function $f(args...; kws...)
+        if !haskey(pltm, $sf)
+            error("matplotlib ", version, " does not have pyplot.", $sf)
+        end
+        return pycall(pltm[$sf], PyAny, args...; kws...)
+    end
+end
 
-const py_connect = pltm["connect"]
-connect(s::Union(AbstractString,Symbol), f::Function) = pycall(py_connect, PyAny, s, f)
-addhelp("PyPlot.connect", py_connect)
+step(x, y; kws...) = pycall(pltm["step"], PyAny, x, y; kws...)
 
-const py_fill = pltm["fill"]
+close(f::Union(Figure,AbstractString,Symbol,Integer)) = pycall(pltm["close"], PyAny, f)
+close() = pycall(pltm["close"], PyAny)
+
+connect(s::Union(AbstractString,Symbol), f::Function) = pycall(pltm["connect"], PyAny, s, f)
+
 fill(x::AbstractArray,y::AbstractArray, args...; kws...) =
-    pycall(py_fill, PyAny, x, y, args...; kws...)
-addhelp("PyPlot.fill", py_fill)
+    pycall(pltm["fill"], PyAny, x, y, args...; kws...)
+
+function init_pyplot_funcs()
+    for f in plt_funcs
+        addhelp(f, pltm, string(f))
+    end
+    addhelp("figure", orig_figure)
+    addhelp("gcf", orig_gcf)
+    addhelp("PyPlot.step", pltm["step"])
+    addhelp("PyPlot.close", pltm["close"])
+    addhelp("PyPlot.connect", pltm["connect"])
+    addhelp("PyPlot.fill", pltm["fill"])
+end
 
 # no way to use method dispatch for hist or xcorr, since their
 # argument signatures look too much like Julia's
@@ -372,32 +393,40 @@ bar{T<:Symbol}(x::AbstractVector{T}, y; kws...) =
 
 export art3d, Axes3D, surf, mesh, bar3d, bar3D, contour3D, contourf3D, plot3D, plot_surface, plot_trisurf, plot_wireframe, scatter3D, text2D, text3D, zlabel, zlim, zscale, zticks
 
-const mplot3d = pyimport("mpl_toolkits.mplot3d")
-const axes3d = pyimport("mpl_toolkits.mplot3d.axes3d")
+const mplot3d_funcs = (:bar3d, :contour3D, :contourf3D, :plot3D, :plot_surface,
+                       :plot_trisurf, :plot_wireframe, :scatter3D,
+                       :text2D, :text3D)
 
-const art3d = pywrap(pyimport("mpl_toolkits.mplot3d.art3d"))
-const Axes3D = axes3d[:Axes3D]
-
-for f in (:bar3d, :contour3D, :contourf3D, :plot3D, :plot_surface,
-          :plot_trisurf, :plot_wireframe, :scatter3D, :text2D, :text3D)
+for f in mplot3d_funcs
     fs = string(f)
     @eval function $f(args...; kws...)
         ax = gca(projection="3d")
         pycall(ax[$fs], PyAny, args...; kws...)
     end
-    addhelp(fs, axes3d["Axes3D"], fs)
 end
+
 const bar3D = bar3d # correct for annoying mplot3d inconsistency
-addhelp("bar3D", axes3d["Axes3D"], "bar3d")
 
 # it's annoying to have xlabel etc. but not zlabel
-for f in (:zlabel, :zlim, :zscale, :zticks)
+const zlabel_funcs = (:zlabel, :zlim, :zscale, :zticks)
+for f in zlabel_funcs
     fs = string("set_", f)
     @eval function $f(args...; kws...)
         ax = gca(projection="3d")
         pycall(ax[$fs], PyAny, args...; kws...)
     end
-    addhelp(f, axes3d["Axes3D"], fs)
+end
+
+function init_mplot3d_funcs()
+    for f in mplot3d_funcs
+        addhelp(f, axes3d["Axes3D"], string(f))
+    end
+    addhelp("bar3D", axes3d["Axes3D"], "bar3d")
+    for f in zlabel_funcs
+        addhelp(f, axes3d["Axes3D"], string("set_", f))
+    end
+    addhelp(:surf, axes3d["Axes3D"], "plot_surface")
+    addhelp(:mesh, axes3d["Axes3D"], "plot_wireframe")
 end
 
 # export Matlab-like names
@@ -421,9 +450,6 @@ function mesh(Z::AbstractMatrix; kws...)
     plot_wireframe([1:size(Z,1)]*ones(1,size(Z,2)), 
                    ones(size(Z,1))*[1:size(Z,2)]', Z; kws...)
 end
-
-addhelp(:surf, axes3d["Axes3D"], "plot_surface")
-addhelp(:mesh, axes3d["Axes3D"], "plot_wireframe")
 
 ###########################################################################
 # Allow plots with 2 independent variables (contour, surf, ...)
@@ -498,5 +524,9 @@ using LaTeXStrings
 export LaTeXString, latexstring, @L_str, @L_mstr
 
 ###########################################################################
+
+if VERSION < v"0.3-"
+    __init__() # automatic call to __init__ was added in Julia 0.3
+end
 
 end # module PyPlot
