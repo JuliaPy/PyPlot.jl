@@ -44,8 +44,23 @@ catch
 end
 
 # return (backend,gui) tuple
-function find_backend()
-    gui2matplotlib = @compat Dict(:wx=>"WXAgg", :gtk=>"GTKAgg", :qt=>"Qt4Agg")
+function find_backend(matplotlib::PyObject)
+    gui2matplotlib = @compat Dict(:wx=>"WXAgg",:gtk=>"GTKAgg",
+                                  :qt=>"Qt4Agg",:tk=>"TkAgg")
+    guis = @linux ? [:gtk, :qt, :wx] : [:qt, :wx, :gtk]
+    options = [(g,gui2matplotlib[g]) for g in guis]
+    
+    matplotlib2gui = @compat Dict("wx"=>:wx, "wxagg"=>:wx,
+                                  "gtkagg"=>:gtk, "gtk"=>:gtk,"gtkcairo"=>:gtk,
+                                  "qt4agg"=>:qt, "tkagg"=>:tk, 
+                                  "agg"=>:none,"ps"=>:none,"pdf"=>:none,
+                                  "svg"=>:none,"cairo"=>:none,"gdk"=>:none)
+    rcParams = PyDict(matplotlib["rcParams"])
+    default = lowercase(get(rcParams, "backend", "none"))
+    if haskey(matplotlib2gui,default)
+        insert!(options, 1, (matplotlib2gui[default],default))
+    end
+
     try
         # We will get an exception when we import pyplot below (on
         # Unix) if an X server is not available, even though
@@ -55,37 +70,52 @@ function find_backend()
         # is not set.  [Might be more reliable to test
         # success(`xdpyinfo`), but only if xdpyinfo is installed.]
         
-        @unix_only (@osx ? nothing : ENV["DISPLAY"])
+        if options[1][1] != :none
+            @unix_only (@osx ? nothing : ENV["DISPLAY"])
+        end
+
+        qt2gui = @compat Dict("pyqt4"=>:qt_pyqt4, "pyside"=>:qt_pyside)        
         
-        local gui::Symbol = :none
         if PyCall.gui == :default
             # try to ensure that GUI both exists and has a matplotlib backend
-            for g in (@linux? (:gtk, :qt, :wx) : (:qt, :wx, :gtk))
-                if PyCall.pygui_works(g)
+            for (g,b) in options
+                if g == :none # Matplotlib is configured to be non-interactive
+                    pygui(:default)
+                    matplotlib[:use](b)
+                    matplotlib[:interactive](false)
+                    return (b, g)
+                elseif PyCall.pygui_works(g)
                     # must call matplotlib.use *before* loading backends module
-                    matplotlib[:use](gui2matplotlib[g])
-                    if g == :qt && !PyCall.pyexists("PyQt4")
-                        PyDict(matplotlib["rcParams"])["backend.qt4"]="PySide"
+                    matplotlib[:use](b)
+                    if g == :qt
+                        if haskey(rcParams,"backend.qt4")
+                            g = qt2gui[lowercase(rcParams["backend.qt4"])]
+                        elseif !PyCall.pygui_works(:qt_pyqt4)
+                            # both Matplotlib and PyCall default to PyQt4
+                            # if it is available, but we need to tell
+                            # Matplotlib to use PySide otherwise.
+                            rcParams["backend.qt4"] = "PySide"
+                        end
                     end
-                    if pymodule_exists(string("matplotlib.backends.backend_", 
-                                              lowercase(gui2matplotlib[g])))
-                        gui = g
-                        break
+                    if pymodule_exists("matplotlib.backends.backend_" *
+                                       lowercase(b))
+                        isjulia_display[1] || pygui_start(g)
+                        matplotlib[:interactive](true)
+                        return (b, g)
                     end
                 end
             end
-            if gui == :none
-                error("no gui found") # go to catch clause below
-            end
-        else
+            error("no gui found") # go to catch clause below
+        else # the user specified a desired backend via pygui(gui)
             gui = pygui()
             matplotlib[:use](gui2matplotlib[gui])
+            if (gui==:qt && !PyCall.pygui_works(:qt_pyqt4)) || gui==:qt_pyside
+                rcParams["backend.qt4"] = "PySide"
+            end
+            isjulia_display[1] || pygui_start(gui)
+            matplotlib[:interactive](true)
+            return (gui2matplotlib[gui], gui)
         end
-        if !isjulia_display[1]
-            pygui_start(gui)
-        end
-        matplotlib[:interactive](true)
-        (gui2matplotlib[gui], gui)
     catch
         if !isjulia_display[1]
             warn("No working GUI backend found for matplotlib.")
@@ -94,7 +124,7 @@ function find_backend()
         pygui(:default)
         matplotlib[:use]("Agg") # GUI not available
         matplotlib[:interactive](isdisplayok())
-        ("Agg", :none)
+        return ("Agg", :none)
     end
 end
 
@@ -109,7 +139,7 @@ function __init__()
         v"0.0" # fallback
     end
 
-    backend_gui = find_backend()
+    backend_gui = find_backend(matplotlib)
     # workaround JuliaLang/julia#8925
     global const backend = backend_gui[1]
     global const gui = backend_gui[2]

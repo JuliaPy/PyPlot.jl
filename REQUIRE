@@ -1,5 +1,5 @@
 julia 0.2-
-PyCall
+PyCall 0.5
 Color 0.3.7
 LaTeXStrings
 Compat 0.2
