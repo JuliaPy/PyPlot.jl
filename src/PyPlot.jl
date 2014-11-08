@@ -47,7 +47,7 @@ end
 function find_backend(matplotlib::PyObject)
     gui2matplotlib = @compat Dict(:wx=>"WXAgg",:gtk=>"GTKAgg",
                                   :qt=>"Qt4Agg",:tk=>"TkAgg")
-    guis = @linux ? [:gtk, :qt, :wx] : [:qt, :wx, :gtk]
+    guis = @linux ? [:tk, :gtk, :qt, :wx] : [:tk, :qt, :wx, :gtk]
     options = [(g,gui2matplotlib[g]) for g in guis]
     
     matplotlib2gui = @compat Dict("wx"=>:wx, "wxagg"=>:wx,
