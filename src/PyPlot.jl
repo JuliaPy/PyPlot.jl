@@ -178,7 +178,6 @@ function __init__()
     global const Axes3D = axes3d[:Axes3D]
 
     init_mplot3d_funcs()
-o
     init_colormaps()
 end
 

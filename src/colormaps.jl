@@ -30,18 +30,18 @@ end
 
 # all Python dependencies must be initialized at runtime (not when precompiled)
 function init_colormaps()
-    const colorsm = pyimport("matplotlib.colors")
-    const cm = pyimport("matplotlib.cm")
+    global const colorsm = pyimport("matplotlib.colors")
+    global const cm = pyimport("matplotlib.cm")
 
     pytype_mapping(colorsm["Colormap"], ColorMap)
 
-    const LinearSegmentedColormap = colorsm["LinearSegmentedColormap"]
+    global const LinearSegmentedColormap = colorsm["LinearSegmentedColormap"]
 
-    const cm_get_cmap = cm["get_cmap"]
-    const cm_register_cmap = cm["register_cmap"]
+    global const cm_get_cmap = cm["get_cmap"]
+    global const cm_register_cmap = cm["register_cmap"]
 
-    const ScalarMappable = cm["ScalarMappable"]
-    const Normalize01 = pycall(colorsm["Normalize"],PyAny,vmin=0,vmax=1)
+    global const ScalarMappable = cm["ScalarMappable"]
+    global const Normalize01 = pycall(colorsm["Normalize"],PyAny,vmin=0,vmax=1)
 end
 
 ########################################################################
