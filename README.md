@@ -134,7 +134,7 @@ If no Julia graphics backend is available when PyPlot is imported, then
 Only the [wxWidgets](http://www.wxwidgets.org/),
 [GTK+](http://www.gtk.org/), and [Qt](http://qt-project.org/) (via the
 [PyQt4](http://wiki.python.org/moin/PyQt4) or
-[PySide](http://qt-project.org/wiki/PySide), Python GUI backends are
+[PySide](http://qt-project.org/wiki/PySide)), Python GUI backends are
 supported by PyPlot.  (Obviously, you must have installed one of these
 toolkits for Python first.)  By default, PyPlot picks one of these
 when it starts up (based on what you have installed), but you can
