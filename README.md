@@ -32,15 +32,21 @@ Once Matplotlib is installed, then you can just use
 
 ### OS X
 
-MacOS 10.9 comes with Python and Matplotlib, but this version of
-Matplotlib only comes with the Cocoa GUI backend, which is [not
-supported by PyPlot](https://github.com/stevengj/PyPlot.jl/issues/11).
-So, unless you are running IJulia (which requires you to install
-`ipython`), you will need a different version of Matplotlib.
+On MacOS, you should either install
+[XQuartz](http://xquartz.macosforge.org/landing/) for MacOS 10.9 or
+later or install the [Anaconda](http://continuum.io/downloads) Python
+distribution in order to get a fully functional PyPlot.
 
-For IJulia plots, a working Matplotlib is included as part of the
+MacOS 10.9 comes with Python and Matplotlib, but this version of
+Matplotlib defaults to with the Cocoa GUI backend, which is [not
+supported by PyPlot](https://github.com/stevengj/PyPlot.jl/issues/11).
+It also has a Tk backend, which is supported, but the Tk backend does
+not work unless you install XQuartz.
+
+Alternatively, you can install the
 [Anaconda](http://continuum.io/downloads) Python distribution
 (which also includes `ipython` and other IJulia dependencies).
+
 Otherwise, you can use the [Homebrew](http://brew.sh/) package manager:
 ```
 brew install python gfortran freetype pyqt
