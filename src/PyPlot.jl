@@ -172,10 +172,10 @@ function __init__()
     init_pyplot_funcs()
 
     global const mplot3d = pyimport("mpl_toolkits.mplot3d")
-    global const axes3d = pyimport("mpl_toolkits.mplot3d.axes3d")
+    global const axes3D = pyimport("mpl_toolkits.mplot3d.axes3d")
 
-    global const art3d = pywrap(pyimport("mpl_toolkits.mplot3d.art3d"))
-    global const Axes3D = axes3d[:Axes3D]
+    global const art3D = pywrap(pyimport("mpl_toolkits.mplot3d.art3d"))
+    global const Axes3D = axes3D[:Axes3D]
 
     init_mplot3d_funcs()
     init_colormaps()
@@ -350,7 +350,7 @@ addhelp(f, o::PyObject, key::AbstractString) = haskey(o, key) && addhelp(f, o[ke
 ###########################################################################
 
 # export documented pyplot API (http://matplotlib.org/api/pyplot_api.html)
-export acorr,annotate,arrow,autoscale,autumn,axes,axhline,axhspan,axis,axvline,axvspan,bar,barbs,barh,bone,box,boxplot,broken_barh,cla,clabel,clf,clim,cohere,colorbar,colors,contour,contourf,cool,copper,csd,delaxes,disconnect,draw,errorbar,eventplot,figimage,figlegend,figtext,figure,fill_between,fill_betweenx,findobj,flag,gca,gcf,gci,get_current_fig_manager,get_figlabels,get_fignums,get_plot_commands,ginput,gray,grid,hexbin,hist2d,hlines,hold,hot,hsv,imread,imsave,imshow,ioff,ion,ishold,jet,legend,locator_params,loglog,margins,matshow,minorticks_off,minorticks_on,over,pause,pcolor,pcolormesh,pie,pink,plot,plot_date,plotfile,polar,prism,psd,quiver,quiverkey,rc,rc_context,rcdefaults,rgrids,savefig,sca,scatter,sci,semilogx,semilogy,set_cmap,setp,show,specgram,spectral,spring,spy,stackplot,stem,step,streamplot,subplot,subplot2grid,subplot_tool,subplots,subplots_adjust,summer,suptitle,switch_backend,table,text,thetagrids,tick_params,ticklabel_format,tight_layout,title,tricontour,tricontourf,tripcolor,triplot,twinx,twiny,vlines,waitforbuttonpress,winter,xkcd,xlabel,xlim,xscale,xticks,ylabel,ylim,yscale,yticks
+export acorr,annotate,arrow,autoscale,autumn,axes,axhline,axhspan,axis,axvline,axvspan,bar,barbs,barh,bone,box,boxplot,broken_barh,cla,clabel,clf,clim,cohere,colorbar,colors,contour,contourf,cool,copper,csd,delaxes,disconnect,draw,errorbar,eventplot,figimage,figlegend,figtext,figure,fill_between,fill_betweenx,findobj,flag,gca,gcf,gci,get_current_fig_manager,get_figlabels,get_fignums,get_plot_commands,ginput,gray,grid,hexbin,hist2D,hlines,hold,hot,hsv,imread,imsave,imshow,ioff,ion,ishold,jet,legend,locator_params,loglog,margins,matshow,minorticks_off,minorticks_on,over,pause,pcolor,pcolormesh,pie,pink,plot,plot_date,plotfile,polar,prism,psd,quiver,quiverkey,rc,rc_context,rcdefaults,rgrids,savefig,sca,scatter,sci,semilogx,semilogy,set_cmap,setp,show,specgram,spectral,spring,spy,stackplot,stem,step,streamplot,subplot,subplot2grid,subplot_tool,subplots,subplots_adjust,summer,suptitle,switch_backend,table,text,thetagrids,tick_params,ticklabel_format,tight_layout,title,tricontour,tricontourf,tripcolor,triplot,twinx,twiny,vlines,waitforbuttonpress,winter,xkcd,xlabel,xlim,xscale,xticks,ylabel,ylim,yscale,yticks
 
 # The following pyplot functions must be handled specially since they
 # overlap with standard Julia functions:
@@ -359,7 +359,7 @@ import Base: close, connect, fill, step
 
 show() = display_figs()
 
-const plt_funcs = (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:axis,:axvline,:axvspan,:bar,:barbs,:barh,:bone,:box,:boxplot,:broken_barh,:cla,:clabel,:clf,:clim,:cohere,:colorbar,:colors,:contour,:contourf,:cool,:copper,:csd,:delaxes,:disconnect,:draw,:errorbar,:eventplot,:figimage,:figlegend,:figtext,:fill_between,:fill_betweenx,:findobj,:flag,:gca,:gci,:get_current_fig_manager,:get_figlabels,:get_fignums,:get_plot_commands,:ginput,:gray,:grid,:hexbin,:hist2d,:hlines,:hold,:hot,:hsv,:imread,:imsave,:imshow,:ioff,:ion,:ishold,:jet,:legend,:locator_params,:loglog,:margins,:matshow,:minorticks_off,:minorticks_on,:over,:pause,:pcolor,:pcolormesh,:pie,:pink,:plot,:plot_date,:plotfile,:polar,:prism,:psd,:quiver,:quiverkey,:rc,:rc_context,:rcdefaults,:rgrids,:savefig,:sca,:scatter,:sci,:semilogx,:semilogy,:set_cmap,:setp,:specgram,:spectral,:spring,:spy,:stackplot,:stem,:streamplot,:subplot,:subplot2grid,:subplot_tool,:subplots,:subplots_adjust,:summer,:suptitle,:switch_backend,:table,:text,:thetagrids,:tick_params,:ticklabel_format,:tight_layout,:title,:tricontour,:tricontourf,:tripcolor,:triplot,:twinx,:twiny,:vlines,:waitforbuttonpress,:winter,:xkcd,:xlabel,:xlim,:xscale,:xticks,:ylabel,:ylim,:yscale,:yticks)
+const plt_funcs = (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:axis,:axvline,:axvspan,:bar,:barbs,:barh,:bone,:box,:boxplot,:broken_barh,:cla,:clabel,:clf,:clim,:cohere,:colorbar,:colors,:contour,:contourf,:cool,:copper,:csd,:delaxes,:disconnect,:draw,:errorbar,:eventplot,:figimage,:figlegend,:figtext,:fill_between,:fill_betweenx,:findobj,:flag,:gca,:gci,:get_current_fig_manager,:get_figlabels,:get_fignums,:get_plot_commands,:ginput,:gray,:grid,:hexbin,:hist2d,:hlines,:hold,:hot,:hsv,:imread,:imsave,:imshow,:ioff,:ion,:ishold,:jet,:legend,:locator_params,:loglog,:margins,:matshow,:minorticks_off,:minorticks_on,:over,:pause,:pcolor,:pcolormesh,:pie,:pink,:plot,:plot_date,:plotfile,:polar,:prism,:psd,:quiver,:quiverkey,:rc,:rc_context,:rcdefaults,:rgrids,:savefig,:sca,:scatter,:sci,:semilogx,:semilogy,:set_cmap,:setp,:specgram,:spectral,:spring,:spy,:stackplot,:stem,:streamplot,:subplot,:subplot2grid,:subplot_tool,:subplots,:subplots_adjust,:summer,:suptitle,:switch_backend,:table,:text,:thetagrids,:tick_params,:ticklabel_format,:tight_layout,:title,:tricontour,:tricontourf,:tripcolor,:triplot,:twinx,:twiny,:vlines,:waitforbuttonpress,:winter,:xkcd,:xlabel,:xlim,:xscale,:xticks,:ylabel,:ylim,:yscale,:yticks,:hist,:isinteractive,:xcorr)
 
 for f in plt_funcs
     sf = string(f)
@@ -381,6 +381,8 @@ connect(s::Union(AbstractString,Symbol), f::Function) = pycall(pltm["connect"], 
 fill(x::AbstractArray,y::AbstractArray, args...; kws...) =
     pycall(pltm["fill"], PyAny, x, y, args...; kws...)
 
+const hist2D = hist2d # consistent capitalization with mplot3d, avoid conflict with Base.hist2d
+
 function init_pyplot_funcs()
     for f in plt_funcs
         addhelp(f, pltm, string(f))
@@ -394,7 +396,7 @@ function init_pyplot_funcs()
 end
 
 # no way to use method dispatch for hist or xcorr, since their
-# argument signatures look too much like Julia's
+# argument signatures look too much like Julia's -- we simply don't export them
 
 include("colormaps.jl")
 
@@ -420,7 +422,7 @@ bar{T<:Symbol}(x::AbstractVector{T}, y; kws...) =
 ###########################################################################
 # Include mplot3d for 3d plotting.
 
-export art3d, Axes3D, surf, mesh, bar3d, bar3D, contour3D, contourf3D, plot3D, plot_surface, plot_trisurf, plot_wireframe, scatter3D, text2D, text3D, zlabel, zlim, zscale, zticks
+export art3D, Axes3D, surf, mesh, bar3D, contour3D, contourf3D, plot3D, plot_surface, plot_trisurf, plot_wireframe, scatter3D, text2D, text3D, zlabel, zlim, zscale, zticks
 
 const mplot3d_funcs = (:bar3d, :contour3D, :contourf3D, :plot3D, :plot_surface,
                        :plot_trisurf, :plot_wireframe, :scatter3D,
@@ -448,14 +450,14 @@ end
 
 function init_mplot3d_funcs()
     for f in mplot3d_funcs
-        addhelp(f, axes3d["Axes3D"], string(f))
+        addhelp(f, axes3D["Axes3D"], string(f))
     end
-    addhelp("bar3D", axes3d["Axes3D"], "bar3d")
+    addhelp("bar3D", axes3D["Axes3D"], "bar3d")
     for f in zlabel_funcs
-        addhelp(f, axes3d["Axes3D"], string("set_", f))
+        addhelp(f, axes3D["Axes3D"], string("set_", f))
     end
-    addhelp(:surf, axes3d["Axes3D"], "plot_surface")
-    addhelp(:mesh, axes3d["Axes3D"], "plot_wireframe")
+    addhelp(:surf, axes3D["Axes3D"], "plot_surface")
+    addhelp(:mesh, axes3D["Axes3D"], "plot_wireframe")
 end
 
 # export Matlab-like names
