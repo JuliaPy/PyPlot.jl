@@ -190,15 +190,15 @@ try `get_cmaps()`!
 ## 3d Plotting
 
 The PyPlot package also imports functions from Matplotlib's
-[mplot3d](http://matplotlib.org/dev/mpl_toolkits/mplot3d/) toolkit.
+[mplot3d](http://matplotlib.org/mpl_toolkits/mplot3d/) toolkit.
 Unlike Matplotlib, however, you can create 3d plots directly without
 first creating an
-[Axes3d](http://matplotlib.org/dev/mpl_toolkits/mplot3d/api.html#axes3d)
+[Axes3d](http://matplotlib.org/mpl_toolkits/mplot3d/api.html#axes3d)
 object, simply by calling one of: `bar3D`, `contour3D`, `contourf3D`,
 `plot3D`, `plot_surface`, `plot_trisurf`, `plot_wireframe`, or
 `scatter3D` (as well as `text2D`, `text3D`), exactly like the
 correspondingly named methods of
-[Axes3d](http://matplotlib.org/dev/mpl_toolkits/mplot3d/api.html#axes3d).
+[Axes3d](http://matplotlib.org/mpl_toolkits/mplot3d/api.html#axes3d).
 We also export the Matlab-like synonyms `surf` for `plot_surface` (or
 `plot_trisurf` for 1d-array arguments) and `mesh` for
 `plot_wireframe`.  For example, you can do:
@@ -210,7 +210,7 @@ to plot a random 30×40 surface mesh.
 You can also explicitly create a subplot with 3d axes via, for
 example, `subplot(111, projection="3d")`, exactly as in Matplotlib.
 The `Axes3d` constructor and the
-[art3d](http://matplotlib.org/dev/mpl_toolkits/mplot3d/api.html#art3d)
+[art3d](http://matplotlib.org/mpl_toolkits/mplot3d/api.html#art3d)
 module are also exported.
 
 ## LaTeX plot labels
