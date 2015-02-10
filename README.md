@@ -122,7 +122,7 @@ PyPlot can use any Julia graphics backend capable of displaying PNG,
 SVG, or PDF images, such as the IJulia environment.  To use a
 different backend, simply call `pushdisplay` with the desired
 `Display`; see the [Julia multimedia display
-API](http://docs.julialang.org/en/latest/stdlib/base/#multimedia-i-o)
+API](http://docs.julialang.org/en/latest/stdlib/io-network/#multimedia-i-o)
 for more detail.
 
 On the other hand, you may wish to use one of the Python Matplotlib
