@@ -1,7 +1,7 @@
 module PyPlot
 
 using PyCall
-import PyCall: PyObject, pygui
+import PyCall: PyObject, pygui, pycall
 import Base: convert, ==, isequal, hash, writemime, getindex, setindex!, haskey, keys, show, mimewritable
 export Figure, plt, matplotlib, pygui, withfig
 
@@ -207,6 +207,7 @@ isequal(f::Figure, g::Figure) = f.o == g.o # Julia 0.2 compatibility
 ==(f::Figure, g::PyObject) = f.o == g
 ==(f::PyObject, g::Figure) = f == g.o
 hash(f::Figure) = hash(f.o)
+pycall(f::Figure, args...; kws...) = pycall(f.o, args...; kws...)
 
 getindex(f::Figure, x) = getindex(f.o, x)
 setindex!(f::Figure, v, x) = setindex!(f.o, v, x)

@@ -18,6 +18,7 @@ isequal(c::ColorMap, g::ColorMap) = c.o == g.o # Julia 0.2 compatibility
 ==(c::PyObject, g::ColorMap) = c == g.o
 ==(c::ColorMap, g::PyObject) = c.o == g
 hash(c::ColorMap) = hash(c.o)
+pycall(c::ColorMap, args...; kws...) = pycall(c.o, args...; kws...)
 
 getindex(c::ColorMap, x) = getindex(c.o, x)
 setindex!(c::ColorMap, v, x) = setindex!(c.o, v, x)
