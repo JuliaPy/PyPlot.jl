@@ -203,7 +203,6 @@ end
 PyObject(f::Figure) = f.o
 convert(::Type{Figure}, o::PyObject) = Figure(o)
 ==(f::Figure, g::Figure) = f.o == g.o
-isequal(f::Figure, g::Figure) = f.o == g.o # Julia 0.2 compatibility
 ==(f::Figure, g::PyObject) = f.o == g
 ==(f::PyObject, g::Figure) = f == g.o
 hash(f::Figure) = hash(f.o)

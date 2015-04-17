@@ -14,7 +14,6 @@ end
 PyObject(c::ColorMap) = c.o
 convert(::Type{ColorMap}, o::PyObject) = ColorMap(o)
 ==(c::ColorMap, g::ColorMap) = c.o == g.o
-isequal(c::ColorMap, g::ColorMap) = c.o == g.o # Julia 0.2 compatibility
 ==(c::PyObject, g::ColorMap) = c == g.o
 ==(c::ColorMap, g::PyObject) = c.o == g
 hash(c::ColorMap) = hash(c.o)
@@ -51,18 +50,18 @@ end
 # most general constructors using RGB arrays of triples, defined
 # as for matplotlib.colors.LinearSegmentedColormap
 ColorMap{T<:Real}(name::Union(AbstractString,Symbol), 
-                  r::AbstractVector{(T,T,T)},
-                  g::AbstractVector{(T,T,T)},
-                  b::AbstractVector{(T,T,T)},
+                  r::AbstractVector{@compat Tuple{T,T,T}},
+                  g::AbstractVector{@compat Tuple{T,T,T}},
+                  b::AbstractVector{@compat Tuple{T,T,T}},
                   n=max(256,length(r),length(g),length(b)), gamma=1.0) =
-    ColorMap(name, r,g,b, Array((T,T,T),0), n, gamma)
+    ColorMap(name, r,g,b, Array(@compat(Tuple{T,T,T}),0), n, gamma)
 
 # as above, but also passing an alpha array
 function ColorMap{T<:Real}(name::Union(AbstractString,Symbol), 
-                           r::AbstractVector{(T,T,T)},
-                           g::AbstractVector{(T,T,T)},
-                           b::AbstractVector{(T,T,T)},
-                           a::AbstractVector{(T,T,T)},
+                           r::AbstractVector{@compat Tuple{T,T,T}},
+                           g::AbstractVector{@compat Tuple{T,T,T}},
+                           b::AbstractVector{@compat Tuple{T,T,T}},
+                           a::AbstractVector{@compat Tuple{T,T,T}},
                            n=max(256,length(r),length(g),length(b),length(a)),
                            gamma=1.0)
     segmentdata = @compat Dict("red" => r, "green" => g, "blue" => b)
@@ -83,11 +82,11 @@ function ColorMap{T<:AColorValue}(name::Union(AbstractString,Symbol),
     if nc == 0
         throw(ArgumentError("ColorMap requires a non-empty ColorValue array"))
     end
-    r = Array((Float64,Float64,Float64), nc)
+    r = Array(@compat(Tuple{Float64,Float64,Float64}), nc)
     g = similar(r)
     b = similar(r)
     a = T <: AbstractAlphaColorValue ? 
-        similar(r) : Array((Float64,Float64,Float64), 0)
+        similar(r) : Array(@compat(Tuple{Float64,Float64,Float64}), 0)
     for i = 1:nc
         x = (i-1) / (nc-1)
         if T <: AbstractAlphaColorValue
