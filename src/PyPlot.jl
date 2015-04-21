@@ -45,13 +45,14 @@ end
 
 # return (backend,gui) tuple
 function find_backend(matplotlib::PyObject)
-    gui2matplotlib = @compat Dict(:wx=>"WXAgg",:gtk=>"GTKAgg",
+    gui2matplotlib = @compat Dict(:wx=>"WXAgg",:gtk=>"GTKAgg",:gtk3=>"GTK3Agg",
                                   :qt=>"Qt4Agg",:tk=>"TkAgg")
-    guis = @linux ? [:tk, :gtk, :qt, :wx] : [:tk, :qt, :wx, :gtk]
+    guis = @linux ? [:tk, :gtk3, :gtk, :qt, :wx] : [:tk, :qt, :wx, :gtk, :gtk3]
     options = [(g,gui2matplotlib[g]) for g in guis]
     
     matplotlib2gui = @compat Dict("wx"=>:wx, "wxagg"=>:wx,
                                   "gtkagg"=>:gtk, "gtk"=>:gtk,"gtkcairo"=>:gtk,
+                                  "gtk3agg"=>:gtk3, "gtk3"=>:gtk3,"gtk3cairo"=>:gtk3,
                                   "qt4agg"=>:qt, "tkagg"=>:tk, 
                                   "agg"=>:none,"ps"=>:none,"pdf"=>:none,
                                   "svg"=>:none,"cairo"=>:none,"gdk"=>:none)
