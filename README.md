@@ -49,7 +49,7 @@ Alternatively, you can install the
 
 Otherwise, you can use the [Homebrew](http://brew.sh/) package manager:
 ```
-brew install python gfortran freetype pyqt
+brew install python gcc freetype pyqt
 ln -s /usr/local/Cellar/freetype/2.5.3_1/include/freetype2/ /usr/local/include/freetype
 export PATH="/usr/local/bin:$PATH"
 export PYTHONPATH=/usr/local/lib/python2.7
