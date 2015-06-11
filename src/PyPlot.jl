@@ -163,7 +163,9 @@ function __init__()
         Main.IJulia.push_posterror_hook(close_queued_figs)
     end
     
-    if isjulia_display[1]
+    if haskey(ENV, "MPLBACKEND")
+        pltm[:switch_backend](ENV["MPLBACKEND"])
+    elseif isjulia_display[1]
         if backend != "Agg"
             pltm[:switch_backend]("Agg")
         end
