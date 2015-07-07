@@ -133,7 +133,11 @@ end
 # so that it occurs at runtime (while the rest of PyPlot can be precompiled).
 function __init__()
     global const isjulia_display = Bool[isdisplayok()]
-    global const matplotlib = pyimport("matplotlib")
+    try
+        global const matplotlib = pyimport("matplotlib")
+    catch e
+        error("Failed to pyimport(\"matplotlib\"): PyPlot will not work until you have a functioning matplotlib module.  ", e)
+    end
     global const version = try
         convert(VersionNumber, matplotlib[:__version__])
     catch
