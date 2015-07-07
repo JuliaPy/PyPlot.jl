@@ -101,7 +101,7 @@ function find_backend(matplotlib::PyObject)
                     if pymodule_exists("matplotlib.backends.backend_" *
                                        lowercase(b))
                         isjulia_display[1] || pygui_start(g)
-                        matplotlib[:interactive](true)
+                        matplotlib[:interactive](Base.isinteractive())
                         return (b, g)
                     end
                 end
@@ -114,7 +114,7 @@ function find_backend(matplotlib::PyObject)
                 rcParams["backend.qt4"] = "PySide"
             end
             isjulia_display[1] || pygui_start(gui)
-            matplotlib[:interactive](true)
+            matplotlib[:interactive](Base.isinteractive())
             return (gui2matplotlib[gui], gui)
         end
     catch
@@ -124,7 +124,7 @@ function find_backend(matplotlib::PyObject)
         end
         pygui(:default)
         matplotlib[:use]("Agg") # GUI not available
-        matplotlib[:interactive](isdisplayok())
+        matplotlib[:interactive](Base.isinteractive() && isdisplayok())
         return ("Agg", :none)
     end
 end
