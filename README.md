@@ -87,21 +87,21 @@ version number is returned by `PyPlot.version`.
 
 Only the currently documented `matplotlib.pyplot` API is exported.  To use
 other functions in the module, you can also call `matplotlib.pyplot.foo(...)`
-as `plt.foo(...)`.  For example, `plt.plot(x, y)` also works.  (And
-the raw `PyObject`s for the `matplotlib` and `pyplot` modules are accessible
-as `PyPlot.matplotlib` and `PyPlot.pltm`, respectively.)
+as `plt[:foo](...)`.  For example, `plt[:plot](x, y)` also works.  (And
+the raw `PyObject` for the `matplotlib` modules is also accessible
+as `PyPlot.matplotlib`.)
 
 Matplotlib is somewhat inconsistent about capitalization: it has
 `contour3D` but `bar3d`, etcetera.  PyPlot renames all such functions
 to use a capital *D* (e.g. it has `hist2D`, `bar3D`, and so on).
 
 You must also use `plt` to access some functions that conflict with
-built-in Julia functions.  In particular, `plt.hist`, `plt.xcorr`, and
-`plt.isinteractive` must be used to access `matplotlib.pyplot.hist`
-etcetera (or alternatively you can use `PyPlot.hist` etc.).
+built-in Julia functions.  In particular `plt[:hist]`, `plt[:xcorr]`, and
+`plt[:isinteractive]` must be used to access `matplotlib.pyplot.hist`
+etcetera.
 
 If you wish to access *all* of the PyPlot functions exclusively
-through `plt.somefunction(...)`, as is conventional in Python, simply
+through `plt.somefunction(...)`, as is conventional in Python, you can
 do `import PyPlot; const plt = PyPlot` instead of `using PyPlot`.
 
 ### Figure objects

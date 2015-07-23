@@ -56,6 +56,8 @@ function find_backend(matplotlib::PyObject)
                                   "qt4agg"=>:qt, "tkagg"=>:tk, 
                                   "agg"=>:none,"ps"=>:none,"pdf"=>:none,
                                   "svg"=>:none,"cairo"=>:none,"gdk"=>:none)
+    qt2gui = @compat Dict("pyqt4"=>:qt_pyqt4, "pyside"=>:qt_pyside)
+
     rcParams = PyDict(matplotlib["rcParams"])
     default = lowercase(get(rcParams, "backend", "none"))
     if haskey(matplotlib2gui,default)
@@ -75,8 +77,6 @@ function find_backend(matplotlib::PyObject)
             @unix_only (@osx ? nothing : ENV["DISPLAY"])
         end
 
-        qt2gui = @compat Dict("pyqt4"=>:qt_pyqt4, "pyside"=>:qt_pyside)        
-        
         if PyCall.gui == :default
             # try to ensure that GUI both exists and has a matplotlib backend
             for (g,b) in options
@@ -149,17 +149,16 @@ function __init__()
     global const backend = backend_gui[1]
     global const gui = backend_gui[2]
 
-    global const pltm = pyimport("matplotlib.pyplot") # raw Python module
-    global const plt = pywrap(pltm)
+    global const plt = pyimport("matplotlib.pyplot") # raw Python module
 
-    pytype_mapping(pltm["Figure"], Figure)
+    pytype_mapping(plt["Figure"], Figure)
 
     global const Gcf = pyimport("matplotlib._pylab_helpers")["Gcf"]
     global const drew_something = [false]
-    global const orig_draw = pltm["draw_if_interactive"]
+    global const orig_draw = plt["draw_if_interactive"]
 
-    global const orig_gcf = pltm["gcf"]
-    global const orig_figure = pltm["figure"]
+    global const orig_gcf = plt["gcf"]
+    global const orig_figure = plt["figure"]
 
     if isdefined(Main, :IJulia) && Main.IJulia.inited
         Main.IJulia.push_preexecute_hook(force_new_fig)
@@ -169,7 +168,7 @@ function __init__()
     
     if isjulia_display[1]
         if backend != "Agg"
-            pltm[:switch_backend]("Agg")
+            plt[:switch_backend]("Agg")
         end
         monkeypatch()
     end
@@ -189,7 +188,7 @@ end
 function pygui(b::Bool)
     if !b != isjulia_display[1]
         if backend != "Agg"
-            pltm[:switch_backend](b ? backend : "Agg")
+            plt[:switch_backend](b ? backend : "Agg")
             monkeypatch()
             if b
                 pygui_start(gui) # make sure event loop is started
@@ -297,11 +296,11 @@ function close_queued_figs()
     if isjulia_display[1] && (drew_something[1] || !isempty(closequeue))
         for f in Main.IJulia.displayqueue
             if isa(f, Figure)
-                pltm[:close](f[:number])
+                plt[:close](f[:number])
             end
         end
         for f in closequeue
-            pltm[:close](f[:number])
+            plt[:close](f[:number])
         end
         empty!(closequeue)
         drew_something[1] = false # reset until next drawing command 
@@ -328,10 +327,10 @@ function gcf()
 end
 
 function monkeypatch()
-    pltm["draw_if_interactive"] = draw_if_interactive
-    pltm["show"] = display_figs
-    pltm["gcf"] = gcf
-    pltm["figure"] = figure
+    plt["draw_if_interactive"] = draw_if_interactive
+    plt["show"] = display_figs
+    plt["gcf"] = gcf
+    plt["figure"] = figure
 end
 
 ###########################################################################
@@ -362,46 +361,46 @@ export acorr,annotate,arrow,autoscale,autumn,axes,axhline,axhspan,axis,axvline,a
 #          close, connect, fill, hist, xcorr
 import Base: close, connect, fill, step
 
-show() = pycall(pltm["show"], PyAny) # == display_figs after monkeypatch
+show() = pycall(plt["show"], PyAny) # == display_figs after monkeypatch
 
 const plt_funcs = (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:axis,:axvline,:axvspan,:bar,:barbs,:barh,:bone,:box,:boxplot,:broken_barh,:cla,:clabel,:clf,:clim,:cohere,:colorbar,:colors,:contour,:contourf,:cool,:copper,:csd,:delaxes,:disconnect,:draw,:errorbar,:eventplot,:figimage,:figlegend,:figtext,:fill_between,:fill_betweenx,:findobj,:flag,:gca,:gci,:get_current_fig_manager,:get_figlabels,:get_fignums,:get_plot_commands,:ginput,:gray,:grid,:hexbin,:hist2d,:hlines,:hold,:hot,:hsv,:imread,:imsave,:imshow,:ioff,:ion,:ishold,:jet,:legend,:locator_params,:loglog,:margins,:matshow,:minorticks_off,:minorticks_on,:over,:pause,:pcolor,:pcolormesh,:pie,:pink,:plot,:plot_date,:plotfile,:polar,:prism,:psd,:quiver,:quiverkey,:rc,:rc_context,:rcdefaults,:rgrids,:savefig,:sca,:scatter,:sci,:semilogx,:semilogy,:set_cmap,:setp,:specgram,:spectral,:spring,:spy,:stackplot,:stem,:streamplot,:subplot,:subplot2grid,:subplot_tool,:subplots,:subplots_adjust,:summer,:suptitle,:switch_backend,:table,:text,:thetagrids,:tick_params,:ticklabel_format,:tight_layout,:title,:tricontour,:tricontourf,:tripcolor,:triplot,:twinx,:twiny,:vlines,:waitforbuttonpress,:winter,:xkcd,:xlabel,:xlim,:xscale,:xticks,:ylabel,:ylim,:yscale,:yticks,:hist,:isinteractive,:xcorr)
 
 for f in plt_funcs
     sf = string(f)
     @eval function $f(args...; kws...)
-        if !haskey(pltm, $sf)
+        if !haskey(plt, $sf)
             error("matplotlib ", version, " does not have pyplot.", $sf)
         end
-        return pycall(pltm[$sf], PyAny, args...; kws...)
+        return pycall(plt[$sf], PyAny, args...; kws...)
     end
 end
 
-step(x, y; kws...) = pycall(pltm["step"], PyAny, x, y; kws...)
+step(x, y; kws...) = pycall(plt["step"], PyAny, x, y; kws...)
 
-close(f::Union(Figure,AbstractString,Symbol,Integer)) = pycall(pltm["close"], PyAny, f)
-close() = pycall(pltm["close"], PyAny)
+close(f::Union(Figure,AbstractString,Symbol,Integer)) = pycall(plt["close"], PyAny, f)
+close() = pycall(plt["close"], PyAny)
 
-connect(s::Union(AbstractString,Symbol), f::Function) = pycall(pltm["connect"], PyAny, s, f)
+connect(s::Union(AbstractString,Symbol), f::Function) = pycall(plt["connect"], PyAny, s, f)
 
 fill(x::AbstractArray,y::AbstractArray, args...; kws...) =
-    pycall(pltm["fill"], PyAny, x, y, args...; kws...)
+    pycall(plt["fill"], PyAny, x, y, args...; kws...)
 
 const hist2D = hist2d # consistent capitalization with mplot3d, avoid conflict with Base.hist2d
 
 function init_pyplot_funcs()
     for f in plt_funcs
-        addhelp(f, pltm, string(f))
+        addhelp(f, plt, string(f))
     end
     addhelp("figure", orig_figure)
     addhelp("gcf", orig_gcf)
-    addhelp("PyPlot.step", pltm["step"])
-    addhelp("PyPlot.close", pltm["close"])
-    addhelp("PyPlot.connect", pltm["connect"])
-    addhelp("PyPlot.fill", pltm["fill"])
+    addhelp("PyPlot.step", plt["step"])
+    addhelp("PyPlot.close", plt["close"])
+    addhelp("PyPlot.connect", plt["connect"])
+    addhelp("PyPlot.fill", plt["fill"])
 end
 
 # no way to use method dispatch for hist or xcorr, since their
-# argument signatures look too much like Julia's -- we simply don't export them
+# argument signatures look too much like Julia's -- just use plt[:hist]
 
 include("colormaps.jl")
 
