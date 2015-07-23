@@ -156,9 +156,9 @@ function __init__()
     global const Gcf = pyimport("matplotlib._pylab_helpers")["Gcf"]
     global const drew_something = [false]
     global const orig_draw = plt["draw_if_interactive"]
-
     global const orig_gcf = plt["gcf"]
     global const orig_figure = plt["figure"]
+    global const orig_show = plt["show"]
 
     if isdefined(Main, :IJulia) && Main.IJulia.inited
         Main.IJulia.push_preexecute_hook(force_new_fig)
@@ -282,12 +282,16 @@ function pushclose(f::Figure)
     return f
 end
 
-function display_figs()
-    if drew_something[1] && isjulia_display[1]
-        for manager in Gcf[:get_all_fig_managers]()
-            display(pushclose(Figure(manager["canvas"]["figure"])))
+function display_figs() # replaces pyplot.show
+    if isjulia_display[1]
+        if drew_something[1] && 
+            for manager in Gcf[:get_all_fig_managers]()
+                display(pushclose(Figure(manager["canvas"]["figure"])))
+            end
+            drew_something[1] = false # reset until next drawing command
         end
-        drew_something[1] = false # reset until next drawing command
+    else
+        pycall(orig_show, PyObject)
     end
     nothing
 end
