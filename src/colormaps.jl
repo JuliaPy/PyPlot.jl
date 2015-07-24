@@ -29,19 +29,26 @@ function show(io::IO, c::ColorMap)
 end
 
 # all Python dependencies must be initialized at runtime (not when precompiled)
+const colorsm = PyCall.PyNULL()
+const cm = PyCall.PyNULL()
+const LinearSegmentedColormap = PyCall.PyNULL()
+const cm_get_cmap = PyCall.PyNULL()
+const cm_register_cmap = PyCall.PyNULL()
+const ScalarMappable = PyCall.PyNULL()
+const Normalize01 = PyCall.PyNULL()
 function init_colormaps()
-    global const colorsm = pyimport("matplotlib.colors")
-    global const cm = pyimport("matplotlib.cm")
+    copy!(colorsm, pyimport("matplotlib.colors"))
+    copy!(cm, pyimport("matplotlib.cm"))
 
     pytype_mapping(colorsm["Colormap"], ColorMap)
 
-    global const LinearSegmentedColormap = colorsm["LinearSegmentedColormap"]
+    copy!(LinearSegmentedColormap, colorsm["LinearSegmentedColormap"])
 
-    global const cm_get_cmap = cm["get_cmap"]
-    global const cm_register_cmap = cm["register_cmap"]
+    copy!(cm_get_cmap, cm["get_cmap"])
+    copy!(cm_register_cmap, cm["register_cmap"])
 
-    global const ScalarMappable = cm["ScalarMappable"]
-    global const Normalize01 = pycall(colorsm["Normalize"],PyAny,vmin=0,vmax=1)
+    copy!(ScalarMappable, cm["ScalarMappable"])
+    copy!(Normalize01, pycall(colorsm["Normalize"],PyAny,vmin=0,vmax=1))
 end
 
 ########################################################################
@@ -130,13 +137,13 @@ ColorMap{T<:Real}(c::AbstractMatrix{T}, n=max(256, size(c,1)), gamma=1.0) =
 
 ########################################################################
 
-get_cmap() = pycall(cm_get_cmap, PyAny)
+@doc LazyHelp(cm_get_cmap) get_cmap() = pycall(cm_get_cmap, PyAny)
 get_cmap(name::Union(AbstractString,Symbol)) = pycall(cm_get_cmap, PyAny, name)
 get_cmap(name::Union(AbstractString,Symbol), lut::Integer) = pycall(cm_get_cmap, PyAny, name, lut)
 get_cmap(c::ColorMap) = c
 ColorMap(name::Union(AbstractString,Symbol)) = get_cmap(name)
 
-register_cmap(c::ColorMap) = pycall(cm_register_cmap, PyAny, c)
+@doc LazyHelp(cm_register_cmap) register_cmap(c::ColorMap) = pycall(cm_register_cmap, PyAny, c)
 register_cmap(n::Union(AbstractString,Symbol), c::ColorMap) = pycall(cm_register_cmap, PyAny, n,c)
 
 # convenience function to get array of registered colormaps

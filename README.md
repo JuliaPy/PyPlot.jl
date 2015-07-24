@@ -211,8 +211,8 @@ to plot a random 30×40 surface mesh.
 
 You can also explicitly create a subplot with 3d axes via, for
 example, `subplot(111, projection="3d")`, exactly as in Matplotlib.
-The `Axes3d` constructor and the
-[art3d](http://matplotlib.org/mpl_toolkits/mplot3d/api.html#art3d)
+The `Axes3D` constructor and the
+[art3D](http://matplotlib.org/mpl_toolkits/mplot3d/api.html#art3d)
 module are also exported.
 
 ## LaTeX plot labels
