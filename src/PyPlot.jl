@@ -226,7 +226,12 @@ function __init__()
         v"0.0" # fallback
     end
 
-    backend_gui = find_backend(matplotlib)
+    mpl_backend = haskey(ENV, "MPLBACKEND") ? ENV["MPLBACKEND"] : :none
+    if mpl_backend != :none
+        backend_gui = (mpl_backend, :none)
+    else
+        backend_gui = find_backend(matplotlib)
+    end
     # workaround JuliaLang/julia#8925
     global const backend = backend_gui[1]
     global const gui = backend_gui[2]
@@ -247,7 +252,9 @@ function __init__()
         Main.IJulia.push_posterror_hook(close_queued_figs)
     end
     
-    if isjulia_display[1]
+    if mpl_backend != :none
+        pltm[:switch_backend](mpl_backend)
+    elseif isjulia_display[1]
         if backend != "Agg"
             plt[:switch_backend]("Agg")
         end
