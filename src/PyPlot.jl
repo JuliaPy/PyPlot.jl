@@ -141,7 +141,8 @@ function find_backend(matplotlib::PyObject)
     qt2gui = @compat Dict("pyqt4"=>:qt_pyqt4, "pyside"=>:qt_pyside)
 
     rcParams = PyDict(matplotlib["rcParams"])
-    default = lowercase(get(rcParams, "backend", "none"))
+    default = lowercase(get(ENV, "MPLBACKEND",
+                            get(rcParams, "backend", "none")))
     if haskey(matplotlib2gui,default)
         insert!(options, 1, (matplotlib2gui[default],default))
     end
