@@ -459,7 +459,7 @@ close(f::Union(Figure,AbstractString,Symbol,Integer)) = pycall(plt["close"], PyA
 @doc LazyHelp(plt,"hist2d") hist2D(args...; kws...) = pycall(plt["hist2d"], PyAny, args...; kws...)
 
 function init_pyplot_funcs()
-    if VERSION < v"0.4.0-dev+5873"
+    if VERSION < v"0.4.0-dev+1503"
         for f in plt_funcs
             addhelp(f, plt, string(f))
         end
@@ -530,7 +530,7 @@ for f in zlabel_funcs
 end
 
 function init_mplot3d_funcs()
-    if VERSION < v"0.4.0-dev+5873"
+    if VERSION < v"0.4.0-dev+1503"
         for f in mplot3d_funcs
             addhelp(f, axes3D["Axes3D"], string(f))
         end
