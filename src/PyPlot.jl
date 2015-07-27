@@ -66,7 +66,7 @@ else
     addhelp(f, o::PyObject, key::AbstractString) = haskey(o, key) && addhelp(f, o[key])
 
     # no-op: we need to call addhelp at runtime
-    macro doc(o,k,ex)
+    macro doc(h,ex)
         esc(ex)
     end
 end
