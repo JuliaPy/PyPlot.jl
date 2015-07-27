@@ -56,7 +56,7 @@ end
 
 # most general constructors using RGB arrays of triples, defined
 # as for matplotlib.colors.LinearSegmentedColormap
-ColorMap{T<:Real}(name::Union(AbstractString,Symbol), 
+ColorMap{T<:Real}(name::Union(AbstractString,Symbol),
                   r::AbstractVector{@compat Tuple{T,T,T}},
                   g::AbstractVector{@compat Tuple{T,T,T}},
                   b::AbstractVector{@compat Tuple{T,T,T}},
@@ -64,7 +64,7 @@ ColorMap{T<:Real}(name::Union(AbstractString,Symbol),
     ColorMap(name, r,g,b, Array(@compat(Tuple{T,T,T}),0), n, gamma)
 
 # as above, but also passing an alpha array
-function ColorMap{T<:Real}(name::Union(AbstractString,Symbol), 
+function ColorMap{T<:Real}(name::Union(AbstractString,Symbol),
                            r::AbstractVector{@compat Tuple{T,T,T}},
                            g::AbstractVector{@compat Tuple{T,T,T}},
                            b::AbstractVector{@compat Tuple{T,T,T}},
@@ -74,7 +74,7 @@ function ColorMap{T<:Real}(name::Union(AbstractString,Symbol),
     segmentdata = @compat Dict("red" => r, "green" => g, "blue" => b)
     if !isempty(a)
         segmentdata["alpha"] = a
-    end  
+    end
     pycall(LinearSegmentedColormap, ColorMap,
            name, segmentdata, n, gamma)
 end
@@ -92,7 +92,7 @@ function ColorMap{T<:AColorValue}(name::Union(AbstractString,Symbol),
     r = Array(@compat(Tuple{Float64,Float64,Float64}), nc)
     g = similar(r)
     b = similar(r)
-    a = T <: AbstractAlphaColorValue ? 
+    a = T <: AbstractAlphaColorValue ?
         similar(r) : Array(@compat(Tuple{Float64,Float64,Float64}), 0)
     for i = 1:nc
         x = (i-1) / (nc-1)
@@ -156,7 +156,7 @@ get_cmaps() =
 ########################################################################
 # display of ColorMaps as a horizontal color bar in SVG
 
-function writemime(io::IO, ::MIME"image/svg+xml", 
+function writemime(io::IO, ::MIME"image/svg+xml",
                    cs::AbstractVector{ColorMap})
     n = 256
     nc = length(cs)
