@@ -50,7 +50,7 @@ else
     # Julia 0.3:
     # Base.Help.FUNCTION_DICT is undocumented, but it is better than nothing
     # until Julia gets a documented docstring-like facility.
-    
+
     function addhelp(f::AbstractString, o::PyObject)
         try
             Base.Help.init_help()
@@ -131,11 +131,11 @@ function find_backend(matplotlib::PyObject)
                                   :qt=>"Qt4Agg",:tk=>"TkAgg")
     guis = @linux ? [:tk, :gtk3, :gtk, :qt, :wx] : [:tk, :qt, :wx, :gtk, :gtk3]
     options = [(g,gui2matplotlib[g]) for g in guis]
-    
+
     matplotlib2gui = @compat Dict("wx"=>:wx, "wxagg"=>:wx,
                                   "gtkagg"=>:gtk, "gtk"=>:gtk,"gtkcairo"=>:gtk,
                                   "gtk3agg"=>:gtk3, "gtk3"=>:gtk3,"gtk3cairo"=>:gtk3,
-                                  "qt4agg"=>:qt, "tkagg"=>:tk, 
+                                  "qt4agg"=>:qt, "tkagg"=>:tk,
                                   "agg"=>:none,"ps"=>:none,"pdf"=>:none,
                                   "svg"=>:none,"cairo"=>:none,"gdk"=>:none)
     qt2gui = @compat Dict("pyqt4"=>:qt_pyqt4, "pyside"=>:qt_pyside)
@@ -154,7 +154,7 @@ function find_backend(matplotlib::PyObject)
         # throw exception (drop to catch block below) if DISPLAY
         # is not set.  [Might be more reliable to test
         # success(`xdpyinfo`), but only if xdpyinfo is installed.]
-        
+
         if options[1][1] != :none
             @unix_only (@osx ? nothing : ENV["DISPLAY"])
         end
@@ -246,7 +246,7 @@ function __init__()
         Main.IJulia.push_postexecute_hook(close_queued_figs)
         Main.IJulia.push_posterror_hook(close_queued_figs)
     end
-    
+
     if isjulia_display[1]
         if backend != "Agg"
             plt[:switch_backend]("Agg")
@@ -366,7 +366,7 @@ end
 
 function display_figs() # replaces pyplot.show
     if isjulia_display[1]
-        if drew_something[1] && 
+        if drew_something[1]
             for manager in Gcf[:get_all_fig_managers]()
                 display(pushclose(Figure(manager["canvas"]["figure"])))
             end
@@ -546,8 +546,8 @@ end
 # export Matlab-like names
 
 function surf(Z::AbstractMatrix; kws...)
-    plot_surface([1:size(Z,1)]*ones(1,size(Z,2)), 
-                 ones(size(Z,1))*[1:size(Z,2)]', Z; kws...)
+    plot_surface([1:size(Z,1);]*ones(1,size(Z,2)),
+                 ones(size(Z,1))*[1:size(Z,2);]', Z; kws...)
 end
 
 @doc LazyHelp(axes3D,"Axes3D", "plot_surface") function surf(X, Y, Z::AbstractMatrix, args...; kws...)
@@ -561,8 +561,8 @@ end
 @doc LazyHelp(axes3D,"Axes3D", "plot_wireframe") mesh(args...; kws...) = plot_wireframe(args...; kws...)
 
 function mesh(Z::AbstractMatrix; kws...)
-    plot_wireframe([1:size(Z,1)]*ones(1,size(Z,2)), 
-                   ones(size(Z,1))*[1:size(Z,2)]', Z; kws...)
+    plot_wireframe([1:size(Z,1);]*ones(1,size(Z,2)),
+                   ones(size(Z,1))*[1:size(Z,2);]', Z; kws...)
 end
 
 ###########################################################################
