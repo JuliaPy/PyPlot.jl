@@ -1,7 +1,7 @@
 # Conveniences for working with and displaying matplotlib colormaps,
 # integrating with the Julia Colors package
 
-using Color
+using Colors
 export ColorMap, get_cmap, register_cmap, get_cmaps
 
 ########################################################################
@@ -79,28 +79,28 @@ function ColorMap{T<:Real}(name::Union(AbstractString,Symbol),
            name, segmentdata, n, gamma)
 end
 
-typealias AColorValue Union(ColorValue,AbstractAlphaColorValue)
+typealias AColor Union(Color,TransparentColor)
 
 # create from an array c, assuming linear mapping from [0,1] to c
-function ColorMap{T<:AColorValue}(name::Union(AbstractString,Symbol),
+function ColorMap{T<:AColor}(name::Union(AbstractString,Symbol),
                                   c::AbstractVector{T},
                                   n=max(256, length(c)), gamma=1.0)
     nc = length(c)
     if nc == 0
-        throw(ArgumentError("ColorMap requires a non-empty ColorValue array"))
+        throw(ArgumentError("ColorMap requires a non-empty Color array"))
     end
     r = Array(@compat(Tuple{Float64,Float64,Float64}), nc)
     g = similar(r)
     b = similar(r)
-    a = T <: AbstractAlphaColorValue ?
+    a = T <: TransparentColor ?
         similar(r) : Array(@compat(Tuple{Float64,Float64,Float64}), 0)
     for i = 1:nc
         x = (i-1) / (nc-1)
-        if T <: AbstractAlphaColorValue
-            rgba = convert(AlphaColorValue{RGB{Float64},Float64}, c[i])
-            r[i] = (x, rgba.c.r, rgba.c.r)
-            b[i] = (x, rgba.c.b, rgba.c.b)
-            g[i] = (x, rgba.c.g, rgba.c.g)
+        if T <: TransparentColor
+            rgba = convert(RGBA{Float64}, c[i])
+            r[i] = (x, rgba.r, rgba.r)
+            b[i] = (x, rgba.b, rgba.b)
+            g[i] = (x, rgba.g, rgba.g)
             a[i] = (x, rgba.alpha, rgba.alpha)
         else
             rgb = convert(RGB{Float64}, c[i])
@@ -112,7 +112,7 @@ function ColorMap{T<:AColorValue}(name::Union(AbstractString,Symbol),
     ColorMap(name, r,g,b,a, n, gamma)
 end
 
-ColorMap{T<:AColorValue}(c::AbstractVector{T},
+ColorMap{T<:AColor}(c::AbstractVector{T},
                          n=max(256, length(c)), gamma=1.0) =
     ColorMap(string("cm_", hash(c)), c, n, gamma)
 
@@ -124,7 +124,7 @@ function ColorMap{T<:Real}(name::Union(AbstractString,Symbol), c::AbstractMatrix
                         n, gamma)
     elseif size(c,2) == 4
         return ColorMap(name,
-                        [AlphaColorValue(RGB{T}(c[i,1],c[i,2],c[i,3]), c[i,4])
+                        [RGBA{T}(c[i,1],c[i,2],c[i,3],c[i,4])
                          for i in 1:size(c,1)],
                         n, gamma)
     else
