@@ -79,15 +79,13 @@ function ColorMap{T<:Real}(name::Union(AbstractString,Symbol),
            name, segmentdata, n, gamma)
 end
 
-typealias AColor Union(Color,TransparentColor)
-
 # create from an array c, assuming linear mapping from [0,1] to c
-function ColorMap{T<:AColor}(name::Union(AbstractString,Symbol),
+function ColorMap{T<:Colorant}(name::Union(AbstractString,Symbol),
                                   c::AbstractVector{T},
                                   n=max(256, length(c)), gamma=1.0)
     nc = length(c)
     if nc == 0
-        throw(ArgumentError("ColorMap requires a non-empty Color array"))
+        throw(ArgumentError("ColorMap requires a non-empty Colorant array"))
     end
     r = Array(@compat(Tuple{Float64,Float64,Float64}), nc)
     g = similar(r)
@@ -112,8 +110,8 @@ function ColorMap{T<:AColor}(name::Union(AbstractString,Symbol),
     ColorMap(name, r,g,b,a, n, gamma)
 end
 
-ColorMap{T<:AColor}(c::AbstractVector{T},
-                         n=max(256, length(c)), gamma=1.0) =
+ColorMap{T<:Colorant}(c::AbstractVector{T},
+                      n=max(256, length(c)), gamma=1.0) =
     ColorMap(string("cm_", hash(c)), c, n, gamma)
 
 function ColorMap{T<:Real}(name::Union(AbstractString,Symbol), c::AbstractMatrix{T},
