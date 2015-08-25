@@ -1,4 +1,5 @@
-VERSION >= v"0.4.0-dev+6521" && __precompile__()
+# enable precompile once precompilable PyCall is tagged:
+# VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module PyPlot
 
