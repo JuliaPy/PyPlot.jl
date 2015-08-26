@@ -78,16 +78,23 @@ end
 # initialize them here (rather than via "global const foo = ..." in __init__)
 # so that their type is known at compile-time.
 
-const matplotlib = PyCall.PyNULL()
-const plt = PyCall.PyNULL()
-const Gcf = PyCall.PyNULL()
-const orig_draw = PyCall.PyNULL()
-const orig_gcf = PyCall.PyNULL()
-const orig_figure = PyCall.PyNULL()
-const orig_show = PyCall.PyNULL()
-const mplot3d = PyCall.PyNULL()
-const axes3D = PyCall.PyNULL()
-const art3D = PyCall.PyNULL()
+# remove this once we tag and require a newer PyCall version:
+if isdefined(PyCall,:PyNULL)
+    PyNULL() = PyCall.PyNULL()
+else
+    PyNULL() = PyCall.PyObject()
+end
+
+const matplotlib = PyNULL()
+const plt = PyNULL()
+const Gcf = PyNULL()
+const orig_draw = PyNULL()
+const orig_gcf = PyNULL()
+const orig_figure = PyNULL()
+const orig_show = PyNULL()
+const mplot3d = PyNULL()
+const axes3D = PyNULL()
+const art3D = PyNULL()
 
 # TODO: move this to PyCall:
 function Base.copy!(dest::PyObject, src::PyObject)
