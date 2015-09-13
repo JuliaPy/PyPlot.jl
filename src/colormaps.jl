@@ -1,7 +1,7 @@
 # Conveniences for working with and displaying matplotlib colormaps,
 # integrating with the Julia Colors package
 
-using Color
+using Colors
 export ColorMap, get_cmap, register_cmap, get_cmaps
 
 ########################################################################
@@ -29,19 +29,26 @@ function show(io::IO, c::ColorMap)
 end
 
 # all Python dependencies must be initialized at runtime (not when precompiled)
+const colorsm = PyNULL()
+const cm = PyNULL()
+const LinearSegmentedColormap = PyNULL()
+const cm_get_cmap = PyNULL()
+const cm_register_cmap = PyNULL()
+const ScalarMappable = PyNULL()
+const Normalize01 = PyNULL()
 function init_colormaps()
-    global const colorsm = pyimport("matplotlib.colors")
-    global const cm = pyimport("matplotlib.cm")
+    copy!(colorsm, pyimport("matplotlib.colors"))
+    copy!(cm, pyimport("matplotlib.cm"))
 
     pytype_mapping(colorsm["Colormap"], ColorMap)
 
-    global const LinearSegmentedColormap = colorsm["LinearSegmentedColormap"]
+    copy!(LinearSegmentedColormap, colorsm["LinearSegmentedColormap"])
 
-    global const cm_get_cmap = cm["get_cmap"]
-    global const cm_register_cmap = cm["register_cmap"]
+    copy!(cm_get_cmap, cm["get_cmap"])
+    copy!(cm_register_cmap, cm["register_cmap"])
 
-    global const ScalarMappable = cm["ScalarMappable"]
-    global const Normalize01 = pycall(colorsm["Normalize"],PyAny,vmin=0,vmax=1)
+    copy!(ScalarMappable, cm["ScalarMappable"])
+    copy!(Normalize01, pycall(colorsm["Normalize"],PyAny,vmin=0,vmax=1))
 end
 
 ########################################################################
@@ -49,7 +56,7 @@ end
 
 # most general constructors using RGB arrays of triples, defined
 # as for matplotlib.colors.LinearSegmentedColormap
-ColorMap{T<:Real}(name::Union(AbstractString,Symbol), 
+ColorMap{T<:Real}(name::Union(AbstractString,Symbol),
                   r::AbstractVector{@compat Tuple{T,T,T}},
                   g::AbstractVector{@compat Tuple{T,T,T}},
                   b::AbstractVector{@compat Tuple{T,T,T}},
@@ -57,7 +64,7 @@ ColorMap{T<:Real}(name::Union(AbstractString,Symbol),
     ColorMap(name, r,g,b, Array(@compat(Tuple{T,T,T}),0), n, gamma)
 
 # as above, but also passing an alpha array
-function ColorMap{T<:Real}(name::Union(AbstractString,Symbol), 
+function ColorMap{T<:Real}(name::Union(AbstractString,Symbol),
                            r::AbstractVector{@compat Tuple{T,T,T}},
                            g::AbstractVector{@compat Tuple{T,T,T}},
                            b::AbstractVector{@compat Tuple{T,T,T}},
@@ -67,33 +74,31 @@ function ColorMap{T<:Real}(name::Union(AbstractString,Symbol),
     segmentdata = @compat Dict("red" => r, "green" => g, "blue" => b)
     if !isempty(a)
         segmentdata["alpha"] = a
-    end  
+    end
     pycall(LinearSegmentedColormap, ColorMap,
            name, segmentdata, n, gamma)
 end
 
-typealias AColorValue Union(ColorValue,AbstractAlphaColorValue)
-
 # create from an array c, assuming linear mapping from [0,1] to c
-function ColorMap{T<:AColorValue}(name::Union(AbstractString,Symbol),
+function ColorMap{T<:Colorant}(name::Union(AbstractString,Symbol),
                                   c::AbstractVector{T},
                                   n=max(256, length(c)), gamma=1.0)
     nc = length(c)
     if nc == 0
-        throw(ArgumentError("ColorMap requires a non-empty ColorValue array"))
+        throw(ArgumentError("ColorMap requires a non-empty Colorant array"))
     end
     r = Array(@compat(Tuple{Float64,Float64,Float64}), nc)
     g = similar(r)
     b = similar(r)
-    a = T <: AbstractAlphaColorValue ? 
+    a = T <: TransparentColor ?
         similar(r) : Array(@compat(Tuple{Float64,Float64,Float64}), 0)
     for i = 1:nc
         x = (i-1) / (nc-1)
-        if T <: AbstractAlphaColorValue
-            rgba = convert(AlphaColorValue{RGB{Float64},Float64}, c[i])
-            r[i] = (x, rgba.c.r, rgba.c.r)
-            b[i] = (x, rgba.c.b, rgba.c.b)
-            g[i] = (x, rgba.c.g, rgba.c.g)
+        if T <: TransparentColor
+            rgba = convert(RGBA{Float64}, c[i])
+            r[i] = (x, rgba.r, rgba.r)
+            b[i] = (x, rgba.b, rgba.b)
+            g[i] = (x, rgba.g, rgba.g)
             a[i] = (x, rgba.alpha, rgba.alpha)
         else
             rgb = convert(RGB{Float64}, c[i])
@@ -105,8 +110,8 @@ function ColorMap{T<:AColorValue}(name::Union(AbstractString,Symbol),
     ColorMap(name, r,g,b,a, n, gamma)
 end
 
-ColorMap{T<:AColorValue}(c::AbstractVector{T},
-                         n=max(256, length(c)), gamma=1.0) =
+ColorMap{T<:Colorant}(c::AbstractVector{T},
+                      n=max(256, length(c)), gamma=1.0) =
     ColorMap(string("cm_", hash(c)), c, n, gamma)
 
 function ColorMap{T<:Real}(name::Union(AbstractString,Symbol), c::AbstractMatrix{T},
@@ -117,7 +122,7 @@ function ColorMap{T<:Real}(name::Union(AbstractString,Symbol), c::AbstractMatrix
                         n, gamma)
     elseif size(c,2) == 4
         return ColorMap(name,
-                        [AlphaColorValue(RGB{T}(c[i,1],c[i,2],c[i,3]), c[i,4])
+                        [RGBA{T}(c[i,1],c[i,2],c[i,3],c[i,4])
                          for i in 1:size(c,1)],
                         n, gamma)
     else
@@ -130,13 +135,13 @@ ColorMap{T<:Real}(c::AbstractMatrix{T}, n=max(256, size(c,1)), gamma=1.0) =
 
 ########################################################################
 
-get_cmap() = pycall(cm_get_cmap, PyAny)
+@doc LazyHelp(cm_get_cmap) get_cmap() = pycall(cm_get_cmap, PyAny)
 get_cmap(name::Union(AbstractString,Symbol)) = pycall(cm_get_cmap, PyAny, name)
 get_cmap(name::Union(AbstractString,Symbol), lut::Integer) = pycall(cm_get_cmap, PyAny, name, lut)
 get_cmap(c::ColorMap) = c
 ColorMap(name::Union(AbstractString,Symbol)) = get_cmap(name)
 
-register_cmap(c::ColorMap) = pycall(cm_register_cmap, PyAny, c)
+@doc LazyHelp(cm_register_cmap) register_cmap(c::ColorMap) = pycall(cm_register_cmap, PyAny, c)
 register_cmap(n::Union(AbstractString,Symbol), c::ColorMap) = pycall(cm_register_cmap, PyAny, n,c)
 
 # convenience function to get array of registered colormaps
@@ -149,7 +154,7 @@ get_cmaps() =
 ########################################################################
 # display of ColorMaps as a horizontal color bar in SVG
 
-function writemime(io::IO, ::MIME"image/svg+xml", 
+function writemime(io::IO, ::MIME"image/svg+xml",
                    cs::AbstractVector{ColorMap})
     n = 256
     nc = length(cs)
