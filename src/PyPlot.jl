@@ -1,5 +1,4 @@
-# enable precompile once precompilable PyCall is tagged:
-# VERSION >= v"0.4.0-dev+6521" && __precompile__()
+VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module PyPlot
 
@@ -96,13 +95,6 @@ const orig_show = PyNULL()
 const mplot3d = PyNULL()
 const axes3D = PyNULL()
 const art3D = PyNULL()
-
-# TODO: move this to PyCall:
-function Base.copy!(dest::PyObject, src::PyObject)
-    pydecref(dest)
-    dest.o = src.o
-    return pyincref(dest)
-end
 
 ###########################################################################
 # file formats supported by Agg backend, from MIME types
