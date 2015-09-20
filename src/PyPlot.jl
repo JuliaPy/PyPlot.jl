@@ -640,10 +640,4 @@ end
 using LaTeXStrings
 export LaTeXString, latexstring, @L_str, @L_mstr
 
-###########################################################################
-
-if VERSION < v"0.3-"
-    __init__() # automatic call to __init__ was added in Julia 0.3
-end
-
 end # module PyPlot
