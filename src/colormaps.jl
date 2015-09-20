@@ -56,22 +56,22 @@ end
 
 # most general constructors using RGB arrays of triples, defined
 # as for matplotlib.colors.LinearSegmentedColormap
-ColorMap{T<:Real}(name::Union(AbstractString,Symbol),
-                  r::AbstractVector{@compat Tuple{T,T,T}},
-                  g::AbstractVector{@compat Tuple{T,T,T}},
-                  b::AbstractVector{@compat Tuple{T,T,T}},
+@compat ColorMap{T<:Real}(name::Union{AbstractString,Symbol},
+                  r::AbstractVector{Tuple{T,T,T}},
+                  g::AbstractVector{Tuple{T,T,T}},
+                  b::AbstractVector{Tuple{T,T,T}},
                   n=max(256,length(r),length(g),length(b)), gamma=1.0) =
-    ColorMap(name, r,g,b, Array(@compat(Tuple{T,T,T}),0), n, gamma)
+    ColorMap(name, r,g,b, Array(Tuple{T,T,T},0), n, gamma)
 
 # as above, but also passing an alpha array
-function ColorMap{T<:Real}(name::Union(AbstractString,Symbol),
-                           r::AbstractVector{@compat Tuple{T,T,T}},
-                           g::AbstractVector{@compat Tuple{T,T,T}},
-                           b::AbstractVector{@compat Tuple{T,T,T}},
-                           a::AbstractVector{@compat Tuple{T,T,T}},
+@compat function ColorMap{T<:Real}(name::Union{AbstractString,Symbol},
+                           r::AbstractVector{Tuple{T,T,T}},
+                           g::AbstractVector{Tuple{T,T,T}},
+                           b::AbstractVector{Tuple{T,T,T}},
+                           a::AbstractVector{Tuple{T,T,T}},
                            n=max(256,length(r),length(g),length(b),length(a)),
                            gamma=1.0)
-    segmentdata = @compat Dict("red" => r, "green" => g, "blue" => b)
+    segmentdata = Dict("red" => r, "green" => g, "blue" => b)
     if !isempty(a)
         segmentdata["alpha"] = a
     end
@@ -80,18 +80,18 @@ function ColorMap{T<:Real}(name::Union(AbstractString,Symbol),
 end
 
 # create from an array c, assuming linear mapping from [0,1] to c
-function ColorMap{T<:Colorant}(name::Union(AbstractString,Symbol),
+@compat function ColorMap{T<:Colorant}(name::Union{AbstractString,Symbol},
                                   c::AbstractVector{T},
                                   n=max(256, length(c)), gamma=1.0)
     nc = length(c)
     if nc == 0
         throw(ArgumentError("ColorMap requires a non-empty Colorant array"))
     end
-    r = Array(@compat(Tuple{Float64,Float64,Float64}), nc)
+    r = Array(Tuple{Float64,Float64,Float64}, nc)
     g = similar(r)
     b = similar(r)
     a = T <: TransparentColor ?
-        similar(r) : Array(@compat(Tuple{Float64,Float64,Float64}), 0)
+        similar(r) : Array(Tuple{Float64,Float64,Float64}, 0)
     for i = 1:nc
         x = (i-1) / (nc-1)
         if T <: TransparentColor
@@ -114,7 +114,7 @@ ColorMap{T<:Colorant}(c::AbstractVector{T},
                       n=max(256, length(c)), gamma=1.0) =
     ColorMap(string("cm_", hash(c)), c, n, gamma)
 
-function ColorMap{T<:Real}(name::Union(AbstractString,Symbol), c::AbstractMatrix{T},
+@compat function ColorMap{T<:Real}(name::Union{AbstractString,Symbol}, c::AbstractMatrix{T},
                            n=max(256, size(c,1)), gamma=1.0)
     if size(c,2) == 3
         return ColorMap(name,
@@ -136,13 +136,13 @@ ColorMap{T<:Real}(c::AbstractMatrix{T}, n=max(256, size(c,1)), gamma=1.0) =
 ########################################################################
 
 @doc LazyHelp(cm_get_cmap) get_cmap() = pycall(cm_get_cmap, PyAny)
-get_cmap(name::Union(AbstractString,Symbol)) = pycall(cm_get_cmap, PyAny, name)
-get_cmap(name::Union(AbstractString,Symbol), lut::Integer) = pycall(cm_get_cmap, PyAny, name, lut)
+@compat get_cmap(name::Union{AbstractString,Symbol}) = pycall(cm_get_cmap, PyAny, name)
+@compat get_cmap(name::Union{AbstractString,Symbol}, lut::Integer) = pycall(cm_get_cmap, PyAny, name, lut)
 get_cmap(c::ColorMap) = c
-ColorMap(name::Union(AbstractString,Symbol)) = get_cmap(name)
+@compat ColorMap(name::Union{AbstractString,Symbol}) = get_cmap(name)
 
 @doc LazyHelp(cm_register_cmap) register_cmap(c::ColorMap) = pycall(cm_register_cmap, PyAny, c)
-register_cmap(n::Union(AbstractString,Symbol), c::ColorMap) = pycall(cm_register_cmap, PyAny, n,c)
+@compat register_cmap(n::Union{AbstractString,Symbol}, c::ColorMap) = pycall(cm_register_cmap, PyAny, n,c)
 
 # convenience function to get array of registered colormaps
 get_cmaps() =
