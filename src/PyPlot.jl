@@ -450,10 +450,10 @@ end
 
 @doc LazyHelp(plt,"step") step(x, y; kws...) = pycall(plt["step"], PyAny, x, y; kws...)
 
-close(f::Union(Figure,AbstractString,Symbol,Integer)) = pycall(plt["close"], PyAny, f)
+@compat close(f::Union{Figure,AbstractString,Symbol,Integer}) = pycall(plt["close"], PyAny, f)
 @doc LazyHelp(plt,"close") close() = pycall(plt["close"], PyAny)
 
-@doc LazyHelp(plt,"connect") connect(s::Union(AbstractString,Symbol), f::Function) = pycall(plt["connect"], PyAny, s, f)
+@compat @doc LazyHelp(plt,"connect") connect(s::Union{AbstractString,Symbol}, f::Function) = pycall(plt["connect"], PyAny, s, f)
 
 @doc LazyHelp(plt,"fill") fill(x::AbstractArray,y::AbstractArray, args...; kws...) =
     pycall(plt["fill"], PyAny, x, y, args...; kws...)
@@ -639,11 +639,5 @@ end
 
 using LaTeXStrings
 export LaTeXString, latexstring, @L_str, @L_mstr
-
-###########################################################################
-
-if VERSION < v"0.3-"
-    __init__() # automatic call to __init__ was added in Julia 0.3
-end
 
 end # module PyPlot
