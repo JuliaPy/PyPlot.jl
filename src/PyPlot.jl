@@ -2,7 +2,7 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module PyPlot
 
-using PyCall
+using PyCall, Conda
 import PyCall: PyObject, pygui, pycall
 import Base: convert, ==, isequal, hash, writemime, getindex, setindex!, haskey, keys, show, mimewritable
 export Figure, plt, matplotlib, pygui, withfig
@@ -219,9 +219,22 @@ end
 function __init__()
     global const isjulia_display = Bool[isdisplayok()]
     try
-        copy!(matplotlib, pyimport("matplotlib"))
+        copy!(matplotlib, pyimport("matplotlibx"))
     catch e
-        error("Failed to pyimport(\"matplotlib\"): PyPlot will not work until you have a functioning matplotlib module.  ", e)
+        if PyCall.conda
+            info("Installing matplotlib via the Conda package...")
+            Conda.add("matplotlib")
+            copy!(matplotlib, pyimport("matplotlib"))
+        else
+            error("""Failed to pyimport("matplotlib"): PyPlot will not work until you have a functioning matplotlib module.
+
+                  For automated Matplotlib installation, try configuring PyCall to use the Conda Python distribution within Julia.  Relaunch Julia and run:
+                        ENV["PYTHON"]=""
+                        Pkg.build("PyCall")
+                        using PyPlot
+
+                  pyimport exception was: """, e)
+        end
     end
     global const version = try
         convert(VersionNumber, matplotlib[:__version__])
