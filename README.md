@@ -30,6 +30,20 @@ of Matplotlib as described below.
 Once Matplotlib is installed, then you can just use
 `Pkg.add("PyPlot")` in Julia to install PyPlot and its dependencies.
 
+### Automated Matplotlib installation
+
+If you set up PyCall to use the
+[Conda.jl](https://github.com/Luthaf/Conda.jl) package to install a
+private (not in the system `PATH`) Julia Python distribution (via
+Miniconda), then PyPlot will automatically install Matplotlib as needed.
+
+If you are installing PyCall and PyPlot for the first time, just do `ENV["PYTHON"]=""` before running `Pkg.add("PyPlot")`.  Otherwise, you can reconfigure PyCall to use Conda via:
+```
+ENV["PYTHON"]=""
+Pkg.build("PyCall")
+```
+The next time you import `PyPlot`, it will tell Conda to install Matplotlib.
+
 ### OS X
 
 On MacOS, you should either install
