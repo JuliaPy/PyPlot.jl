@@ -219,7 +219,7 @@ end
 function __init__()
     global const isjulia_display = Bool[isdisplayok()]
     try
-        copy!(matplotlib, pyimport("matplotlibx"))
+        copy!(matplotlib, pyimport("matplotlib"))
     catch e
         if PyCall.conda
             info("Installing matplotlib via the Conda package...")
