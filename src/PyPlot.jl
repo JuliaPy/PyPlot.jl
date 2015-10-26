@@ -120,7 +120,7 @@ end
 # if possible, then switching to a Julia-display backend (if available),
 # hooking into pyplot via a monkey-patched draw_if_interactive.
 
-pymodule_exists(s::AbstractString) = try 
+pymodule_exists(s::AbstractString) = try
     pyimport(s)
     true
 catch
@@ -307,6 +307,12 @@ convert(::Type{Figure}, o::PyObject) = Figure(o)
 ==(f::PyObject, g::Figure) = f == g.o
 hash(f::Figure) = hash(f.o)
 pycall(f::Figure, args...; kws...) = pycall(f.o, args...; kws...)
+if VERSION >= v"0.4.0-dev+1246" # call overloading
+    Base.call(f::Figure, args...; kws...) = pycall(f.o, PyAny, args...; kws...)
+end
+if VERSION >= v"0.4.0-dev+6471" # docstrings
+    Base.Docs.doc(f::Figure) = Base.Docs.doc(f.o)
+end
 
 getindex(f::Figure, x) = getindex(f.o, x)
 setindex!(f::Figure, v, x) = setindex!(f.o, v, x)
@@ -405,7 +411,7 @@ function close_queued_figs()
             plt[:close](f[:number])
         end
         empty!(closequeue)
-        drew_something[1] = false # reset until next drawing command 
+        drew_something[1] = false # reset until next drawing command
     end
 end
 

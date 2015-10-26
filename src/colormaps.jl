@@ -18,6 +18,12 @@ convert(::Type{ColorMap}, o::PyObject) = ColorMap(o)
 ==(c::ColorMap, g::PyObject) = c.o == g
 hash(c::ColorMap) = hash(c.o)
 pycall(c::ColorMap, args...; kws...) = pycall(c.o, args...; kws...)
+if VERSION >= v"0.4.0-dev+1246" # call overloading
+    Base.call(c::ColorMap, args...; kws...) = pycall(c.o, PyAny, args...; kws...)
+end
+if VERSION >= v"0.4.0-dev+6471" # docstrings
+    Base.Docs.doc(c::ColorMap) = Base.Docs.doc(c.o)
+end
 
 getindex(c::ColorMap, x) = getindex(c.o, x)
 setindex!(c::ColorMap, v, x) = setindex!(c.o, v, x)
