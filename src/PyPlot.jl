@@ -3,7 +3,7 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 module PyPlot
 
 using PyCall, Conda
-import PyCall: PyObject, pygui, pycall
+import PyCall: PyObject, pygui, pycall, pyexists
 import Base: convert, ==, isequal, hash, writemime, getindex, setindex!, haskey, keys, show, mimewritable
 export Figure, plt, matplotlib, pygui, withfig
 
@@ -120,13 +120,6 @@ end
 # if possible, then switching to a Julia-display backend (if available),
 # hooking into pyplot via a monkey-patched draw_if_interactive.
 
-pymodule_exists(s::AbstractString) = try
-    pyimport(s)
-    true
-catch
-    false
-end
-
 # return (backend,gui) tuple
 function find_backend(matplotlib::PyObject)
     gui2matplotlib = @compat Dict(:wx=>"WXAgg",:gtk=>"GTKAgg",:gtk3=>"GTK3Agg",
@@ -146,7 +139,29 @@ function find_backend(matplotlib::PyObject)
     default = lowercase(get(ENV, "MPLBACKEND",
                             get(rcParams, "backend", "none")))
     if haskey(matplotlib2gui,default)
-        insert!(options, 1, (matplotlib2gui[default],default))
+        defaultgui = matplotlib2gui[default]
+
+        # if the user explicitly requested a particular GUI,
+        # it makes sense to ensure that the relevant Conda
+        # package is installed (if we are using Conda).
+        if PyCall.conda
+            if defaultgui == :qt
+                # default to pyqt rather than pyside, as below:
+                defaultgui = haskey(rcParams,"backend.qt4") ? qt2gui[lowercase(rcParams["backend.qt4"])] : :qt_pyqt4
+                if defaultgui == :qt_pyside && !pyexists("PySide")
+                    info("Installing PySide via the Conda package")
+                    Conda.add("pyside")
+                elseif !pyexists("PyQt4")
+                    info("Installing PyQt4 via the Conda package")
+                    Conda.add("pyqt")
+                end
+            elseif defaultgui == :wx && !pyexists("wx")
+                info("Installing wxpython via the Conda package")
+                Conda.add("wxpython")
+            end
+        end
+
+        insert!(options, 1, (defaultgui,default))
     end
 
     try
@@ -183,8 +198,7 @@ function find_backend(matplotlib::PyObject)
                             rcParams["backend.qt4"] = "PySide"
                         end
                     end
-                    if pymodule_exists("matplotlib.backends.backend_" *
-                                       lowercase(b))
+                    if pyexists("matplotlib.backends.backend_" * lowercase(b))
                         isjulia_display[1] || pygui_start(g)
                         matplotlib[:interactive](Base.isinteractive())
                         return (b, g)
