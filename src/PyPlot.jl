@@ -611,6 +611,8 @@ for f in (:contour, :contourf)
     @eval function $f(X::AbstractMatrix, Y::AbstractVector, args...; kws...)
         if size(X,1) == 1 || size(X,2) == 1
             $f(reshape(X, length(X)), Y, args...; kws...)
+        elseif size(X,1) > 1 && size(X,2) > 1 && isempty(args)
+            $f(X; levels=Y, kws...) # treat Y as contour levels
         else
             throw(ArgumentError("if 2nd arg is column vector, 1st arg must be row or column vector"))
         end
