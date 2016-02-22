@@ -79,21 +79,6 @@ writemime(io, m, t)
 a = spdiagm(1:100)
 spy(a)
 
-#Different backends
-pygui(:wx)
-plot(1:100,1:100)
-pygui(:gtk)
-plot(1:100,1:100)
-pygui(:qt)
-plot(1:100,1:100)
-
-#Try another backend
-workspace()
-using PyCall
-PyCall.pygui(:qt)
-using PyPlot
-plot(1:100,1:100)
-
 #Some other internal stuff
 PyPlot.svg()
 PyPlot.svg(true)
