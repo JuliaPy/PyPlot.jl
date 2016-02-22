@@ -130,6 +130,19 @@ so you can use `display(fig)` to show a `fig::PyFigure` and
 (e.g. `"image/png"` or `"application/pdf"`) that is supported by the
 Matplotlib backend.
 
+## Non-interactive plotting
+
+If you use PyPlot from an interactive Julia prompt, such as the Julia
+[command-line prompt](http://docs.julialang.org/en/latest/manual/interacting-with-julia/)
+or an IJulia notebook, then plots appear immediately after a plotting
+function (`plot` etc.) is evaluated.
+
+However, if you use PyPlot from a Julia script that is run non-interactively
+(e.g. `julia myscript.jl`), then Matplotlib is executed in
+[non-interactive mode](http://matplotlib.org/faq/usage_faq.html#what-is-interactive-mode):
+a plot window is not opened until you run `show()` (equivalent to `plt.show()`
+in the Python examples).
+
 ## Interactive versus Julia graphics
 
 PyPlot can use any Julia graphics backend capable of displaying PNG,
