@@ -132,7 +132,8 @@ function find_backend(matplotlib::PyObject)
                                   "gtk3agg"=>:gtk3, "gtk3"=>:gtk3,"gtk3cairo"=>:gtk3,
                                   "qt4agg"=>:qt, "tkagg"=>:tk,
                                   "agg"=>:none,"ps"=>:none,"pdf"=>:none,
-                                  "svg"=>:none,"cairo"=>:none,"gdk"=>:none)
+                                  "svg"=>:none,"cairo"=>:none,"gdk"=>:none,
+                                  "module://gr.matplotlib.backend_gr"=>:none)
     qt2gui = @compat Dict("pyqt4"=>:qt_pyqt4, "pyside"=>:qt_pyside)
 
     rcParams = PyDict(matplotlib["rcParams"])
@@ -256,12 +257,7 @@ function __init__()
         v"0.0" # fallback
     end
 
-    mpl_backend = haskey(ENV, "MPLBACKEND") ? ENV["MPLBACKEND"] : :none
-    if mpl_backend != :none
-        backend_gui = (mpl_backend, :none)
-    else
-        backend_gui = find_backend(matplotlib)
-    end
+    backend_gui = find_backend(matplotlib)
     # workaround JuliaLang/julia#8925
     global const backend = backend_gui[1]
     global const gui = backend_gui[2]
