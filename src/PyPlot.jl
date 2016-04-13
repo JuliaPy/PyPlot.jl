@@ -1,10 +1,9 @@
-# enable precompile once precompilable PyCall is tagged:
-# VERSION >= v"0.4.0-dev+6521" && __precompile__()
+VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module PyPlot
 
-using PyCall
-import PyCall: PyObject, pygui, pycall
+using PyCall, Conda
+import PyCall: PyObject, pygui, pycall, pyexists
 import Base: convert, ==, isequal, hash, writemime, getindex, setindex!, haskey, keys, show, mimewritable
 export Figure, plt, matplotlib, pygui, withfig
 
@@ -97,13 +96,6 @@ const mplot3d = PyNULL()
 const axes3D = PyNULL()
 const art3D = PyNULL()
 
-# TODO: move this to PyCall:
-function Base.copy!(dest::PyObject, src::PyObject)
-    pydecref(dest)
-    dest.o = src.o
-    return pyincref(dest)
-end
-
 ###########################################################################
 # file formats supported by Agg backend, from MIME types
 const aggformats = @compat Dict("application/eps" => "eps",
@@ -128,13 +120,6 @@ end
 # if possible, then switching to a Julia-display backend (if available),
 # hooking into pyplot via a monkey-patched draw_if_interactive.
 
-pymodule_exists(s::AbstractString) = try 
-    pyimport(s)
-    true
-catch
-    false
-end
-
 # return (backend,gui) tuple
 function find_backend(matplotlib::PyObject)
     gui2matplotlib = @compat Dict(:wx=>"WXAgg",:gtk=>"GTKAgg",:gtk3=>"GTK3Agg",
@@ -154,7 +139,29 @@ function find_backend(matplotlib::PyObject)
     default = lowercase(get(ENV, "MPLBACKEND",
                             get(rcParams, "backend", "none")))
     if haskey(matplotlib2gui,default)
-        insert!(options, 1, (matplotlib2gui[default],default))
+        defaultgui = matplotlib2gui[default]
+
+        # if the user explicitly requested a particular GUI,
+        # it makes sense to ensure that the relevant Conda
+        # package is installed (if we are using Conda).
+        if PyCall.conda
+            if defaultgui == :qt
+                # default to pyqt rather than pyside, as below:
+                defaultgui = haskey(rcParams,"backend.qt4") ? qt2gui[lowercase(rcParams["backend.qt4"])] : :qt_pyqt4
+                if defaultgui == :qt_pyside && !pyexists("PySide")
+                    info("Installing PySide via the Conda package")
+                    Conda.add("pyside")
+                elseif !pyexists("PyQt4")
+                    info("Installing PyQt4 via the Conda package")
+                    Conda.add("pyqt")
+                end
+            elseif defaultgui == :wx && !pyexists("wx")
+                info("Installing wxpython via the Conda package")
+                Conda.add("wxpython")
+            end
+        end
+
+        insert!(options, 1, (defaultgui,default))
     end
 
     try
@@ -191,8 +198,7 @@ function find_backend(matplotlib::PyObject)
                             rcParams["backend.qt4"] = "PySide"
                         end
                     end
-                    if pymodule_exists("matplotlib.backends.backend_" *
-                                       lowercase(b))
+                    if pyexists("matplotlib.backends.backend_" * lowercase(b))
                         isjulia_display[1] || pygui_start(g)
                         matplotlib[:interactive](Base.isinteractive())
                         return (b, g)
@@ -229,7 +235,20 @@ function __init__()
     try
         copy!(matplotlib, pyimport("matplotlib"))
     catch e
-        error("Failed to pyimport(\"matplotlib\"): PyPlot will not work until you have a functioning matplotlib module.  ", e)
+        if PyCall.conda
+            info("Installing matplotlib via the Conda package...")
+            Conda.add("matplotlib")
+            copy!(matplotlib, pyimport("matplotlib"))
+        else
+            error("""Failed to pyimport("matplotlib"): PyPlot will not work until you have a functioning matplotlib module.
+
+                  For automated Matplotlib installation, try configuring PyCall to use the Conda Python distribution within Julia.  Relaunch Julia and run:
+                        ENV["PYTHON"]=""
+                        Pkg.build("PyCall")
+                        using PyPlot
+
+                  pyimport exception was: """, e)
+        end
     end
     global const version = try
         convert(VersionNumber, matplotlib[:__version__])
@@ -307,6 +326,12 @@ convert(::Type{Figure}, o::PyObject) = Figure(o)
 ==(f::PyObject, g::Figure) = f == g.o
 hash(f::Figure) = hash(f.o)
 pycall(f::Figure, args...; kws...) = pycall(f.o, args...; kws...)
+if VERSION >= v"0.4.0-dev+1246" # call overloading
+    Base.call(f::Figure, args...; kws...) = pycall(f.o, PyAny, args...; kws...)
+end
+if VERSION >= v"0.4.0-dev+6471" # docstrings
+    Base.Docs.doc(f::Figure) = Base.Docs.doc(f.o)
+end
 
 getindex(f::Figure, x) = getindex(f.o, x)
 setindex!(f::Figure, v, x) = setindex!(f.o, v, x)
@@ -405,7 +430,7 @@ function close_queued_figs()
             plt[:close](f[:number])
         end
         empty!(closequeue)
-        drew_something[1] = false # reset until next drawing command 
+        drew_something[1] = false # reset until next drawing command
     end
 end
 
@@ -463,10 +488,10 @@ end
 
 @doc LazyHelp(plt,"step") step(x, y; kws...) = pycall(plt["step"], PyAny, x, y; kws...)
 
-close(f::Union(Figure,AbstractString,Symbol,Integer)) = pycall(plt["close"], PyAny, f)
+@compat close(f::Union{Figure,AbstractString,Symbol,Integer}) = pycall(plt["close"], PyAny, f)
 @doc LazyHelp(plt,"close") close() = pycall(plt["close"], PyAny)
 
-@doc LazyHelp(plt,"connect") connect(s::Union(AbstractString,Symbol), f::Function) = pycall(plt["connect"], PyAny, s, f)
+@compat @doc LazyHelp(plt,"connect") connect(s::Union{AbstractString,Symbol}, f::Function) = pycall(plt["connect"], PyAny, s, f)
 
 @doc LazyHelp(plt,"fill") fill(x::AbstractArray,y::AbstractArray, args...; kws...) =
     pycall(plt["fill"], PyAny, x, y, args...; kws...)
@@ -591,6 +616,8 @@ for f in (:contour, :contourf)
     @eval function $f(X::AbstractMatrix, Y::AbstractVector, args...; kws...)
         if size(X,1) == 1 || size(X,2) == 1
             $f(reshape(X, length(X)), Y, args...; kws...)
+        elseif size(X,1) > 1 && size(X,2) > 1 && isempty(args)
+            $f(X; levels=Y, kws...) # treat Y as contour levels
         else
             throw(ArgumentError("if 2nd arg is column vector, 1st arg must be row or column vector"))
         end
@@ -652,11 +679,5 @@ end
 
 using LaTeXStrings
 export LaTeXString, latexstring, @L_str, @L_mstr
-
-###########################################################################
-
-if VERSION < v"0.3-"
-    __init__() # automatic call to __init__ was added in Julia 0.3
-end
 
 end # module PyPlot
