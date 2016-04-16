@@ -132,7 +132,9 @@ function find_backend(matplotlib::PyObject)
                                   "gtk3agg"=>:gtk3, "gtk3"=>:gtk3,"gtk3cairo"=>:gtk3,
                                   "qt4agg"=>:qt, "tkagg"=>:tk,
                                   "agg"=>:none,"ps"=>:none,"pdf"=>:none,
-                                  "svg"=>:none,"cairo"=>:none,"gdk"=>:none)
+                                  "svg"=>:none,"cairo"=>:none,"gdk"=>:none,
+                                  "module://gr.matplotlib.backend_gr"=>:gr)
+
     qt2gui = @compat Dict("pyqt4"=>:qt_pyqt4, "pyside"=>:qt_pyside)
 
     rcParams = PyDict(matplotlib["rcParams"])
@@ -184,6 +186,8 @@ function find_backend(matplotlib::PyObject)
                     pygui(:default)
                     matplotlib[:use](b)
                     matplotlib[:interactive](false)
+                    return (b, g)
+                elseif g == :gr
                     return (b, g)
                 elseif PyCall.pygui_works(g)
                     # must call matplotlib.use *before* loading backends module
@@ -277,7 +281,7 @@ function __init__()
         Main.IJulia.push_posterror_hook(close_queued_figs)
     end
 
-    if isjulia_display[1]
+    if isjulia_display[1] && gui != :gr
         if backend != "Agg"
             plt[:switch_backend]("Agg")
         end
