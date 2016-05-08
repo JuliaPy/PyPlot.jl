@@ -23,11 +23,11 @@ if VERSION >= v"0.4.0-dev+1503"
     # to load up all of the documentation strings right away.
     immutable LazyHelp
         o::PyObject
-        keys::Tuple{Vararg{ASCIIString}}
+        keys::Tuple{Vararg{Compat.String}}
         LazyHelp(o::PyObject) = new(o, ())
-        LazyHelp(o::PyObject, k::ASCIIString) = new(o, (k,))
-        LazyHelp(o::PyObject, k1::ASCIIString, k2::ASCIIString) = new(o, (k1,k2))
-        LazyHelp(o::PyObject, k::Tuple{Vararg{ASCIIString}}) = new(o, k)
+        LazyHelp(o::PyObject, k::AbstractString) = new(o, (k,))
+        LazyHelp(o::PyObject, k1::AbstractString, k2::AbstractString) = new(o, (k1,k2))
+        LazyHelp(o::PyObject, k::Tuple{Vararg{AbstractString}}) = new(o, k)
     end
     function Base.writemime(io::IO, ::MIME"text/plain", h::LazyHelp)
         o = h.o
@@ -338,7 +338,7 @@ haskey(f::Figure, x) = haskey(f.o, x)
 keys(f::Figure) = keys(f.o)
 
 for (mime,fmt) in aggformats
-    @eval function writemime(io::IO, m::MIME{symbol($mime)}, f::Figure)
+    @eval @compat function writemime(io::IO, m::MIME{Symbol($mime)}, f::Figure)
         if !haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict),
                    $fmt)
             throw(MethodError(writemime, (io, m, f)))
@@ -346,7 +346,7 @@ for (mime,fmt) in aggformats
         f.o["canvas"][:print_figure](io, format=$fmt, bbox_inches="tight")
     end
     if fmt != "svg"
-        @eval mimewritable(::MIME{symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict), $fmt)
+        @eval @compat mimewritable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict), $fmt)
     end
 end
 
