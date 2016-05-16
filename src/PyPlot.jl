@@ -1,4 +1,4 @@
-VERSION >= v"0.4.0-dev+6521" && __precompile__()
+__precompile__()
 
 module PyPlot
 
@@ -15,61 +15,35 @@ type Figure
 end
 
 ###########################################################################
-
-if VERSION >= v"0.4.0-dev+1503"
-    # Julia 0.4 help system: define a documentation object
-    # that lazily looks up help from a PyObject via zero or more keys.
-    # This saves us time when loading PyPlot, since we don't have
-    # to load up all of the documentation strings right away.
-    immutable LazyHelp
-        o::PyObject
-        keys::Tuple{Vararg{Compat.String}}
-        LazyHelp(o::PyObject) = new(o, ())
-        LazyHelp(o::PyObject, k::AbstractString) = new(o, (k,))
-        LazyHelp(o::PyObject, k1::AbstractString, k2::AbstractString) = new(o, (k1,k2))
-        LazyHelp(o::PyObject, k::Tuple{Vararg{AbstractString}}) = new(o, k)
+# Julia 0.4 help system: define a documentation object
+# that lazily looks up help from a PyObject via zero or more keys.
+# This saves us time when loading PyPlot, since we don't have
+# to load up all of the documentation strings right away.
+immutable LazyHelp
+    o::PyObject
+    keys::Tuple{Vararg{Compat.String}}
+    LazyHelp(o::PyObject) = new(o, ())
+    LazyHelp(o::PyObject, k::AbstractString) = new(o, (k,))
+    LazyHelp(o::PyObject, k1::AbstractString, k2::AbstractString) = new(o, (k1,k2))
+    LazyHelp(o::PyObject, k::Tuple{Vararg{AbstractString}}) = new(o, k)
+end
+function Base.writemime(io::IO, ::MIME"text/plain", h::LazyHelp)
+    o = h.o
+    for k in h.keys
+        o = o[k]
     end
-    function Base.writemime(io::IO, ::MIME"text/plain", h::LazyHelp)
-        o = h.o
-        for k in h.keys
-            o = o[k]
-        end
-        if haskey(o, "__doc__")
-            print(io, convert(AbstractString, o["__doc__"]))
-        else
-            print(io, "no Python docstring found for ", h.k)
-        end
+    if haskey(o, "__doc__")
+        print(io, convert(AbstractString, o["__doc__"]))
+    else
+        print(io, "no Python docstring found for ", h.k)
     end
-    Base.show(io::IO, h::LazyHelp) = writemime(io, "text/plain", h)
-    function Base.Docs.catdoc(hs::LazyHelp...)
-        Base.Docs.Text() do io
-            for h in hs
-                writemime(io, MIME"text/plain"(), h)
-            end
+end
+Base.show(io::IO, h::LazyHelp) = writemime(io, "text/plain", h)
+function Base.Docs.catdoc(hs::LazyHelp...)
+    Base.Docs.Text() do io
+        for h in hs
+            writemime(io, MIME"text/plain"(), h)
         end
-    end
-else
-    # Julia 0.3:
-    # Base.Help.FUNCTION_DICT is undocumented, but it is better than nothing
-    # until Julia gets a documented docstring-like facility.
-
-    function addhelp(f::AbstractString, o::PyObject)
-        try
-            Base.Help.init_help()
-            if haskey(o, "__doc__")
-                if !haskey(Base.Help.FUNCTION_DICT, f)
-                    Base.Help.FUNCTION_DICT[f] = Any[]
-                end
-                push!(Base.Help.FUNCTION_DICT[f], convert(AbstractString, o["__doc__"]))
-            end
-        end
-    end
-    addhelp(f::Symbol, o::PyObject) = addhelp(string(f), o)
-    addhelp(f, o::PyObject, key::AbstractString) = haskey(o, key) && addhelp(f, o[key])
-
-    # no-op: we need to call addhelp at runtime
-    macro doc(h,ex)
-        esc(ex)
     end
 end
 
@@ -98,12 +72,12 @@ const art3D = PyNULL()
 
 ###########################################################################
 # file formats supported by Agg backend, from MIME types
-const aggformats = @compat Dict("application/eps" => "eps",
-                                "image/eps" => "eps",
-                                "application/pdf" => "pdf",
-                                "image/png" => "png",
-                                "application/postscript" => "ps",
-                                "image/svg+xml" => "svg")
+const aggformats = Dict("application/eps" => "eps",
+                        "image/eps" => "eps",
+                        "application/pdf" => "pdf",
+                        "image/png" => "png",
+                        "application/postscript" => "ps",
+                        "image/svg+xml" => "svg")
 
 function isdisplayok()
     for mime in keys(aggformats)
@@ -122,20 +96,20 @@ end
 
 # return (backend,gui) tuple
 function find_backend(matplotlib::PyObject)
-    gui2matplotlib = @compat Dict(:wx=>"WXAgg",:gtk=>"GTKAgg",:gtk3=>"GTK3Agg",
-                                  :qt=>"Qt4Agg",:tk=>"TkAgg")
+    gui2matplotlib = Dict(:wx=>"WXAgg",:gtk=>"GTKAgg",:gtk3=>"GTK3Agg",
+                          :qt=>"Qt4Agg",:tk=>"TkAgg")
     guis = @linux ? [:tk, :gtk3, :gtk, :qt, :wx] : [:tk, :qt, :wx, :gtk, :gtk3]
     options = [(g,gui2matplotlib[g]) for g in guis]
 
-    matplotlib2gui = @compat Dict("wx"=>:wx, "wxagg"=>:wx,
-                                  "gtkagg"=>:gtk, "gtk"=>:gtk,"gtkcairo"=>:gtk,
-                                  "gtk3agg"=>:gtk3, "gtk3"=>:gtk3,"gtk3cairo"=>:gtk3,
-                                  "qt4agg"=>:qt, "tkagg"=>:tk,
-                                  "agg"=>:none,"ps"=>:none,"pdf"=>:none,
-                                  "svg"=>:none,"cairo"=>:none,"gdk"=>:none,
-                                  "module://gr.matplotlib.backend_gr"=>:gr)
+    matplotlib2gui = Dict("wx"=>:wx, "wxagg"=>:wx,
+                          "gtkagg"=>:gtk, "gtk"=>:gtk,"gtkcairo"=>:gtk,
+                          "gtk3agg"=>:gtk3, "gtk3"=>:gtk3,"gtk3cairo"=>:gtk3,
+                          "qt4agg"=>:qt, "tkagg"=>:tk,
+                          "agg"=>:none,"ps"=>:none,"pdf"=>:none,
+                          "svg"=>:none,"cairo"=>:none,"gdk"=>:none,
+                          "module://gr.matplotlib.backend_gr"=>:gr)
 
-    qt2gui = @compat Dict("pyqt4"=>:qt_pyqt4, "pyside"=>:qt_pyside)
+    qt2gui = Dict("pyqt4"=>:qt_pyqt4, "pyside"=>:qt_pyside)
 
     rcParams = PyDict(matplotlib["rcParams"])
     default = lowercase(get(ENV, "MPLBACKEND",
@@ -271,14 +245,11 @@ function __init__()
         monkeypatch()
     end
 
-    init_pyplot_funcs()
-
     copy!(mplot3d, pyimport("mpl_toolkits.mplot3d"))
     copy!(axes3D, pyimport("mpl_toolkits.mplot3d.axes3d"))
 
     copy!(art3D, pyimport("mpl_toolkits.mplot3d.art3d"))
 
-    init_mplot3d_funcs()
     init_colormaps()
 end
 
@@ -308,12 +279,8 @@ convert(::Type{Figure}, o::PyObject) = Figure(o)
 ==(f::PyObject, g::Figure) = f == g.o
 hash(f::Figure) = hash(f.o)
 pycall(f::Figure, args...; kws...) = pycall(f.o, args...; kws...)
-if VERSION >= v"0.4.0-dev+1246" # call overloading
-    Base.call(f::Figure, args...; kws...) = pycall(f.o, PyAny, args...; kws...)
-end
-if VERSION >= v"0.4.0-dev+6471" # docstrings
-    Base.Docs.doc(f::Figure) = Base.Docs.doc(f.o)
-end
+Base.call(f::Figure, args...; kws...) = pycall(f.o, PyAny, args...; kws...)
+Base.Docs.doc(f::Figure) = Base.Docs.doc(f.o)
 
 getindex(f::Figure, x) = getindex(f.o, x)
 setindex!(f::Figure, v, x) = setindex!(f.o, v, x)
@@ -321,7 +288,7 @@ haskey(f::Figure, x) = haskey(f.o, x)
 keys(f::Figure) = keys(f.o)
 
 for (mime,fmt) in aggformats
-    @eval @compat function writemime(io::IO, m::MIME{Symbol($mime)}, f::Figure)
+    @eval function writemime(io::IO, m::MIME{Symbol($mime)}, f::Figure)
         if !haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict),
                    $fmt)
             throw(MethodError(writemime, (io, m, f)))
@@ -329,7 +296,7 @@ for (mime,fmt) in aggformats
         f.o["canvas"][:print_figure](io, format=$fmt, bbox_inches="tight")
     end
     if fmt != "svg"
-        @eval @compat mimewritable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict), $fmt)
+        @eval mimewritable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict), $fmt)
     end
 end
 
@@ -470,30 +437,16 @@ end
 
 @doc LazyHelp(plt,"step") step(x, y; kws...) = pycall(plt["step"], PyAny, x, y; kws...)
 
-@compat close(f::Union{Figure,AbstractString,Symbol,Integer}) = pycall(plt["close"], PyAny, f)
+close(f::Union{Figure,AbstractString,Symbol,Integer}) = pycall(plt["close"], PyAny, f)
 @doc LazyHelp(plt,"close") close() = pycall(plt["close"], PyAny)
 
-@compat @doc LazyHelp(plt,"connect") connect(s::Union{AbstractString,Symbol}, f::Function) = pycall(plt["connect"], PyAny, s, f)
+@doc LazyHelp(plt,"connect") connect(s::Union{AbstractString,Symbol}, f::Function) = pycall(plt["connect"], PyAny, s, f)
 
 @doc LazyHelp(plt,"fill") fill(x::AbstractArray,y::AbstractArray, args...; kws...) =
     pycall(plt["fill"], PyAny, x, y, args...; kws...)
 
 # consistent capitalization with mplot3d, avoid conflict with Base.hist2d
 @doc LazyHelp(plt,"hist2d") hist2D(args...; kws...) = pycall(plt["hist2d"], PyAny, args...; kws...)
-
-function init_pyplot_funcs()
-    if VERSION < v"0.4.0-dev+1503"
-        for f in plt_funcs
-            addhelp(f, plt, string(f))
-        end
-        addhelp("figure", orig_figure)
-        addhelp("gcf", orig_gcf)
-        addhelp("PyPlot.step", plt["step"])
-        addhelp("PyPlot.close", plt["close"])
-        addhelp("PyPlot.connect", plt["connect"])
-        addhelp("PyPlot.fill", plt["fill"])
-    end
-end
 
 # no way to use method dispatch for hist or xcorr, since their
 # argument signatures look too much like Julia's -- just use plt[:hist]
@@ -549,20 +502,6 @@ for f in zlabel_funcs
     @eval @doc LazyHelp(axes3D,"Axes3D", $fs) function $f(args...; kws...)
         ax = gca(projection="3d")
         pycall(ax[$fs], PyAny, args...; kws...)
-    end
-end
-
-function init_mplot3d_funcs()
-    if VERSION < v"0.4.0-dev+1503"
-        for f in mplot3d_funcs
-            addhelp(f, axes3D["Axes3D"], string(f))
-        end
-        addhelp("bar3D", axes3D["Axes3D"], "bar3d")
-        for f in zlabel_funcs
-            addhelp(f, axes3D["Axes3D"], string("set_", f))
-        end
-        addhelp(:surf, axes3D["Axes3D"], "plot_surface")
-        addhelp(:mesh, axes3D["Axes3D"], "plot_wireframe")
     end
 end
 
