@@ -91,8 +91,7 @@ end
 ###########################################################################
 # We allow the user to turn on or off the Python gui interactively via
 # pygui(true/false).  This is done by loading pyplot with a GUI backend
-# if possible, then switching to a Julia-display backend (if available),
-# hooking into pyplot via a monkey-patched draw_if_interactive.
+# if possible, then switching to a Julia-display backend (if available)
 
 # return (backend,gui) tuple
 function find_backend(matplotlib::PyObject)
@@ -178,7 +177,7 @@ function find_backend(matplotlib::PyObject)
                     end
                     if pyexists("matplotlib.backends.backend_" * lowercase(b))
                         isjulia_display[1] || pygui_start(g)
-                        matplotlib[:interactive](Base.isinteractive())
+                        matplotlib[:interactive](!isjulia_display[1] && Base.isinteractive())
                         return (b, g)
                     end
                 end
@@ -191,7 +190,7 @@ function find_backend(matplotlib::PyObject)
                 rcParams["backend.qt4"] = "PySide"
             end
             isjulia_display[1] || pygui_start(gui)
-            matplotlib[:interactive](Base.isinteractive())
+            matplotlib[:interactive](!isjulia_display[1] && Base.isinteractive())
             return (gui2matplotlib[gui], gui)
         end
     catch
@@ -201,7 +200,7 @@ function find_backend(matplotlib::PyObject)
         end
         pygui(:default)
         matplotlib[:use]("Agg") # GUI not available
-        matplotlib[:interactive](Base.isinteractive() && isdisplayok())
+        matplotlib[:interactive](false)
         return ("Agg", :none)
     end
 end
@@ -227,22 +226,20 @@ function __init__()
     pytype_mapping(plt["Figure"], Figure)
 
     copy!(Gcf, pyimport("matplotlib._pylab_helpers")["Gcf"])
-    copy!(orig_draw, plt["draw_if_interactive"])
     copy!(orig_gcf, plt["gcf"])
     copy!(orig_figure, plt["figure"])
-    copy!(orig_show, plt["show"])
+    plt["gcf"] = gcf
+    plt["figure"] = figure
 
     if isdefined(Main, :IJulia) && Main.IJulia.inited
         Main.IJulia.push_preexecute_hook(force_new_fig)
-        Main.IJulia.push_postexecute_hook(close_queued_figs)
-        Main.IJulia.push_posterror_hook(close_queued_figs)
+        Main.IJulia.push_postexecute_hook(display_figs)
+        Main.IJulia.push_posterror_hook(close_figs)
     end
 
-    if isjulia_display[1] && gui != :gr
-        if backend != "Agg"
-            plt[:switch_backend]("Agg")
-        end
-        monkeypatch()
+    if isjulia_display[1] && gui != :gr && backend != "Agg"
+        plt[:switch_backend]("Agg")
+        plt[:ioff]()
     end
 
     copy!(mplot3d, pyimport("mpl_toolkits.mplot3d"))
@@ -257,10 +254,8 @@ function pygui(b::Bool)
     if !b != isjulia_display[1]
         if backend != "Agg"
             plt[:switch_backend](b ? backend : "Agg")
-            monkeypatch()
-            if b
-                pygui_start(gui) # make sure event loop is started
-            end
+            b && pygui_start(gui) # make sure event loop is started
+            matplotlib[:interactive](b && Base.isinteractive())
         elseif b
             error("No working GUI backend found for matplotlib.")
         end
@@ -308,78 +303,42 @@ svg() = SVG[1]
 svg(b::Bool) = (SVG[1] = b)
 
 ###########################################################################
-# Monkey-patch pylab to call redisplay after each drawing command
-# (which calls draw_if_interactive) for Julia displays.
+# In IJulia, we want to automatically display any figures
+# at the end of cell execution, and then close them.   However,
+# we don't want to display/close figures being used in withfig,
+# since the user is keeping track of these in some other way,
+# e.g. for interactive widgets.
 
 Base.isempty(f::Figure) = isempty(pycall(f["get_axes"], PyVector))
 
-const drew_something = [false]
+# We keep a set of figure numbers for the figures used in withfig, because
+# for these figures we don't want to auto-display or auto-close them
+# when the cell finishes executing.   (We store figure numbers, rather
+# than Figure objects, since the latter would prevent the figures from
+# finalizing and hence closing.)  Closing the figure removes it from this set.
+const withfig_fignums = Set{Int}()
 
-# monkey-patch draw_if_interactive to queue the figure for drawing in IJulia
-function draw_if_interactive()
+function display_figs() # called after IJulia cell executes
     if isjulia_display[1]
-        if pycall(matplotlib["is_interactive"], Bool)
-            manager = Gcf[:get_active]()
-            if manager != nothing
-                fig = Figure(manager["canvas"]["figure"])
-                redisplay(fig)
-                drew_something[1] = true
+        for manager in Gcf[:get_all_fig_managers]()
+            f = manager["canvas"]["figure"]
+            if f[:number] ∉ withfig_fignums
+                fig = Figure(f)
+                isempty(fig) || display(fig)
+                pycall(plt["close"], PyAny, f)
             end
         end
-    else
-        pycall(orig_draw, PyObject)
     end
-    nothing
 end
 
-# The logic of display/redisplay/close is a bit complicated.  In
-# IJulia, we want to automatically display any figures that were
-# queued (via redisplay in draw_if_interactive) at the end of the cell
-# execution, and then close them.  However, we don't want to
-# close/display *all* figures, as there may be some other figures that
-# the user is keeping track of in some other way, e.g. for interactive
-# widgets.  So, we only want to close figures in the
-# IJulia.displayqueue.  Furthermore, if the user explicitly calls
-# display() on a figure or does so implicitly by returning a Figure
-# object from the cell, we still want to eventually close the figure
-# even though display removes it from the displayqueue, so we need to
-# keep track of it in a separate closequeue in that case.
-
-# queue of figures that need closing despite being removed from displayqueue
-const closequeue = Figure[]
-function pushclose(f::Figure)
-    if !in(f, closequeue)
-        push!(closequeue, f)
-    end
-    return f
-end
-
-function display_figs() # replaces pyplot.show
+function close_figs() # called after error in IJulia cell
     if isjulia_display[1]
-        if drew_something[1]
-            for manager in Gcf[:get_all_fig_managers]()
-                display(pushclose(Figure(manager["canvas"]["figure"])))
-            end
-            drew_something[1] = false # reset until next drawing command
-        end
-    else
-        pycall(orig_show, PyObject)
-    end
-    nothing
-end
-
-function close_queued_figs()
-    if isjulia_display[1] && (drew_something[1] || !isempty(closequeue))
-        for f in Main.IJulia.displayqueue
-            if isa(f, Figure)
-                plt[:close](f[:number])
+        for manager in Gcf[:get_all_fig_managers]()
+            f = manager["canvas"]["figure"]
+            if f[:number] ∉ withfig_fignums
+                pycall(plt["close"], PyAny, f)
             end
         end
-        for f in closequeue
-            plt[:close](f[:number])
-        end
-        empty!(closequeue)
-        drew_something[1] = false # reset until next drawing command
     end
 end
 
@@ -404,26 +363,17 @@ end
     end
 end
 
-function monkeypatch()
-    plt["draw_if_interactive"] = draw_if_interactive
-    plt["show"] = display_figs
-    plt["gcf"] = gcf
-    plt["figure"] = figure
-end
-
 ###########################################################################
 
 # export documented pyplot API (http://matplotlib.org/api/pyplot_api.html)
-export acorr,annotate,arrow,autoscale,autumn,axes,axhline,axhspan,axis,axvline,axvspan,bar,barbs,barh,bone,box,boxplot,broken_barh,cla,clabel,clf,clim,cohere,colorbar,colors,contour,contourf,cool,copper,csd,delaxes,disconnect,draw,errorbar,eventplot,figaspect,figimage,figlegend,figtext,figure,fill_between,fill_betweenx,findobj,flag,gca,gcf,gci,get_current_fig_manager,get_figlabels,get_fignums,get_plot_commands,ginput,gray,grid,hexbin,hist2D,hlines,hold,hot,hsv,imread,imsave,imshow,ioff,ion,ishold,jet,legend,locator_params,loglog,margins,matshow,minorticks_off,minorticks_on,over,pause,pcolor,pcolormesh,pie,pink,plot,plot_date,plotfile,polar,prism,psd,quiver,quiverkey,rc,rc_context,rcdefaults,rgrids,savefig,sca,scatter,sci,semilogx,semilogy,set_cmap,setp,show,specgram,spectral,spring,spy,stackplot,stem,step,streamplot,subplot,subplot2grid,subplot_tool,subplots,subplots_adjust,summer,suptitle,switch_backend,table,text,thetagrids,tick_params,ticklabel_format,tight_layout,title,tricontour,tricontourf,tripcolor,triplot,twinx,twiny,vlines,waitforbuttonpress,winter,xkcd,xlabel,xlim,xscale,xticks,ylabel,ylim,yscale,yticks
+export acorr,annotate,arrow,autoscale,autumn,axes,axhline,axhspan,axis,axvline,axvspan,bar,barbs,barh,bone,box,boxplot,broken_barh,cla,clabel,clf,clim,cohere,colorbar,colors,contour,contourf,cool,copper,csd,delaxes,disconnect,draw,errorbar,eventplot,figaspect,figimage,figlegend,figtext,figure,fill_between,fill_betweenx,findobj,flag,gca,gcf,gci,get_current_fig_manager,get_figlabels,get_fignums,get_plot_commands,ginput,gray,grid,hexbin,hist2D,hlines,hold,hot,hsv,imread,imsave,imshow,ioff,ion,ishold,jet,legend,locator_params,loglog,margins,matshow,minorticks_off,minorticks_on,over,pause,pcolor,pcolormesh,pie,pink,plot,plot_date,plotfile,polar,prism,psd,quiver,quiverkey,rc,rc_context,rcdefaults,rgrids,savefig,sca,scatter,sci,semilogx,semilogy,set_cmap,setp,show,specgram,spectral,spring,spy,stackplot,stem,step,streamplot,subplot,subplot2grid,subplot_tool,subplots,subplots_adjust,summer,suptitle,table,text,thetagrids,tick_params,ticklabel_format,tight_layout,title,tricontour,tricontourf,tripcolor,triplot,twinx,twiny,vlines,waitforbuttonpress,winter,xkcd,xlabel,xlim,xscale,xticks,ylabel,ylim,yscale,yticks
 
 # The following pyplot functions must be handled specially since they
 # overlap with standard Julia functions:
 #          close, connect, fill, hist, xcorr
 import Base: close, connect, fill, step
 
-show() = pycall(plt["show"], PyAny) # == display_figs after monkeypatch
-
-const plt_funcs = (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:axis,:axvline,:axvspan,:bar,:barbs,:barh,:bone,:box,:boxplot,:broken_barh,:cla,:clabel,:clf,:clim,:cohere,:colorbar,:colors,:contour,:contourf,:cool,:copper,:csd,:delaxes,:disconnect,:draw,:errorbar,:eventplot,:figaspect,:figimage,:figlegend,:figtext,:fill_between,:fill_betweenx,:findobj,:flag,:gca,:gci,:get_current_fig_manager,:get_figlabels,:get_fignums,:get_plot_commands,:ginput,:gray,:grid,:hexbin,:hlines,:hold,:hot,:hsv,:imread,:imsave,:imshow,:ioff,:ion,:ishold,:jet,:legend,:locator_params,:loglog,:margins,:matshow,:minorticks_off,:minorticks_on,:over,:pause,:pcolor,:pcolormesh,:pie,:pink,:plot,:plot_date,:plotfile,:polar,:prism,:psd,:quiver,:quiverkey,:rc,:rc_context,:rcdefaults,:rgrids,:savefig,:sca,:scatter,:sci,:semilogx,:semilogy,:set_cmap,:setp,:specgram,:spectral,:spring,:spy,:stackplot,:stem,:streamplot,:subplot,:subplot2grid,:subplot_tool,:subplots,:subplots_adjust,:summer,:suptitle,:switch_backend,:table,:text,:thetagrids,:tick_params,:ticklabel_format,:tight_layout,:title,:tricontour,:tricontourf,:tripcolor,:triplot,:twinx,:twiny,:vlines,:waitforbuttonpress,:winter,:xkcd,:xlabel,:xlim,:xscale,:xticks,:ylabel,:ylim,:yscale,:yticks)
+const plt_funcs = (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:axhspan,:axis,:axvline,:axvspan,:bar,:barbs,:barh,:bone,:box,:boxplot,:broken_barh,:cla,:clabel,:clf,:clim,:cohere,:colorbar,:colors,:contour,:contourf,:cool,:copper,:csd,:delaxes,:disconnect,:draw,:errorbar,:eventplot,:figaspect,:figimage,:figlegend,:figtext,:fill_between,:fill_betweenx,:findobj,:flag,:gca,:gci,:get_current_fig_manager,:get_figlabels,:get_fignums,:get_plot_commands,:ginput,:gray,:grid,:hexbin,:hlines,:hold,:hot,:hsv,:imread,:imsave,:imshow,:ioff,:ion,:ishold,:jet,:legend,:locator_params,:loglog,:margins,:matshow,:minorticks_off,:minorticks_on,:over,:pause,:pcolor,:pcolormesh,:pie,:pink,:plot,:plot_date,:plotfile,:polar,:prism,:psd,:quiver,:quiverkey,:rc,:rc_context,:rcdefaults,:rgrids,:savefig,:sca,:scatter,:sci,:semilogx,:semilogy,:set_cmap,:setp,:specgram,:spectral,:spring,:spy,:stackplot,:stem,:streamplot,:subplot,:subplot2grid,:subplot_tool,:subplots,:subplots_adjust,:summer,:suptitle,:table,:text,:thetagrids,:tick_params,:ticklabel_format,:tight_layout,:title,:tricontour,:tricontourf,:tripcolor,:triplot,:twinx,:twiny,:vlines,:waitforbuttonpress,:winter,:xkcd,:xlabel,:xlim,:xscale,:xticks,:ylabel,:ylim,:yscale,:yticks)
 
 for f in plt_funcs
     sf = string(f)
@@ -437,7 +387,12 @@ end
 
 @doc LazyHelp(plt,"step") step(x, y; kws...) = pycall(plt["step"], PyAny, x, y; kws...)
 
-close(f::Union{Figure,AbstractString,Symbol,Integer}) = pycall(plt["close"], PyAny, f)
+close(f::Figure) = close(f[:number])
+function close(f::Integer)
+    pop!(withfig_fignums, f, f)
+    pycall(plt["close"], PyAny, f)
+end
+close(f::Union{AbstractString,Symbol}) = pycall(plt["close"], PyAny, f)
 @doc LazyHelp(plt,"close") close() = pycall(plt["close"], PyAny)
 
 @doc LazyHelp(plt,"connect") connect(s::Union{AbstractString,Symbol}, f::Function) = pycall(plt["connect"], PyAny, s, f)
@@ -578,6 +533,7 @@ end
 
 function withfig(actions::Function, f::Figure; clear=true)
     ax_save = gca()
+    push!(withfig_fignums, f[:number])
     figure(f[:number])
     finalizer(f, close)
     try
