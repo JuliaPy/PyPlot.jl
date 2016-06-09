@@ -208,7 +208,7 @@ end
 # initialization -- anything that depends on Python has to go here,
 # so that it occurs at runtime (while the rest of PyPlot can be precompiled).
 function __init__()
-    global const isjulia_display = Bool[isdisplayok()]
+    global const isjulia_display = Bool[!haskey(ENV, "OVERRIDE_PYPLOT_DISPLAY") && isdisplayok()]
     copy!(matplotlib, pyimport_conda("matplotlib", "matplotlib"))
     global const version = try
         convert(VersionNumber, matplotlib[:__version__])
