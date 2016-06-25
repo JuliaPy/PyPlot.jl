@@ -2,5 +2,5 @@ julia 0.4
 PyCall 1.5
 Colors
 LaTeXStrings
-Compat 0.7.15
+Compat 0.8.0
 Conda

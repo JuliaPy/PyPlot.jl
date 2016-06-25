@@ -4,10 +4,11 @@ module PyPlot
 
 using PyCall, Conda
 import PyCall: PyObject, pygui, pycall, pyexists
-import Base: convert, ==, isequal, hash, writemime, getindex, setindex!, haskey, keys, show, mimewritable
+import Base: convert, ==, isequal, hash, getindex, setindex!, haskey, keys, show, mimewritable
 export Figure, plt, matplotlib, pygui, withfig
 
 using Compat
+@compat import Base.show
 
 # Wrapper around matplotlib Figure, supporting graphics I/O and pretty display
 type Figure
@@ -27,7 +28,7 @@ immutable LazyHelp
     LazyHelp(o::PyObject, k1::AbstractString, k2::AbstractString) = new(o, (k1,k2))
     LazyHelp(o::PyObject, k::Tuple{Vararg{AbstractString}}) = new(o, k)
 end
-function Base.writemime(io::IO, ::MIME"text/plain", h::LazyHelp)
+@compat function show(io::IO, ::MIME"text/plain", h::LazyHelp)
     o = h.o
     for k in h.keys
         o = o[k]
@@ -42,7 +43,7 @@ Base.show(io::IO, h::LazyHelp) = writemime(io, "text/plain", h)
 function Base.Docs.catdoc(hs::LazyHelp...)
     Base.Docs.Text() do io
         for h in hs
-            writemime(io, MIME"text/plain"(), h)
+            @compat show(io, MIME"text/plain"(), h)
         end
     end
 end
@@ -97,7 +98,11 @@ end
 function find_backend(matplotlib::PyObject)
     gui2matplotlib = Dict(:wx=>"WXAgg",:gtk=>"GTKAgg",:gtk3=>"GTK3Agg",
                           :qt=>"Qt4Agg",:tk=>"TkAgg")
-    guis = @linux ? [:tk, :gtk3, :gtk, :qt, :wx] : [:tk, :qt, :wx, :gtk, :gtk3]
+    @static if is_linux()
+        guis = [:tk, :gtk3, :gtk, :qt, :wx]
+    else
+        guis = [:tk, :qt, :wx, :gtk, :gtk3]
+    end
     options = [(g,gui2matplotlib[g]) for g in guis]
 
     matplotlib2gui = Dict("wx"=>:wx, "wxagg"=>:wx,
@@ -149,7 +154,13 @@ function find_backend(matplotlib::PyObject)
         # success(`xdpyinfo`), but only if xdpyinfo is installed.]
 
         if options[1][1] != :none
-            @unix_only (@osx ? nothing : ENV["DISPLAY"])
+            @static if is_unix()
+                @static if is_apple()
+                    nothing
+                else
+                    ENV["DISPLAY"]
+                end
+            end
         end
 
         if PyCall.gui == :default
@@ -274,7 +285,7 @@ convert(::Type{Figure}, o::PyObject) = Figure(o)
 ==(f::PyObject, g::Figure) = f == g.o
 hash(f::Figure) = hash(f.o)
 pycall(f::Figure, args...; kws...) = pycall(f.o, args...; kws...)
-Base.call(f::Figure, args...; kws...) = pycall(f.o, PyAny, args...; kws...)
+@compat (f::Figure)(args...; kws...) = pycall(f.o, PyAny, args...; kws...)
 Base.Docs.doc(f::Figure) = Base.Docs.doc(f.o)
 
 getindex(f::Figure, x) = getindex(f.o, x)
@@ -283,7 +294,7 @@ haskey(f::Figure, x) = haskey(f.o, x)
 keys(f::Figure) = keys(f.o)
 
 for (mime,fmt) in aggformats
-    @eval function writemime(io::IO, m::MIME{Symbol($mime)}, f::Figure)
+    @eval @compat function show(io::IO, m::MIME{Symbol($mime)}, f::Figure)
         if !haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict),
                    $fmt)
             throw(MethodError(writemime, (io, m, f)))
