@@ -398,6 +398,8 @@ end
 
 @doc LazyHelp(plt,"step") step(x, y; kws...) = pycall(plt["step"], PyAny, x, y; kws...)
 
+Base.show() = begin pycall(plt[:show], PyObject); nothing; end
+
 close(f::Figure) = close(f[:number])
 function close(f::Integer)
     pop!(withfig_fignums, f, f)
