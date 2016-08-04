@@ -2,7 +2,7 @@ __precompile__()
 
 module PyPlot
 
-using PyCall, Conda
+using PyCall
 import PyCall: PyObject, pygui, pycall, pyexists
 import Base: convert, ==, isequal, hash, getindex, setindex!, haskey, keys, show, mimewritable
 export Figure, plt, matplotlib, pygui, withfig
@@ -98,8 +98,11 @@ end
 function find_backend(matplotlib::PyObject)
     gui2matplotlib = Dict(:wx=>"WXAgg",:gtk=>"GTKAgg",:gtk3=>"GTK3Agg",
                           :qt=>"Qt4Agg",:tk=>"TkAgg")
-    @static if is_linux()
+    conda = PyCall.conda || !isempty(PyCall.anaconda_conda())
+    if is_linux()
         guis = [:tk, :gtk3, :gtk, :qt, :wx]
+    elseif is_apple() && conda # partially work around #164
+        guis = [:qt, :tk, :wx, :gtk, :gtk3]
     else
         guis = [:tk, :qt, :wx, :gtk, :gtk3]
     end
@@ -124,20 +127,17 @@ function find_backend(matplotlib::PyObject)
         # if the user explicitly requested a particular GUI,
         # it makes sense to ensure that the relevant Conda
         # package is installed (if we are using Conda).
-        if PyCall.conda
+        if conda
             if defaultgui == :qt
                 # default to pyqt rather than pyside, as below:
                 defaultgui = haskey(rcParams,"backend.qt4") ? qt2gui[lowercase(rcParams["backend.qt4"])] : :qt_pyqt4
-                if defaultgui == :qt_pyside && !pyexists("PySide")
-                    info("Installing PySide via the Conda package")
-                    Conda.add("pyside")
-                elseif !pyexists("PyQt4")
-                    info("Installing PyQt4 via the Conda package")
-                    Conda.add("pyqt")
+                if defaultgui == :qt_pyside
+                    pyimport_conda("PySide", "pyside")
+                else
+                    pyimport_conda("PyQt4", "pyqt")
                 end
-            elseif defaultgui == :wx && !pyexists("wx")
-                info("Installing wxpython via the Conda package")
-                Conda.add("wxpython")
+            elseif defaultgui == :wx
+                pyimport_conda("wx", "wxpython")
             end
         end
 
