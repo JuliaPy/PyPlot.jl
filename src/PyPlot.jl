@@ -297,7 +297,7 @@ for (mime,fmt) in aggformats
     @eval @compat function show(io::IO, m::MIME{Symbol($mime)}, f::Figure)
         if !haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict),
                    $fmt)
-            throw(MethodError(VERSION < v"0.5.0-dev+4340" ? writemime : show, (io, m, f)))
+            throw(MethodError(@static(VERSION < v"0.5.0-dev+4340" ? writemime : show), (io, m, f)))
         end
         f.o["canvas"][:print_figure](io, format=$fmt, bbox_inches="tight")
     end
