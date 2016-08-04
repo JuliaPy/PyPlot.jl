@@ -126,7 +126,7 @@ around `matplotlib.pyplot.Figure`) by calling `gcf()`.
 The `Figure` type supports Julia's [multimedia I/O
 API](http://docs.julialang.org/en/latest/stdlib/base/#multimedia-i-o),
 so you can use `display(fig)` to show a `fig::PyFigure` and
-`writemime(io, mime, fig)` to write it to a given `mime` type string
+`show(io, mime, fig)` (or `writemime` in Julia 0.4) to write it to a given `mime` type string
 (e.g. `"image/png"` or `"application/pdf"`) that is supported by the
 Matplotlib backend.
 

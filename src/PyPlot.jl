@@ -39,7 +39,7 @@ end
         print(io, "no Python docstring found for ", h.k)
     end
 end
-Base.show(io::IO, h::LazyHelp) = writemime(io, "text/plain", h)
+Base.show(io::IO, h::LazyHelp) = @compat show(io, "text/plain", h)
 function Base.Docs.catdoc(hs::LazyHelp...)
     Base.Docs.Text() do io
         for h in hs
@@ -297,7 +297,7 @@ for (mime,fmt) in aggformats
     @eval @compat function show(io::IO, m::MIME{Symbol($mime)}, f::Figure)
         if !haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict),
                    $fmt)
-            throw(MethodError(writemime, (io, m, f)))
+            throw(MethodError(VERSION < v"0.5.0-dev+4340" ? writemime : show, (io, m, f)))
         end
         f.o["canvas"][:print_figure](io, format=$fmt, bbox_inches="tight")
     end
