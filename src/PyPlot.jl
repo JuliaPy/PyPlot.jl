@@ -134,7 +134,7 @@ function find_backend(matplotlib::PyObject)
                 if defaultgui == :qt_pyside
                     pyimport_conda("PySide", "pyside")
                 else
-                    pyimport_conda("PyQt4", "pyqt")
+                    pyimport_conda("PyQt5", "pyqt")
                 end
             elseif defaultgui == :wx
                 pyimport_conda("wx", "wxpython")
