@@ -265,8 +265,12 @@ function pygui(b::Bool)
     if !b != isjulia_display[1]
         if backend != "Agg"
             plt[:switch_backend](b ? backend : "Agg")
-            b && pygui_start(gui) # make sure event loop is started
-            matplotlib[:interactive](b && Base.isinteractive())
+            if b
+                pygui_start(gui) # make sure event loop is started
+                Base.isinteractive() && plt["ion"]()
+            else
+                plt["ioff"]()
+            end
         elseif b
             error("No working GUI backend found for matplotlib.")
         end
