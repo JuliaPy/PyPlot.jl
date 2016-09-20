@@ -168,14 +168,14 @@ function find_backend(matplotlib::PyObject)
             for (g,b) in options
                 if g == :none # Matplotlib is configured to be non-interactive
                     pygui(:default)
-                    matplotlib[:use](b)
-                    matplotlib[:interactive](false)
+                    matplotlib["use"](b)
+                    matplotlib["interactive"](false)
                     return (b, g)
                 elseif g == :gr
                     return (b, g)
                 elseif PyCall.pygui_works(g)
                     # must call matplotlib.use *before* loading backends module
-                    matplotlib[:use](b)
+                    matplotlib["use"](b)
                     if g == :qt
                         if haskey(rcParams,"backend.qt4")
                             g = qt2gui[lowercase(rcParams["backend.qt4"])]
@@ -188,7 +188,7 @@ function find_backend(matplotlib::PyObject)
                     end
                     if pyexists("matplotlib.backends.backend_" * lowercase(b))
                         isjulia_display[1] || pygui_start(g)
-                        matplotlib[:interactive](!isjulia_display[1] && Base.isinteractive())
+                        matplotlib["interactive"](!isjulia_display[1] && Base.isinteractive())
                         return (b, g)
                     end
                 end
@@ -196,12 +196,12 @@ function find_backend(matplotlib::PyObject)
             error("no gui found") # go to catch clause below
         else # the user specified a desired backend via pygui(gui)
             gui = pygui()
-            matplotlib[:use](gui2matplotlib[gui])
+            matplotlib["use"](gui2matplotlib[gui])
             if (gui==:qt && !PyCall.pygui_works(:qt_pyqt4)) || gui==:qt_pyside
                 rcParams["backend.qt4"] = "PySide"
             end
             isjulia_display[1] || pygui_start(gui)
-            matplotlib[:interactive](!isjulia_display[1] && Base.isinteractive())
+            matplotlib["interactive"](!isjulia_display[1] && Base.isinteractive())
             return (gui2matplotlib[gui], gui)
         end
     catch
@@ -210,8 +210,8 @@ function find_backend(matplotlib::PyObject)
             isjulia_display[1] = true
         end
         pygui(:default)
-        matplotlib[:use]("Agg") # GUI not available
-        matplotlib[:interactive](false)
+        matplotlib["use"]("Agg") # GUI not available
+        matplotlib["interactive"](false)
         return ("Agg", :none)
     end
 end
@@ -249,8 +249,8 @@ function __init__()
     end
 
     if isjulia_display[1] && gui != :gr && backend != "Agg"
-        plt[:switch_backend]("Agg")
-        plt[:ioff]()
+        plt["switch_backend"]("Agg")
+        plt["ioff"]()
     end
 
     copy!(mplot3d, pyimport("mpl_toolkits.mplot3d"))
@@ -264,7 +264,7 @@ end
 function pygui(b::Bool)
     if !b != isjulia_display[1]
         if backend != "Agg"
-            plt[:switch_backend](b ? backend : "Agg")
+            plt["switch_backend"](b ? backend : "Agg")
             if b
                 pygui_start(gui) # make sure event loop is started
                 Base.isinteractive() && plt["ion"]()
@@ -303,7 +303,7 @@ for (mime,fmt) in aggformats
                    $fmt)
             throw(MethodError(@static(VERSION < v"0.5.0-dev+4340" ? writemime : show), (io, m, f)))
         end
-        f.o["canvas"][:print_figure](io, format=$fmt, bbox_inches="tight")
+        f.o["canvas"]["print_figure"](io, format=$fmt, bbox_inches="tight")
     end
     if fmt != "svg"
         @eval mimewritable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict), $fmt)
@@ -335,7 +335,7 @@ const withfig_fignums = Set{Int}()
 
 function display_figs() # called after IJulia cell executes
     if isjulia_display[1]
-        for manager in Gcf[:get_all_fig_managers]()
+        for manager in Gcf["get_all_fig_managers"]()
             f = manager["canvas"]["figure"]
             if f[:number] ∉ withfig_fignums
                 fig = Figure(f)
@@ -348,7 +348,7 @@ end
 
 function close_figs() # called after error in IJulia cell
     if isjulia_display[1]
-        for manager in Gcf[:get_all_fig_managers]()
+        for manager in Gcf["get_all_fig_managers"]()
             f = manager["canvas"]["figure"]
             if f[:number] ∉ withfig_fignums
                 pycall(plt["close"], PyAny, f)
@@ -402,7 +402,7 @@ end
 
 @doc LazyHelp(plt,"step") step(x, y; kws...) = pycall(plt["step"], PyAny, x, y; kws...)
 
-Base.show() = begin pycall(plt[:show], PyObject); nothing; end
+Base.show() = begin pycall(plt["show"], PyObject); nothing; end
 
 close(f::Figure) = close(f[:number])
 function close(f::Integer)
@@ -436,8 +436,8 @@ function bar{T<:AbstractString}(x::AbstractVector{T}, y; kws...)
     p = bar(xi, y; kws...)
     ax = any(kw -> kw[1] == :orientation && lowercase(kw[2]) == "horizontal",
              kws) ? gca()["yaxis"] : gca()["xaxis"]
-    ax[:set_ticks](xi)
-    ax[:set_ticklabels](x)
+    ax["set_ticks"](xi)
+    ax["set_ticklabels"](x)
     return p
 end
 
