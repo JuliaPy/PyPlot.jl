@@ -97,26 +97,28 @@ end
 # return (backend,gui) tuple
 function find_backend(matplotlib::PyObject)
     gui2matplotlib = Dict(:wx=>"WXAgg",:gtk=>"GTKAgg",:gtk3=>"GTK3Agg",
-                          :qt=>"Qt4Agg",:tk=>"TkAgg")
+                          :qt_pyqt4=>"Qt4Agg", :qt_pyqt5=>"Qt5Agg",
+                          :qt_pyside=>"Qt4Agg", :qt4=>"Qt4Agg",
+                          :qt5=>"Qt5Agg", :qt=>"Qt4Agg",:tk=>"TkAgg")
     conda = PyCall.conda || !isempty(PyCall.anaconda_conda())
     if is_linux()
-        guis = [:tk, :gtk3, :gtk, :qt, :wx]
+        guis = [:tk, :gtk3, :gtk, :qt5, :qt4, :wx]
     elseif is_apple() && conda # partially work around #164
-        guis = [:qt, :tk, :wx, :gtk, :gtk3]
+        guis = [:qt5, :qt4, :tk, :wx, :gtk, :gtk3]
     else
-        guis = [:tk, :qt, :wx, :gtk, :gtk3]
+        guis = [:tk, :qt5, :qt4, :wx, :gtk, :gtk3]
     end
     options = [(g,gui2matplotlib[g]) for g in guis]
 
     matplotlib2gui = Dict("wx"=>:wx, "wxagg"=>:wx,
                           "gtkagg"=>:gtk, "gtk"=>:gtk,"gtkcairo"=>:gtk,
                           "gtk3agg"=>:gtk3, "gtk3"=>:gtk3,"gtk3cairo"=>:gtk3,
-                          "qt4agg"=>:qt, "tkagg"=>:tk,
+                          "qt5agg"=>:qt5, "qt4agg"=>:qt4, "tkagg"=>:tk,
                           "agg"=>:none,"ps"=>:none,"pdf"=>:none,
                           "svg"=>:none,"cairo"=>:none,"gdk"=>:none,
                           "module://gr.matplotlib.backend_gr"=>:gr)
 
-    qt2gui = Dict("pyqt4"=>:qt_pyqt4, "pyside"=>:qt_pyside)
+    qt2gui = Dict("pyqt5"=>:qt_pyqt5, "pyqt4"=>:qt_pyqt4, "pyside"=>:qt_pyside)
 
     rcParams = PyDict(matplotlib["rcParams"])
     default = lowercase(get(ENV, "MPLBACKEND",
@@ -128,7 +130,7 @@ function find_backend(matplotlib::PyObject)
         # it makes sense to ensure that the relevant Conda
         # package is installed (if we are using Conda).
         if conda
-            if defaultgui == :qt
+            if defaultgui == :qt || defaultgui == :qt4
                 # default to pyqt rather than pyside, as below:
                 defaultgui = haskey(rcParams,"backend.qt4") ? qt2gui[lowercase(rcParams["backend.qt4"])] : :qt_pyqt4
                 if defaultgui == :qt_pyside
@@ -140,6 +142,8 @@ function find_backend(matplotlib::PyObject)
                         pyimport("PyQt4")
                     end
                 end
+            elseif defaultgui == :qt5
+                pyimport_conda("PyQt5", "pyqt")
             elseif defaultgui == :wx
                 pyimport_conda("wx", "wxpython")
             end
@@ -156,15 +160,8 @@ function find_backend(matplotlib::PyObject)
         # throw exception (drop to catch block below) if DISPLAY
         # is not set.  [Might be more reliable to test
         # success(`xdpyinfo`), but only if xdpyinfo is installed.]
-
-        if options[1][1] != :none
-            @static if is_unix()
-                @static if is_apple()
-                    nothing
-                else
-                    ENV["DISPLAY"]
-                end
-            end
+        if options[1][1] != :none && is_unix() && !is_apple()
+            ENV["DISPLAY"]
         end
 
         if PyCall.gui == :default
@@ -180,10 +177,10 @@ function find_backend(matplotlib::PyObject)
                 elseif PyCall.pygui_works(g)
                     # must call matplotlib.use *before* loading backends module
                     matplotlib["use"](b)
-                    if g == :qt
+                    if g == :qt || g == :qt4
                         if haskey(rcParams,"backend.qt4")
                             g = qt2gui[lowercase(rcParams["backend.qt4"])]
-                        elseif !PyCall.pygui_works(:qt_pyqt4)
+                        elseif !PyCall.pyexists("PyQt5") && !PyCall.pyexists("PyQt4")
                             # both Matplotlib and PyCall default to PyQt4
                             # if it is available, but we need to tell
                             # Matplotlib to use PySide otherwise.
@@ -201,16 +198,16 @@ function find_backend(matplotlib::PyObject)
         else # the user specified a desired backend via pygui(gui)
             gui = pygui()
             matplotlib["use"](gui2matplotlib[gui])
-            if (gui==:qt && !PyCall.pygui_works(:qt_pyqt4)) || gui==:qt_pyside
+            if (gui==:qt && !PyCall.pyexists("PyQt5") && !PyCall.pyexists("PyQt4")) || gui==:qt_pyside
                 rcParams["backend.qt4"] = "PySide"
             end
             isjulia_display[1] || pygui_start(gui)
             matplotlib["interactive"](!isjulia_display[1] && Base.isinteractive())
             return (gui2matplotlib[gui], gui)
         end
-    catch
+    catch e
         if !isjulia_display[1]
-            warn("No working GUI backend found for matplotlib.")
+            warn("No working GUI backend found for matplotlib")
             isjulia_display[1] = true
         end
         pygui(:default)
