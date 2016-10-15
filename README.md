@@ -169,7 +169,7 @@ If no Julia graphics backend is available when PyPlot is imported, then
 ### Choosing a Python GUI toolkit
 
 Only the [wxWidgets](http://www.wxwidgets.org/),
-[GTK+](http://www.gtk.org/) (version 2 or 3), and [Qt](http://qt-project.org/) (via the
+[GTK+](http://www.gtk.org/) (version 2 or 3), and [Qt](http://qt-project.org/) (version 4 or 5; via the PyQt5, 
 [PyQt4](http://wiki.python.org/moin/PyQt4) or
 [PySide](http://qt-project.org/wiki/PySide)), Python GUI backends are
 supported by PyPlot.  (Obviously, you must have installed one of these
@@ -183,7 +183,7 @@ using PyCall
 pygui(gui)
 using PyPlot
 ```
-where `gui` can currently be one of `:wx`, `:gtk`, or `:qt`.  You can
+where `gui` can currently be one of `:wx`, `:gtk3`, `:gtk`, `:qt5`, `:qt4`, or `:qt`. You can
 also set a default via the Matplotlib `rcParams['backend']` parameter in your
 [matplotlibrc](http://matplotlib.org/users/customizing.html) file.
 
