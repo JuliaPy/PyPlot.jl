@@ -72,6 +72,19 @@ pip install numpy scipy matplotlib
 (You may want to add the two `export` commands to your `~/.profile` file so that they
 are automatically executed whenever you start a shell.)
 
+In addition it might be a good idea to make sure that there's a working GUI backend:
+```
+using PyCall
+pyimport("matplotlib")["matplotlib_fname"]()
+```
+In this file make sure to change 
+```
+backend : macosxby
+```
+to
+```
+backend : TkAgg
+```
 ## Basic usage
 
 Once Matplotlib and PyPlot are installed, and you are using a
