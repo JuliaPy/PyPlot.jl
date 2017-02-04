@@ -124,8 +124,8 @@ function find_backend(matplotlib::PyObject)
     default = lowercase(get(ENV, "MPLBACKEND", "none"))
     if default == "none"
         default = lowercase(get(rcParams, "backend", "none"))
-        if is_windows() && default == "qt5agg"
-            default = "qt4agg" # workaround issue #278
+        if is_windows() && startswith(default, "qt")
+            default = "tkagg" # workaround issue #278
         end
     end
     if haskey(matplotlib2gui,default)
