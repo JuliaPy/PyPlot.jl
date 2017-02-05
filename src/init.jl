@@ -74,13 +74,8 @@ function find_backend(matplotlib::PyObject)
     qt2gui = Dict("pyqt5"=>:qt_pyqt5, "pyqt4"=>:qt_pyqt4, "pyside"=>:qt_pyside)
 
     rcParams = PyDict(matplotlib["rcParams"])
-    default = lowercase(get(ENV, "MPLBACKEND", "none"))
-    if default == "none"
-        default = lowercase(get(rcParams, "backend", "none"))
-        if is_windows() && startswith(default, "qt")
-            default = "tkagg" # workaround issue #278
-        end
-    end
+    default = lowercase(get(ENV, "MPLBACKEND",
+                            get(rcParams, "backend", "none")))
     if haskey(matplotlib2gui,default)
         defaultgui = matplotlib2gui[default]
 
