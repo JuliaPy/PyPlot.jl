@@ -59,7 +59,7 @@ function find_backend(matplotlib::PyObject)
     elseif is_apple() && conda # partially work around #164
         guis = [:qt5, :qt4, :tk, :wx, :gtk, :gtk3]
     else
-        guis = [:tk, :qt4, :qt5, :wx, :gtk, :gtk3]
+        guis = [:tk, :qt5, :qt4, :wx, :gtk, :gtk3]
     end
     options = [(g,gui2matplotlib[g]) for g in guis]
 
