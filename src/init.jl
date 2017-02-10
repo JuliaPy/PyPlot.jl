@@ -33,14 +33,9 @@ const aggformats = Dict("application/eps" => "eps",
                         "application/postscript" => "ps",
                         "image/svg+xml" => "svg")
 
-function isdisplayok()
-    for mime in keys(aggformats)
-        if displayable(mime)
-            return true
-        end
-    end
-    false
-end
+# In 0.6, TextDisplay can show e.g. image/svg+xml as text (#281).
+# Any "real" graphical display should support PNG, I hope.
+isdisplayok() = displayable(MIME("image/png"))
 
 ###########################################################################
 # We allow the user to turn on or off the Python gui interactively via
