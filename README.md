@@ -9,7 +9,7 @@ package to call Matplotlib directly from Julia with little or no
 overhead (arrays are passed without making a copy).
 
 This package takes advantage of Julia's [multimedia
-I/O](http://docs.julialang.org/en/latest/stdlib/base/#multimedia-i-o)
+I/O](https://docs.julialang.org/en/latest/stdlib/io-network.html#Multimedia-I/O-1)
 API to display plots in any Julia graphical backend, including as
 inline graphics in [IJulia](https://github.com/JuliaLang/IJulia.jl).
 Alternatively, you can use a Python-based graphical Matplotlib
