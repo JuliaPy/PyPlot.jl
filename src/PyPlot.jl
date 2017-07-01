@@ -11,7 +11,7 @@ using Compat
 @compat import Base.show
 
 # Wrapper around matplotlib Figure, supporting graphics I/O and pretty display
-type Figure
+mutable struct Figure
     o::PyObject
 end
 
@@ -20,7 +20,7 @@ end
 # that lazily looks up help from a PyObject via zero or more keys.
 # This saves us time when loading PyPlot, since we don't have
 # to load up all of the documentation strings right away.
-immutable LazyHelp
+struct LazyHelp
     o::PyObject
     keys::Tuple{Vararg{Compat.String}}
     LazyHelp(o::PyObject) = new(o, ())

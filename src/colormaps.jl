@@ -7,7 +7,7 @@ export ColorMap, get_cmap, register_cmap, get_cmaps
 ########################################################################
 # Wrapper around colors.Colormap type:
 
-type ColorMap
+mutable struct ColorMap
     o::PyObject
 end
 
