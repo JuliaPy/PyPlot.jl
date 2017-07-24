@@ -18,7 +18,7 @@ convert(::Type{ColorMap}, o::PyObject) = ColorMap(o)
 ==(c::ColorMap, g::PyObject) = c.o == g
 hash(c::ColorMap) = hash(c.o)
 pycall(c::ColorMap, args...; kws...) = pycall(c.o, args...; kws...)
-@compat (c::ColorMap)(args...; kws...) = pycall(c.o, PyAny, args...; kws...)
+(c::ColorMap)(args...; kws...) = pycall(c.o, PyAny, args...; kws...)
 Base.Docs.doc(c::ColorMap) = Base.Docs.doc(c.o)
 
 getindex(c::ColorMap, x) = getindex(c.o, x)
@@ -155,8 +155,7 @@ get_cmaps() =
 ########################################################################
 # display of ColorMaps as a horizontal color bar in SVG
 
-@compat function show(io::IO, ::MIME"image/svg+xml",
-                   cs::AbstractVector{ColorMap})
+function show(io::IO, ::MIME"image/svg+xml", cs::AbstractVector{ColorMap})
     n = 256
     nc = length(cs)
     a = linspace(0,1,n)
@@ -186,8 +185,8 @@ get_cmaps() =
     write(io, "</svg>")
 end
 
-@compat function show(io::IO, m::MIME"image/svg+xml", c::ColorMap)
-    @compat show(io, m, [c])
+function show(io::IO, m::MIME"image/svg+xml", c::ColorMap)
+    show(io, m, [c])
 end
 
 ########################################################################
