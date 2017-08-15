@@ -175,7 +175,7 @@ end
 
 @doc LazyHelp(plt,"step") step(x, y; kws...) = pycall(plt["step"], PyAny, x, y; kws...)
 
-Base.show(args...; kws...) = begin pycall(plt["show"], PyObject, args...; kws...); nothing; end
+Base.show(; kws...) = begin pycall(plt["show"], PyObject; kws...); nothing; end
 
 close(f::Figure) = close(f[:number])
 function close(f::Integer)
