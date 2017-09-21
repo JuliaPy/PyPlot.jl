@@ -2,4 +2,4 @@ julia 0.5
 PyCall 1.6.2
 Colors
 LaTeXStrings
-Compat 0.27.0
+Compat 0.32.0

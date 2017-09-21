@@ -311,9 +311,9 @@ end
 # Matplotlib pcolor* functions accept 1d arrays but not ranges
 for f in (:pcolor, :pcolormesh)
     @eval begin
-        $f(X::Range, Y::Range, args...; kws...) = $f([X...], [Y...], args...; kws...)
-        $f(X::Range, Y::AbstractArray, args...; kws...) = $f([X...], Y, args...; kws...)
-        $f(X::AbstractArray, Y::Range, args...; kws...) = $f(X, [Y...], args...; kws...)
+        $f(X::AbstractRange, Y::AbstractRange, args...; kws...) = $f([X...], [Y...], args...; kws...)
+        $f(X::AbstractRange, Y::AbstractArray, args...; kws...) = $f([X...], Y, args...; kws...)
+        $f(X::AbstractArray, Y::AbstractRange, args...; kws...) = $f(X, [Y...], args...; kws...)
     end
 end
 
