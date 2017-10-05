@@ -1,3 +1,8 @@
+[![Build Status](https://travis-ci.org/JuliaPy/PyPlot.jl.svg?branch=master)](https://travis-ci.org/JuliaPy/PyPlot.jl)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/JuliaPy/PyPlot.jl?branch=master)](https://ci.appveyor.com/project/StevenGJohnson/pyplot-jl/branch/master)
+[![PyPlot](http://pkg.julialang.org/badges/PyPlot_0.5.svg)](http://pkg.julialang.org/?pkg=PyPlot&ver=0.5)
+[![PyPlot](http://pkg.julialang.org/badges/PyPlot_0.6.svg)](http://pkg.julialang.org/?pkg=PyPlot&ver=0.6)
+
 # The PyPlot module for Julia
 
 This module provides a Julia interface to the
