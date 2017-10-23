@@ -8,7 +8,7 @@ import Base: convert, ==, isequal, hash, getindex, setindex!, haskey, keys, show
 export Figure, plt, matplotlib, pygui, withfig
 
 using Compat
-@compat import Base.show
+import Base.show
 
 # Wrapper around matplotlib Figure, supporting graphics I/O and pretty display
 mutable struct Figure
@@ -22,13 +22,13 @@ end
 # to load up all of the documentation strings right away.
 struct LazyHelp
     o::PyObject
-    keys::Tuple{Vararg{Compat.String}}
+    keys::Tuple{Vararg{String}}
     LazyHelp(o::PyObject) = new(o, ())
     LazyHelp(o::PyObject, k::AbstractString) = new(o, (k,))
     LazyHelp(o::PyObject, k1::AbstractString, k2::AbstractString) = new(o, (k1,k2))
     LazyHelp(o::PyObject, k::Tuple{Vararg{AbstractString}}) = new(o, k)
 end
-@compat function show(io::IO, ::MIME"text/plain", h::LazyHelp)
+function show(io::IO, ::MIME"text/plain", h::LazyHelp)
     o = h.o
     for k in h.keys
         o = o[k]
@@ -39,11 +39,11 @@ end
         print(io, "no Python docstring found for ", h.k)
     end
 end
-Base.show(io::IO, h::LazyHelp) = @compat show(io, "text/plain", h)
+Base.show(io::IO, h::LazyHelp) = show(io, "text/plain", h)
 function Base.Docs.catdoc(hs::LazyHelp...)
     Base.Docs.Text() do io
         for h in hs
-            @compat show(io, MIME"text/plain"(), h)
+            show(io, MIME"text/plain"(), h)
         end
     end
 end
@@ -62,7 +62,7 @@ convert(::Type{Figure}, o::PyObject) = Figure(o)
 ==(f::PyObject, g::Figure) = f == g.o
 hash(f::Figure) = hash(f.o)
 pycall(f::Figure, args...; kws...) = pycall(f.o, args...; kws...)
-@compat (f::Figure)(args...; kws...) = pycall(f.o, PyAny, args...; kws...)
+(f::Figure)(args...; kws...) = pycall(f.o, PyAny, args...; kws...)
 Base.Docs.doc(f::Figure) = Base.Docs.doc(f.o)
 
 getindex(f::Figure, x) = getindex(f.o, x)
@@ -71,10 +71,10 @@ haskey(f::Figure, x) = haskey(f.o, x)
 keys(f::Figure) = keys(f.o)
 
 for (mime,fmt) in aggformats
-    @eval @compat function show(io::IO, m::MIME{Symbol($mime)}, f::Figure)
+    @eval function show(io::IO, m::MIME{Symbol($mime)}, f::Figure)
         if !haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict),
                    $fmt)
-            throw(MethodError(@static(VERSION < v"0.5.0-dev+4340" ? writemime : show), (io, m, f)))
+            throw(MethodError(show, (io, m, f)))
         end
         f.o["canvas"]["print_figure"](io, format=$fmt, bbox_inches="tight")
     end
@@ -175,7 +175,7 @@ end
 
 @doc LazyHelp(plt,"step") step(x, y; kws...) = pycall(plt["step"], PyAny, x, y; kws...)
 
-Base.show() = begin pycall(plt["show"], PyObject); nothing; end
+Base.show(; kws...) = begin pycall(plt["show"], PyObject; kws...); nothing; end
 
 close(f::Figure) = close(f[:number])
 function close(f::Integer)
@@ -311,9 +311,9 @@ end
 # Matplotlib pcolor* functions accept 1d arrays but not ranges
 for f in (:pcolor, :pcolormesh)
     @eval begin
-        $f(X::Range, Y::Range, args...; kws...) = $f([X...], [Y...], args...; kws...)
-        $f(X::Range, Y::AbstractArray, args...; kws...) = $f([X...], Y, args...; kws...)
-        $f(X::AbstractArray, Y::Range, args...; kws...) = $f(X, [Y...], args...; kws...)
+        $f(X::AbstractRange, Y::AbstractRange, args...; kws...) = $f([X...], [Y...], args...; kws...)
+        $f(X::AbstractRange, Y::AbstractArray, args...; kws...) = $f([X...], Y, args...; kws...)
+        $f(X::AbstractArray, Y::AbstractRange, args...; kws...) = $f(X, [Y...], args...; kws...)
     end
 end
 

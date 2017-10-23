@@ -49,9 +49,9 @@ function find_backend(matplotlib::PyObject)
                           :qt_pyside=>"Qt4Agg", :qt4=>"Qt4Agg",
                           :qt5=>"Qt5Agg", :qt=>"Qt4Agg",:tk=>"TkAgg")
     conda = PyCall.conda || !isempty(PyCall.anaconda_conda())
-    if is_linux()
+    if Compat.Sys.islinux()
         guis = [:tk, :gtk3, :gtk, :qt5, :qt4, :wx]
-    elseif is_apple() && conda # partially work around #164
+    elseif Compat.Sys.isapple() && conda # partially work around #164
         guis = [:qt5, :qt4, :tk, :wx, :gtk, :gtk3]
     else
         guis = [:tk, :qt5, :qt4, :wx, :gtk, :gtk3]
@@ -108,7 +108,7 @@ function find_backend(matplotlib::PyObject)
         # throw exception (drop to catch block below) if DISPLAY
         # is not set.  [Might be more reliable to test
         # success(`xdpyinfo`), but only if xdpyinfo is installed.]
-        if options[1][1] != :none && is_unix() && !is_apple()
+        if options[1][1] != :none && Compat.Sys.isunix() && !Compat.Sys.isapple()
             ENV["DISPLAY"]
         end
 

@@ -1,3 +1,8 @@
+[![Build Status](https://travis-ci.org/JuliaPy/PyPlot.jl.svg?branch=master)](https://travis-ci.org/JuliaPy/PyPlot.jl)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/JuliaPy/PyPlot.jl?branch=master)](https://ci.appveyor.com/project/StevenGJohnson/pyplot-jl/branch/master)
+[![PyPlot](http://pkg.julialang.org/badges/PyPlot_0.5.svg)](http://pkg.julialang.org/?pkg=PyPlot&ver=0.5)
+[![PyPlot](http://pkg.julialang.org/badges/PyPlot_0.6.svg)](http://pkg.julialang.org/?pkg=PyPlot&ver=0.6)
+
 # The PyPlot module for Julia
 
 This module provides a Julia interface to the
@@ -82,7 +87,7 @@ For example:
 
 ```
 using PyPlot
-x = linspace(0,2*pi,1000); y = sin(3*x + 4*cos(2*x));
+x = linspace(0,2*pi,1000); y = sin.(3 * x + 4 * cos.(2 * x));
 plot(x, y, color="red", linewidth=2.0, linestyle="--")
 title("A sinusoidally modulated sinusoid")
 ```

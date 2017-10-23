@@ -18,7 +18,7 @@ convert(::Type{ColorMap}, o::PyObject) = ColorMap(o)
 ==(c::ColorMap, g::PyObject) = c.o == g
 hash(c::ColorMap) = hash(c.o)
 pycall(c::ColorMap, args...; kws...) = pycall(c.o, args...; kws...)
-@compat (c::ColorMap)(args...; kws...) = pycall(c.o, PyAny, args...; kws...)
+(c::ColorMap)(args...; kws...) = pycall(c.o, PyAny, args...; kws...)
 Base.Docs.doc(c::ColorMap) = Base.Docs.doc(c.o)
 
 getindex(c::ColorMap, x) = getindex(c.o, x)
@@ -63,7 +63,7 @@ ColorMap{T<:Real}(name::Union{AbstractString,Symbol},
                   g::AbstractVector{Tuple{T,T,T}},
                   b::AbstractVector{Tuple{T,T,T}},
                   n=max(256,length(r),length(g),length(b)), gamma=1.0) =
-    ColorMap(name, r,g,b, Array(Tuple{T,T,T},0), n, gamma)
+    ColorMap(name, r,g,b, Array{Tuple{T,T,T}}(0), n, gamma)
 
 # as above, but also passing an alpha array
 function ColorMap{T<:Real}(name::Union{AbstractString,Symbol},
@@ -88,11 +88,11 @@ function ColorMap{T<:Colorant}(name::Union{AbstractString,Symbol},
     if nc == 0
         throw(ArgumentError("ColorMap requires a non-empty Colorant array"))
     end
-    r = Array(Tuple{Float64,Float64,Float64}, nc)
+    r = Array{Tuple{Float64,Float64,Float64}}(nc)
     g = similar(r)
     b = similar(r)
     a = T <: TransparentColor ?
-        similar(r) : Array(Tuple{Float64,Float64,Float64}, 0)
+        similar(r) : Array{Tuple{Float64,Float64,Float64}}(0)
     for i = 1:nc
         x = (i-1) / (nc-1)
         if T <: TransparentColor
@@ -155,8 +155,7 @@ get_cmaps() =
 ########################################################################
 # display of ColorMaps as a horizontal color bar in SVG
 
-@compat function show(io::IO, ::MIME"image/svg+xml",
-                   cs::AbstractVector{ColorMap})
+function show(io::IO, ::MIME"image/svg+xml", cs::AbstractVector{ColorMap})
     n = 256
     nc = length(cs)
     a = linspace(0,1,n)
@@ -186,8 +185,8 @@ get_cmaps() =
     write(io, "</svg>")
 end
 
-@compat function show(io::IO, m::MIME"image/svg+xml", c::ColorMap)
-    @compat show(io, m, [c])
+function show(io::IO, m::MIME"image/svg+xml", c::ColorMap)
+    show(io, m, [c])
 end
 
 ########################################################################
