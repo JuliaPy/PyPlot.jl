@@ -170,10 +170,21 @@ end
 function __init__()
     global const isjulia_display = Bool[isdisplayok()]
     copy!(matplotlib, pyimport_conda("matplotlib", "matplotlib"))
+    mvers = matplotlib[:__version__]
     global const version = try
-        convert(VersionNumber, matplotlib[:__version__])
+        convert(VersionNumber, mvers)
     catch
-        v"0.0" # fallback
+        parts = split(mvers,'.')
+        try
+            # handle mvers == aa.bb.cc.xx by dropping .xx, see #448
+            convert(VersionNumber, join(parts[1:min(3,length(parts))], '.'))
+        catch
+            if !isempty(parts) && all(isdigit, parts[1])
+                convert(VersionNumber, parts[1])
+            else
+                v"0.0" # fallback
+            end
+        end
     end
 
     backend_gui = find_backend(matplotlib)
