@@ -20,9 +20,6 @@ const orig_draw = PyNULL()
 const orig_gcf = PyNULL()
 const orig_figure = PyNULL()
 const orig_show = PyNULL()
-const mplot3d = PyNULL()
-const axes3D = PyNULL()
-const art3D = PyNULL()
 
 ###########################################################################
 # file formats supported by Agg backend, from MIME types
@@ -212,11 +209,6 @@ function __init__()
         plt["switch_backend"]("Agg")
         plt["ioff"]()
     end
-
-    copy!(mplot3d, pyimport("mpl_toolkits.mplot3d"))
-    copy!(axes3D, pyimport("mpl_toolkits.mplot3d.axes3d"))
-
-    copy!(art3D, pyimport("mpl_toolkits.mplot3d.art3d"))
 
     init_colormaps()
 end

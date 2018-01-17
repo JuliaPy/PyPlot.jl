@@ -10,10 +10,6 @@ export Figure, plt, matplotlib, pygui, withfig
 using Compat
 import Base.show
 
-# Wrapper around matplotlib Figure, supporting graphics I/O and pretty display
-type Figure
-    o::PyObject
-end
 
 ###########################################################################
 # Julia 0.4 help system: define a documentation object
@@ -21,12 +17,12 @@ end
 # This saves us time when loading PyPlot, since we don't have
 # to load up all of the documentation strings right away.
 immutable LazyHelp
-    o::PyObject
+    o # a PyObject or similar object supporting getindex with a __doc__ key
     keys::Tuple{Vararg{String}}
-    LazyHelp(o::PyObject) = new(o, ())
-    LazyHelp(o::PyObject, k::AbstractString) = new(o, (k,))
-    LazyHelp(o::PyObject, k1::AbstractString, k2::AbstractString) = new(o, (k1,k2))
-    LazyHelp(o::PyObject, k::Tuple{Vararg{AbstractString}}) = new(o, k)
+    LazyHelp(o) = new(o, ())
+    LazyHelp(o, k::AbstractString) = new(o, (k,))
+    LazyHelp(o, k1::AbstractString, k2::AbstractString) = new(o, (k1,k2))
+    LazyHelp(o, k::Tuple{Vararg{AbstractString}}) = new(o, k)
 end
 function show(io::IO, ::MIME"text/plain", h::LazyHelp)
     o = h.o
@@ -53,8 +49,11 @@ end
 include("init.jl")
 
 ###########################################################################
-# Figure methods
+# Wrapper around matplotlib Figure, supporting graphics I/O and pretty display
 
+type Figure
+    o::PyObject
+end
 PyObject(f::Figure) = f.o
 convert(::Type{Figure}, o::PyObject) = Figure(o)
 ==(f::Figure, g::Figure) = f.o == g.o
@@ -218,65 +217,12 @@ bar{T<:Symbol}(x::AbstractVector{T}, y; kws...) =
     bar(map(string, x), y; kws...)
 
 ###########################################################################
-# Include mplot3d for 3d plotting.
-
-export art3D, Axes3D, surf, mesh, bar3D, contour3D, contourf3D, plot3D, plot_surface, plot_trisurf, plot_wireframe, scatter3D, text2D, text3D, zlabel, zlim, zscale, zticks
-
-const mplot3d_funcs = (:bar3d, :contour3D, :contourf3D, :plot3D, :plot_surface,
-                       :plot_trisurf, :plot_wireframe, :scatter3D,
-                       :text2D, :text3D)
-
-for f in mplot3d_funcs
-    fs = string(f)
-    @eval @doc LazyHelp(axes3D,"Axes3D", $fs) function $f(args...; kws...)
-        ax = gca(projection="3d")
-        pycall(ax[$fs], PyAny, args...; kws...)
-    end
-end
-
-# TODO: in Julia 0.4, change this to a callable object
-@doc LazyHelp(axes3D,"Axes3D") Axes3D(args...; kws...) = pycall(axes3D["Axes3D"], PyAny, args...; kws...)
-
-# correct for annoying mplot3d inconsistency
-@doc LazyHelp(axes3D,"Axes3D", "bar3d") bar3D(args...) = bar3d(args...)
-
-# it's annoying to have xlabel etc. but not zlabel
-const zlabel_funcs = (:zlabel, :zlim, :zscale, :zticks)
-for f in zlabel_funcs
-    fs = string("set_", f)
-    @eval @doc LazyHelp(axes3D,"Axes3D", $fs) function $f(args...; kws...)
-        ax = gca(projection="3d")
-        pycall(ax[$fs], PyAny, args...; kws...)
-    end
-end
-
-# export Matlab-like names
-
-function surf(Z::AbstractMatrix; kws...)
-    plot_surface([1:size(Z,1);]*ones(1,size(Z,2)),
-                 ones(size(Z,1))*[1:size(Z,2);]', Z; kws...)
-end
-
-@doc LazyHelp(axes3D,"Axes3D", "plot_surface") function surf(X, Y, Z::AbstractMatrix, args...; kws...)
-    plot_surface(X, Y, Z, args...; kws...)
-end
-
-function surf(X, Y, Z::AbstractVector, args...; kws...)
-    plot_trisurf(X, Y, Z, args...; kws...)
-end
-
-@doc LazyHelp(axes3D,"Axes3D", "plot_wireframe") mesh(args...; kws...) = plot_wireframe(args...; kws...)
-
-function mesh(Z::AbstractMatrix; kws...)
-    plot_wireframe([1:size(Z,1);]*ones(1,size(Z,2)),
-                   ones(size(Z,1))*[1:size(Z,2);]', Z; kws...)
-end
-
-###########################################################################
 # Allow plots with 2 independent variables (contour, surf, ...)
 # to accept either 2 1d arrays or a row vector and a 1d array,
 # to simplify construction of such plots via broadcasting operations.
 # (Matplotlib is inconsistent about this.)
+
+include("plot3d.jl")
 
 for f in (:contour, :contourf)
     @eval function $f(X::AbstractMatrix, Y::AbstractVector, args...; kws...)
