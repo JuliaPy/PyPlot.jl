@@ -16,7 +16,7 @@ import Base.show
 # that lazily looks up help from a PyObject via zero or more keys.
 # This saves us time when loading PyPlot, since we don't have
 # to load up all of the documentation strings right away.
-immutable LazyHelp
+struct LazyHelp
     o # a PyObject or similar object supporting getindex with a __doc__ key
     keys::Tuple{Vararg{String}}
     LazyHelp(o) = new(o, ())
@@ -51,7 +51,7 @@ include("init.jl")
 ###########################################################################
 # Wrapper around matplotlib Figure, supporting graphics I/O and pretty display
 
-type Figure
+mutable struct Figure
     o::PyObject
 end
 PyObject(f::Figure) = f.o
@@ -200,7 +200,7 @@ include("colormaps.jl")
 ###########################################################################
 # Support array of string labels in bar chart
 
-function bar{T<:AbstractString}(x::AbstractVector{T}, y; kws...)
+function bar(x::AbstractVector{T}, y; kws...) where T<:AbstractString
     xi = 1:length(x)
     if !any(kw -> kw[1] == :align, kws)
         push!(kws, (:align, "center"))
@@ -213,7 +213,7 @@ function bar{T<:AbstractString}(x::AbstractVector{T}, y; kws...)
     return p
 end
 
-bar{T<:Symbol}(x::AbstractVector{T}, y; kws...) =
+bar(x::AbstractVector{T}, y; kws...) where {T<:Symbol} =
     bar(map(string, x), y; kws...)
 
 ###########################################################################
