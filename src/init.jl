@@ -39,6 +39,12 @@ isdisplayok() = displayable(MIME("image/png"))
 # pygui(true/false).  This is done by loading pyplot with a GUI backend
 # if possible, then switching to a Julia-display backend (if available)
 
+# like get(dict, key, default), but treats a value of "nothing" as a missing key
+function getnone(dict, key, default)
+    ret = get(dict, key, default)
+    return ret === nothing ? default : ret
+end
+
 # return (backend,gui) tuple
 function find_backend(matplotlib::PyObject)
     gui2matplotlib = Dict(:wx=>"WXAgg",:gtk=>"GTKAgg",:gtk3=>"GTK3Agg",
@@ -67,7 +73,7 @@ function find_backend(matplotlib::PyObject)
 
     rcParams = PyDict(matplotlib["rcParams"])
     default = lowercase(get(ENV, "MPLBACKEND",
-                            get(rcParams, "backend", "none")))
+                            getnone(rcParams, "backend", "none")))
     if haskey(matplotlib2gui,default)
         defaultgui = matplotlib2gui[default]
 
@@ -77,7 +83,7 @@ function find_backend(matplotlib::PyObject)
         if conda
             if defaultgui == :qt || defaultgui == :qt4
                 # default to pyqt rather than pyside, as below:
-                defaultgui = haskey(rcParams,"backend.qt4") ? qt2gui[lowercase(rcParams["backend.qt4"])] : :qt_pyqt4
+                defaultgui = qt2gui[lowercase(getnone(rcParams,"backend.qt4", "pyqt4"))]
                 if defaultgui == :qt_pyside
                     pyimport_conda("PySide", "pyside")
                 else
