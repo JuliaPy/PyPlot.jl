@@ -3,7 +3,7 @@
 ###########################################################################
 
 # global PyObject constants that get initialized at runtime.  We
-# initialize them here (rather than via "global const foo = ..." in __init__)
+# initialize them here (rather than via "global foo = ..." in __init__)
 # so that their type is known at compile-time.
 
 # remove this once we tag and require a newer PyCall version:
@@ -165,10 +165,10 @@ end
 # initialization -- anything that depends on Python has to go here,
 # so that it occurs at runtime (while the rest of PyPlot can be precompiled).
 function __init__()
-    global const isjulia_display = Bool[isdisplayok()]
+    global isjulia_display = Bool[isdisplayok()]
     copy!(matplotlib, pyimport_conda("matplotlib", "matplotlib"))
     mvers = matplotlib[:__version__]
-    global const version = try
+    global version = try
         convert(VersionNumber, mvers)
     catch
         parts = split(mvers,'.')
@@ -186,8 +186,8 @@ function __init__()
 
     backend_gui = find_backend(matplotlib)
     # workaround JuliaLang/julia#8925
-    global const backend = backend_gui[1]
-    global const gui = backend_gui[2]
+    global backend = backend_gui[1]
+    global gui = backend_gui[2]
 
     copy!(plt, pyimport("matplotlib.pyplot")) # raw Python module
 
