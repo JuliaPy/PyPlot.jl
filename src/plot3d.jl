@@ -1,7 +1,7 @@
 ###########################################################################
 # Lazy wrapper around a PyObject to load a module on demand.
 
-type LazyPyModule
+mutable struct LazyPyModule
     name::String
     o::PyObject
     LazyPyModule(n) = new(n, PyNULL())
