@@ -7,7 +7,7 @@ export ColorMap, get_cmap, register_cmap, get_cmaps
 ########################################################################
 # Wrapper around colors.Colormap type:
 
-type ColorMap
+mutable struct ColorMap
     o::PyObject
 end
 
@@ -58,21 +58,21 @@ end
 
 # most general constructors using RGB arrays of triples, defined
 # as for matplotlib.colors.LinearSegmentedColormap
-ColorMap{T<:Real}(name::Union{AbstractString,Symbol},
-                  r::AbstractVector{Tuple{T,T,T}},
-                  g::AbstractVector{Tuple{T,T,T}},
-                  b::AbstractVector{Tuple{T,T,T}},
-                  n=max(256,length(r),length(g),length(b)), gamma=1.0) =
+ColorMap(name::Union{AbstractString,Symbol},
+         r::AbstractVector{Tuple{T,T,T}},
+         g::AbstractVector{Tuple{T,T,T}},
+         b::AbstractVector{Tuple{T,T,T}},
+         n=max(256,length(r),length(g),length(b)), gamma=1.0) where {T<:Real} =
     ColorMap(name, r,g,b, Array{Tuple{T,T,T}}(0), n, gamma)
 
 # as above, but also passing an alpha array
-function ColorMap{T<:Real}(name::Union{AbstractString,Symbol},
-                           r::AbstractVector{Tuple{T,T,T}},
-                           g::AbstractVector{Tuple{T,T,T}},
-                           b::AbstractVector{Tuple{T,T,T}},
-                           a::AbstractVector{Tuple{T,T,T}},
-                           n=max(256,length(r),length(g),length(b),length(a)),
-                           gamma=1.0)
+function ColorMap(name::Union{AbstractString,Symbol},
+                  r::AbstractVector{Tuple{T,T,T}},
+                  g::AbstractVector{Tuple{T,T,T}},
+                  b::AbstractVector{Tuple{T,T,T}},
+                  a::AbstractVector{Tuple{T,T,T}},
+                  n=max(256,length(r),length(g),length(b),length(a)),
+                  gamma=1.0) where T<:Real
     segmentdata = Dict("red" => r, "green" => g, "blue" => b)
     if !isempty(a)
         segmentdata["alpha"] = a
@@ -82,8 +82,8 @@ function ColorMap{T<:Real}(name::Union{AbstractString,Symbol},
 end
 
 # create from an array c, assuming linear mapping from [0,1] to c
-function ColorMap{T<:Colorant}(name::Union{AbstractString,Symbol},
-                               c::AbstractVector{T}, n=max(256, length(c)), gamma=1.0)
+function ColorMap(name::Union{AbstractString,Symbol},
+                  c::AbstractVector{T}, n=max(256, length(c)), gamma=1.0) where T<:Colorant
     nc = length(c)
     if nc == 0
         throw(ArgumentError("ColorMap requires a non-empty Colorant array"))
@@ -111,12 +111,12 @@ function ColorMap{T<:Colorant}(name::Union{AbstractString,Symbol},
     ColorMap(name, r,g,b,a, n, gamma)
 end
 
-ColorMap{T<:Colorant}(c::AbstractVector{T},
-                      n=max(256, length(c)), gamma=1.0) =
+ColorMap(c::AbstractVector{T},
+         n=max(256, length(c)), gamma=1.0) where {T<:Colorant} =
     ColorMap(string("cm_", hash(c)), c, n, gamma)
 
-function ColorMap{T<:Real}(name::Union{AbstractString,Symbol}, c::AbstractMatrix{T},
-                           n=max(256, size(c,1)), gamma=1.0)
+function ColorMap(name::Union{AbstractString,Symbol}, c::AbstractMatrix{T},
+                  n=max(256, size(c,1)), gamma=1.0) where T<:Real
     if size(c,2) == 3
         return ColorMap(name,
                         [RGB{T}(c[i,1],c[i,2],c[i,3]) for i in 1:size(c,1)],
@@ -131,7 +131,7 @@ function ColorMap{T<:Real}(name::Union{AbstractString,Symbol}, c::AbstractMatrix
     end
 end
 
-ColorMap{T<:Real}(c::AbstractMatrix{T}, n=max(256, size(c,1)), gamma=1.0) =
+ColorMap(c::AbstractMatrix{T}, n=max(256, size(c,1)), gamma=1.0) where {T<:Real} =
     ColorMap(string("cm_", hash(c)), c, n, gamma)
 
 ########################################################################
