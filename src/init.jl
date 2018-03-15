@@ -54,8 +54,6 @@ function find_backend(matplotlib::PyObject)
     conda = PyCall.conda || !isempty(PyCall.anaconda_conda())
     if Compat.Sys.islinux()
         guis = [:tk, :gtk3, :gtk, :qt5, :qt4, :wx]
-    elseif Compat.Sys.isapple() && conda # partially work around #164
-        guis = [:qt5, :qt4, :tk, :wx, :gtk, :gtk3]
     else
         guis = [:tk, :qt5, :qt4, :wx, :gtk, :gtk3]
     end
