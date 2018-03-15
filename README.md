@@ -174,7 +174,7 @@ If no Julia graphics backend is available when PyPlot is imported, then
 ### Choosing a Python GUI toolkit
 
 Only the [Tk](http://www.tcl.tk/), [wxWidgets](http://www.wxwidgets.org/),
-[GTK+](http://www.gtk.org/) (version 2 or 3), and [Qt](http://qt-project.org/) (version 4 or 5; via the PyQt5, 
+[GTK+](http://www.gtk.org/) (version 2 or 3), and [Qt](http://qt-project.org/) (version 4 or 5; via the PyQt5,
 [PyQt4](http://wiki.python.org/moin/PyQt4) or
 [PySide](http://qt-project.org/wiki/PySide)), Python GUI backends are
 supported by PyPlot.  (Obviously, you must have installed one of these
@@ -242,7 +242,9 @@ surf(rand(30,40))
 to plot a random 30×40 surface mesh.
 
 You can also explicitly create a subplot with 3d axes via, for
-example, `subplot(111, projection="3d")`, exactly as in Matplotlib.
+example, `subplot(111, projection="3d")`, exactly as in Matplotlib,
+but you must first call the `using3D()` function to ensure that
+mplot3d is loaded (this happens automatically for `plot3D` etc.).
 The `Axes3D` constructor and the
 [art3D](http://matplotlib.org/mpl_toolkits/mplot3d/api.html#art3d)
 module are also exported.

@@ -22,10 +22,21 @@ keys(m::LazyPyModule) = keys(PyObject(m))
 const axes3D = LazyPyModule("mpl_toolkits.mplot3d.axes3d")
 const art3D = LazyPyModule("mpl_toolkits.mplot3d.art3d")
 
+"""
+    using3D()
+
+This function ensures that the `mplot3d` module is loaded for 3d
+plotting.   This occurs automatically if you call any of the
+3d plotting functions like `plot3D` or `surf`, but it may be
+necessary to call this function manually if you are passing
+`projection="3d"` explicitly to axes or subplot objects.
+"""
+using3D() = (PyObject(axes3D); nothing)
+
 ###########################################################################
 # 3d plotting functions from mplot3d
 
-export art3D, Axes3D, surf, mesh, bar3D, contour3D, contourf3D, plot3D, plot_surface, plot_trisurf, plot_wireframe, scatter3D, text2D, text3D, zlabel, zlim, zscale, zticks
+export art3D, Axes3D, using3D, surf, mesh, bar3D, contour3D, contourf3D, plot3D, plot_surface, plot_trisurf, plot_wireframe, scatter3D, text2D, text3D, zlabel, zlim, zscale, zticks
 
 const mplot3d_funcs = (:bar3d, :contour3D, :contourf3D, :plot3D, :plot_surface,
                        :plot_trisurf, :plot_wireframe, :scatter3D,
@@ -34,7 +45,7 @@ const mplot3d_funcs = (:bar3d, :contour3D, :contourf3D, :plot3D, :plot_surface,
 for f in mplot3d_funcs
     fs = string(f)
     @eval @doc LazyHelp(axes3D,"Axes3D", $fs) function $f(args...; kws...)
-        PyObject(axes3D) # make sure mplot3d is loaded
+        using3D() # make sure mplot3d is loaded
         ax = gca(projection="3d")
         pycall(ax[$fs], PyAny, args...; kws...)
     end
@@ -50,7 +61,7 @@ const zlabel_funcs = (:zlabel, :zlim, :zscale, :zticks)
 for f in zlabel_funcs
     fs = string("set_", f)
     @eval @doc LazyHelp(axes3D,"Axes3D", $fs) function $f(args...; kws...)
-        PyObject(axes3D) # make sure mplot3d is loaded
+        using3D() # make sure mplot3d is loaded
         ax = gca(projection="3d")
         pycall(ax[$fs], PyAny, args...; kws...)
     end
