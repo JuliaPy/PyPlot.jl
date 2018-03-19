@@ -1,4 +1,5 @@
 # PyPlot initialization — the hardest part is finding a working backend.
+using VersionParsing
 
 ###########################################################################
 
@@ -173,19 +174,9 @@ function __init__()
     copy!(matplotlib, pyimport_conda("matplotlib", "matplotlib"))
     mvers = matplotlib[:__version__]
     global version = try
-        convert(VersionNumber, mvers)
+        vparse(mvers)
     catch
-        parts = split(mvers,'.')
-        try
-            # handle mvers == aa.bb.cc.xx by dropping .xx, see #448
-            convert(VersionNumber, join(parts[1:min(3,length(parts))], '.'))
-        catch
-            if !isempty(parts) && all(isdigit, parts[1])
-                convert(VersionNumber, parts[1])
-            else
-                v"0.0" # fallback
-            end
-        end
+        v"0.0.0" # fallback
     end
 
     backend_gui = find_backend(matplotlib)
