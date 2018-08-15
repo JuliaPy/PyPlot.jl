@@ -8,6 +8,8 @@ else
     using Test
 end
 
+!isdefined(Base, :Base64) && using Base64
+
 plot(1:5, 2:6, "ro-")
 
 line = gca()[:lines][1]
@@ -22,7 +24,7 @@ s = stringmime("application/postscript", fig);
 m = match(r"%%BoundingBox: *([0-9]+) +([0-9]+) +([0-9]+) +([0-9]+)", s)
 @test m !== nothing
 boundingbox = map(s -> parse(Int, s), m.captures)
-info("got plot bounding box ", boundingbox)
+Compat.@info("got plot bounding box ", boundingbox)
 @test all([300, 200] .< boundingbox[3:4] - boundingbox[1:2] .< [450,350])
 
 c = get_cmap("viridis")
