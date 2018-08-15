@@ -1,6 +1,6 @@
 ENV["MPLBACKEND"]="agg" # no GUI
 
-using PyPlot, PyCall
+using PyPlot, PyCall, Compat
 
 if isdefined(Base, :Test) && !Base.isdeprecated(Base, :Test)
     using Base.Test
@@ -26,7 +26,7 @@ info("got plot bounding box ", boundingbox)
 @test all([300, 200] .< boundingbox[3:4] - boundingbox[1:2] .< [450,350])
 
 c = get_cmap("viridis")
-a = linspace(0,1,5)
+a = Compat.range(0; stop=1, length=5)
 rgba = pycall(pycall(PyPlot.ScalarMappable, PyObject, cmap=c,
                      norm=PyPlot.Normalize01)["to_rgba"], PyArray, a)
 @test rgba ≈ [ 0.267004  0.004874  0.329415  1.0

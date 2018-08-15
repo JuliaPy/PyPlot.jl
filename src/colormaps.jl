@@ -158,7 +158,7 @@ get_cmaps() =
 function show(io::IO, ::MIME"image/svg+xml", cs::AbstractVector{ColorMap})
     n = 256
     nc = length(cs)
-    a = linspace(0,1,n)
+    a = Compat.range(0; stop=1, length=n)
     namelen = mapreduce(c -> length(c[:name]), max, cs)
     width = 0.5
     height = 5
