@@ -29,29 +29,13 @@ Compat.@info("got plot bounding box ", boundingbox)
 @test all([300, 200] .< boundingbox[3:4] - boundingbox[1:2] .< [450,350])
 
 c = get_cmap("viridis")
-if VERSION < v"0.7.0"
-	a = linspace(0,1,5)
-else
-	a = range(0,step=1,length=5)
-end
+a = 0.0:0.25:1.0
 
 
-#
-# Not sure what this test is doing but
-# the results are different between 0.6 and 1.0
-#
-#rgba = pycall(pycall(PyPlot.ScalarMappable, PyObject, cmap=c,
-#                     norm=PyPlot.Normalize01)["to_rgba"], PyArray, a)
-#@test rgba ≈ [ 0.267004  0.004874  0.329415  1.0
-#               0.993248  0.906157  0.143936  1.0
-#               0.993248  0.906157  0.143936  1.0
-#               0.993248  0.906157  0.143936  1.0
-#               0.993248  0.906157  0.143936  1.0 ]
-
-# This is what Julia 0.6 outputs
-# 0.267004  0.004874  0.329415  1.0
-# 0.229739  0.322361  0.545706  1.0
-# 0.127568  0.566949  0.550556  1.0
-# 0.369214  0.788888  0.382914  1.0
-# 0.993248  0.906157  0.143936  1.0
-
+rgba = pycall(pycall(PyPlot.ScalarMappable, PyObject, cmap=c,
+                     norm=PyPlot.Normalize01)["to_rgba"], PyArray, a)
+@test rgba ≈ [ 0.267004  0.004874  0.329415  1.0
+               0.229739  0.322361  0.545706  1.0
+               0.127568  0.566949  0.550556  1.0
+               0.369214  0.788888  0.382914  1.0
+               0.993248  0.906157  0.143936  1.0 ]
