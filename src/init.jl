@@ -1,5 +1,6 @@
 # PyPlot initialization — the hardest part is finding a working backend.
 using VersionParsing
+using Compat
 
 ###########################################################################
 
@@ -157,7 +158,7 @@ function find_backend(matplotlib::PyObject)
         end
     catch e
         if !isjulia_display[1]
-            warn("No working GUI backend found for matplotlib")
+            Compat.@warn("No working GUI backend found for matplotlib")
             isjulia_display[1] = true
         end
         pygui(:default)
