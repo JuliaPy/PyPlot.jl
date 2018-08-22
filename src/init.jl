@@ -1,6 +1,5 @@
 # PyPlot initialization — the hardest part is finding a working backend.
 using VersionParsing
-using Compat
 
 ###########################################################################
 
