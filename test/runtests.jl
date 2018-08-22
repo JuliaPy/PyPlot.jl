@@ -11,7 +11,7 @@ else
     using Test
 end
 
-plot(collect(1:5), collect(2:6), "ro-")
+plot(1:5, 2:6, "ro-")
 
 line = gca()[:lines][1]
 @test line[:get_xdata]() == [1:5;]
