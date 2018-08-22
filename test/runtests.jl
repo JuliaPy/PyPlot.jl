@@ -1,6 +1,9 @@
 ENV["MPLBACKEND"]="agg" # no GUI
 
 using PyPlot, PyCall
+using Compat
+
+VERSION >= v"0.7.0" && using Base64
 
 if isdefined(Base, :Test) && !Base.isdeprecated(Base, :Test)
     using Base.Test
@@ -22,11 +25,13 @@ s = stringmime("application/postscript", fig);
 m = match(r"%%BoundingBox: *([0-9]+) +([0-9]+) +([0-9]+) +([0-9]+)", s)
 @test m !== nothing
 boundingbox = map(s -> parse(Int, s), m.captures)
-info("got plot bounding box ", boundingbox)
+Compat.@info("got plot bounding box ", boundingbox)
 @test all([300, 200] .< boundingbox[3:4] - boundingbox[1:2] .< [450,350])
 
 c = get_cmap("viridis")
-a = linspace(0,1,5)
+a = 0.0:0.25:1.0
+
+
 rgba = pycall(pycall(PyPlot.ScalarMappable, PyObject, cmap=c,
                      norm=PyPlot.Normalize01)["to_rgba"], PyArray, a)
 @test rgba ≈ [ 0.267004  0.004874  0.329415  1.0
@@ -34,4 +39,3 @@ rgba = pycall(pycall(PyPlot.ScalarMappable, PyObject, cmap=c,
                0.127568  0.566949  0.550556  1.0
                0.369214  0.788888  0.382914  1.0
                0.993248  0.906157  0.143936  1.0 ]
-
