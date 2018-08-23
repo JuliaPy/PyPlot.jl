@@ -63,7 +63,7 @@ ColorMap(name::Union{AbstractString,Symbol},
          g::AbstractVector{Tuple{T,T,T}},
          b::AbstractVector{Tuple{T,T,T}},
          n=max(256,length(r),length(g),length(b)), gamma=1.0) where {T<:Real} =
-    ColorMap(name, r,g,b, Array{Tuple{T,T,T}}(0), n, gamma)
+    ColorMap(name, r,g,b, Array{Tuple{T,T,T}}(undef, 0), n, gamma)
 
 # as above, but also passing an alpha array
 function ColorMap(name::Union{AbstractString,Symbol},
@@ -88,11 +88,11 @@ function ColorMap(name::Union{AbstractString,Symbol},
     if nc == 0
         throw(ArgumentError("ColorMap requires a non-empty Colorant array"))
     end
-    r = Array{Tuple{Float64,Float64,Float64}}(nc)
+    r = Array{Tuple{Float64,Float64,Float64}}(undef, nc)
     g = similar(r)
     b = similar(r)
     a = T <: TransparentColor ?
-        similar(r) : Array{Tuple{Float64,Float64,Float64}}(0)
+        similar(r) : Array{Tuple{Float64,Float64,Float64}}(undef, 0)
     for i = 1:nc
         x = (i-1) / (nc-1)
         if T <: TransparentColor
@@ -158,7 +158,7 @@ get_cmaps() =
 function show(io::IO, ::MIME"image/svg+xml", cs::AbstractVector{ColorMap})
     n = 256
     nc = length(cs)
-    a = linspace(0,1,n)
+    a = Compat.range(0; stop=1, length=n)
     namelen = mapreduce(c -> length(c[:name]), max, cs)
     width = 0.5
     height = 5
