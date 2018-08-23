@@ -2,16 +2,9 @@ ENV["MPLBACKEND"]="agg" # no GUI
 
 using PyPlot, PyCall
 using Compat
+using Compat.Test
 
 VERSION >= v"0.7.0" && using Base64
-
-if isdefined(Base, :Test) && !Base.isdeprecated(Base, :Test)
-    using Base.Test
-else
-    using Test
-end
-
-!isdefined(Base, :Base64) && using Base64
 
 plot(1:5, 2:6, "ro-")
 
