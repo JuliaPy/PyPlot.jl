@@ -6,8 +6,6 @@ using Compat.Test
 
 Compat.@info("PyPlot is using Matplotlib $(PyPlot.version) with Python $(PyCall.pyversion)")
 
-VERSION >= v"0.7.0" && using Base64 # for stringmime
-
 plot(1:5, 2:6, "ro-")
 
 line = gca()[:lines][1]
@@ -16,9 +14,13 @@ line = gca()[:lines][1]
 
 fig = gcf()
 @test isa(fig, PyPlot.Figure)
-@test fig[:get_size_inches]() ≈ [6.4, 4.8]
+if PyPlot.version >= v"2"
+    @test fig[:get_size_inches]() ≈ [6.4, 4.8]
+else # matplotlib 1.3
+    @test fig[:get_size_inches]() ≈ [8, 6]
+end
 
-s = stringmime("application/postscript", fig);
+s = sprint(show, "application/postscript", fig);
 m = match(r"%%BoundingBox: *([0-9]+) +([0-9]+) +([0-9]+) +([0-9]+)", s)
 @test m !== nothing
 boundingbox = map(s -> parse(Int, s), m.captures)
