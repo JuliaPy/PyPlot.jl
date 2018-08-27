@@ -20,12 +20,15 @@ else # matplotlib 1.3
     @test fig[:get_size_inches]() ≈ [8, 6]
 end
 
-s = sprint(show, "application/postscript", fig);
-m = match(r"%%BoundingBox: *([0-9]+) +([0-9]+) +([0-9]+) +([0-9]+)", s)
-@test m !== nothing
-boundingbox = map(s -> parse(Int, s), m.captures)
-Compat.@info("got plot bounding box ", boundingbox)
-@test all([300, 200] .< boundingbox[3:4] - boundingbox[1:2] .< [450,350])
+# with Matplotlib 1.3, I get "UserWarning: bbox_inches option for ps backend is not implemented yet"
+if PyPlot.version >= v"2"
+    s = sprint(show, "application/postscript", fig);
+    m = match(r"%%BoundingBox: *([0-9]+) +([0-9]+) +([0-9]+) +([0-9]+)", s)
+    @test m !== nothing
+    boundingbox = map(s -> parse(Int, s), m.captures)
+    Compat.@info("got plot bounding box ", boundingbox)
+    @test all([300, 200] .< boundingbox[3:4] - boundingbox[1:2] .< [450,350])
+end
 
 c = get_cmap("viridis")
 a = 0.0:0.25:1.0
