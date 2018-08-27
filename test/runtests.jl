@@ -4,7 +4,7 @@ using PyPlot, PyCall
 using Compat
 using Compat.Test
 
-VERSION >= v"0.7.0" && using Base64
+Compat.@info("PyPlot is using Matplotlib $(PyPlot.version) with Python $(PyCall.pyversion)")
 
 plot(1:5, 2:6, "ro-")
 
@@ -14,23 +14,28 @@ line = gca()[:lines][1]
 
 fig = gcf()
 @test isa(fig, PyPlot.Figure)
-@test fig[:get_size_inches]() ≈ [6.4, 4.8]
+if PyPlot.version >= v"2"
+    @test fig[:get_size_inches]() ≈ [6.4, 4.8]
+else # matplotlib 1.3
+    @test fig[:get_size_inches]() ≈ [8, 6]
+end
 
-s = stringmime("application/postscript", fig);
-m = match(r"%%BoundingBox: *([0-9]+) +([0-9]+) +([0-9]+) +([0-9]+)", s)
-@test m !== nothing
-boundingbox = map(s -> parse(Int, s), m.captures)
-Compat.@info("got plot bounding box ", boundingbox)
-@test all([300, 200] .< boundingbox[3:4] - boundingbox[1:2] .< [450,350])
+# with Matplotlib 1.3, I get "UserWarning: bbox_inches option for ps backend is not implemented yet"
+if PyPlot.version >= v"2"
+    s = sprint(show, "application/postscript", fig);
+    m = match(r"%%BoundingBox: *([0-9]+) +([0-9]+) +([0-9]+) +([0-9]+)", s)
+    @test m !== nothing
+    boundingbox = map(s -> parse(Int, s), m.captures)
+    Compat.@info("got plot bounding box ", boundingbox)
+    @test all([300, 200] .< boundingbox[3:4] - boundingbox[1:2] .< [450,350])
+end
 
-c = get_cmap("viridis")
+c = get_cmap("RdBu")
 a = 0.0:0.25:1.0
-
-
 rgba = pycall(pycall(PyPlot.ScalarMappable, PyObject, cmap=c,
                      norm=PyPlot.Normalize01)["to_rgba"], PyArray, a)
-@test rgba ≈ [ 0.267004  0.004874  0.329415  1.0
-               0.229739  0.322361  0.545706  1.0
-               0.127568  0.566949  0.550556  1.0
-               0.369214  0.788888  0.382914  1.0
-               0.993248  0.906157  0.143936  1.0 ]
+@test rgba ≈ [  0.403921568627451   0.0                  0.12156862745098039  1.0
+                0.8991926182237601  0.5144175317185697   0.4079200307574009   1.0
+                0.9657054978854287  0.9672433679354094   0.9680891964628989   1.0
+                0.4085351787773935  0.6687427912341408   0.8145328719723184   1.0
+                0.0196078431372549  0.18823529411764706  0.3803921568627451   1.0 ]
