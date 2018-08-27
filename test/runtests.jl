@@ -4,7 +4,9 @@ using PyPlot, PyCall
 using Compat
 using Compat.Test
 
-VERSION >= v"0.7.0" && using Base64
+Compat.@info("PyPlot is using Matplotlib $(PyPlot.version) with Python $(PyCall.pyversion)")
+
+VERSION >= v"0.7.0" && using Base64 # for stringmime
 
 plot(1:5, 2:6, "ro-")
 
