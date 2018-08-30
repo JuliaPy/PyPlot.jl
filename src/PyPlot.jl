@@ -248,14 +248,14 @@ for f in (:surf,:mesh,:plot_surface,:plot_wireframe,:contour3D,:contourf3D)
     @eval begin
         function $f(X::AbstractVector, Y::AbstractVector, Z::AbstractMatrix, args...; kws...)
             m, n = length(X), length(Y)
-            $f(repmat(reshape(X,1,m),n,1), repmat(Y,1,m), Z, args...; kws...)
+            $f(repeat(X',n,1), repeat(Y,1,m), Z, args...; kws...)
         end
         function $f(X::AbstractMatrix, Y::AbstractVector, Z::AbstractMatrix, args...; kws...)
             if size(X,1) != 1 && size(X,2) != 1
                 throw(ArgumentError("if 2nd arg is column vector, 1st arg must be row or column vector"))
             end
             m, n = length(X), length(Y)
-            $f(repmat(reshape(X,1,m),n,1), repmat(Y,1,m), Z, args...; kws...)
+            $f(repeat(X',n,1), repeat(Y,1,m), Z, args...; kws...)
         end
     end
 end
