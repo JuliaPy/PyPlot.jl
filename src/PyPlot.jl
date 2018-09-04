@@ -279,7 +279,7 @@ function withfig(actions::Function, f::Figure; clear=true)
     ax_save = gca()
     push!(withfig_fignums, f[:number])
     figure(f[:number])
-    finalizer(f, close)
+    @compat finalizer(close, f)
     try
         if clear && !isempty(f)
             clf()
