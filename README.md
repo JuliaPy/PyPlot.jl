@@ -115,9 +115,10 @@ Matplotlib is somewhat inconsistent about capitalization: it has
 `contour3D` but `bar3d`, etcetera.  PyPlot renames all such functions
 to use a capital *D* (e.g. it has `hist2D`, `bar3D`, and so on).
 
-You must also use `plt` to access some functions that conflict with
-built-in Julia functions.  In particular `plt[:hist]`, `plt[:xcorr]`, and
-`plt[:isinteractive]` must be used to access `matplotlib.pyplot.hist`
+You must also explicitly qualify some functions
+built-in Julia functions.  In particular, `PyPlot.xcorr`,
+`PyPlot.axes`, and `PyPlot.isinteractive`
+must be used to access `matplotlib.pyplot.xcorr`
 etcetera.
 
 If you wish to access *all* of the PyPlot functions exclusively
@@ -127,7 +128,7 @@ do `import PyPlot; const plt = PyPlot` instead of `using PyPlot`.
 ### Figure objects
 
 You can get the current figure as a `Figure` object (a wrapper
-around `matplotlib.pyplot.Figure`) by calling `gcf()`.  
+around `matplotlib.pyplot.Figure`) by calling `gcf()`.
 
 The `Figure` type supports Julia's [multimedia I/O
 API](http://docs.julialang.org/en/latest/stdlib/base/#multimedia-i-o),
