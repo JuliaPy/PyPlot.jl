@@ -6,7 +6,7 @@ mutable struct LazyPyModule
     o::PyObject
     LazyPyModule(n) = new(n, PyNULL())
 end
-PyObject(m::LazyPyModule) = getfield(m.o, :o) == C_NULL ? copy!(m.o, pyimport(m.name)) : m.o
+PyObject(m::LazyPyModule) = ispynull(m.o) ? copy!(m.o, pyimport(m.name)) : m.o
 pycall(m::LazyPyModule, args...; kws...) = pycall(PyObject(m), args...; kws...)
 (m::LazyPyModule)(args...; kws...) = pycall(PyObject(m), PyAny, args...; kws...)
 Base.Docs.doc(m::LazyPyModule) = Base.Docs.doc(PyObject(m))
