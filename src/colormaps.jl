@@ -11,20 +11,28 @@ mutable struct ColorMap
     o::PyObject
 end
 
-PyObject(c::ColorMap) = c.o
+PyObject(c::ColorMap) = getfield(c, :o)
 convert(::Type{ColorMap}, o::PyObject) = ColorMap(o)
-==(c::ColorMap, g::ColorMap) = c.o == g.o
-==(c::PyObject, g::ColorMap) = c == g.o
-==(c::ColorMap, g::PyObject) = c.o == g
-hash(c::ColorMap) = hash(c.o)
-pycall(c::ColorMap, args...; kws...) = pycall(c.o, args...; kws...)
-(c::ColorMap)(args...; kws...) = pycall(c.o, PyAny, args...; kws...)
-Base.Docs.doc(c::ColorMap) = Base.Docs.doc(c.o)
+==(c::ColorMap, g::ColorMap) = PyObject(c) == PyObject(g)
+==(c::PyObject, g::ColorMap) = c == PyObject(g)
+==(c::ColorMap, g::PyObject) = PyObject(c) == g
+hash(c::ColorMap) = hash(PyObject(c))
+pycall(c::ColorMap, args...; kws...) = pycall(PyObject(c), args...; kws...)
+(c::ColorMap)(args...; kws...) = pycall(PyObject(c), PyAny, args...; kws...)
+Base.Docs.doc(c::ColorMap) = Base.Docs.doc(PyObject(c))
 
-getindex(c::ColorMap, x) = getindex(c.o, x)
-setindex!(c::ColorMap, v, x) = setindex!(c.o, v, x)
-haskey(c::ColorMap, x) = haskey(c.o, x)
-keys(c::ColorMap) = keys(c.o)
+# Note: using `Union{Symbol,String}` produces ambiguity.
+Base.getproperty(c::ColorMap, s::Symbol) = getproperty(PyObject(c), s)
+Base.getproperty(c::ColorMap, s::AbstractString) = getproperty(PyObject(c), s)
+Base.setproperty!(c::ColorMap, s::Symbol, x) = setproperty!(PyObject(c), s, x)
+Base.setproperty!(c::ColorMap, s::AbstractString, x) = setproperty!(PyObject(c), s, x)
+Base.propertynames(c::ColorMap) = propertynames(PyObject(c))
+hasproperty(c::ColorMap, s::Union{Symbol,AbstractString}) = hasproperty(PyObject(c), s)
+haskey(c::ColorMap, x) = haskey(PyObject(c), x)
+
+@deprecate getindex(c::ColorMap, x) getproperty(c, x)
+@deprecate setindex!(c::ColorMap, s, x) setproperty!(c, s, x)
+@deprecate keys(c::ColorMap) propertynames(c)
 
 function show(io::IO, c::ColorMap)
     print(io, "ColorMap \"$(c.name)\"")

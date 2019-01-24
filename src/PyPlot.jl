@@ -4,7 +4,9 @@ module PyPlot
 
 using PyCall
 import PyCall: PyObject, pygui, pycall, pyexists
+import PyCall: hasproperty  # to be imported from Base
 import Base: convert, ==, isequal, hash, getindex, setindex!, haskey, keys, show
+using Base: @deprecate
 export Figure, plt, matplotlib, pygui, withfig
 
 using Compat
@@ -16,7 +18,7 @@ import Base.show
 # This saves us time when loading PyPlot, since we don't have
 # to load up all of the documentation strings right away.
 struct LazyHelp
-    o # a PyObject or similar object supporting getindex with a __doc__ key
+    o # a PyObject or similar object supporting getindex with a __doc__ property
     keys::Tuple{Vararg{String}}
     LazyHelp(o) = new(o, ())
     LazyHelp(o, k::AbstractString) = new(o, (k,))
@@ -28,7 +30,7 @@ function show(io::IO, ::MIME"text/plain", h::LazyHelp)
     for k in h.keys
         o = o[k]
     end
-    if haskey(o, "__doc__")
+    if hasproperty(o, "__doc__")
         print(io, convert(AbstractString, o."__doc__"))
     else
         print(io, "no Python docstring found for ", h.k)
@@ -53,34 +55,42 @@ include("init.jl")
 mutable struct Figure
     o::PyObject
 end
-PyObject(f::Figure) = f.o
+PyObject(f::Figure) = getfield(f, :o)
 convert(::Type{Figure}, o::PyObject) = Figure(o)
-==(f::Figure, g::Figure) = f.o == g.o
-==(f::Figure, g::PyObject) = f.o == g
-==(f::PyObject, g::Figure) = f == g.o
-hash(f::Figure) = hash(f.o)
-pycall(f::Figure, args...; kws...) = pycall(f.o, args...; kws...)
-(f::Figure)(args...; kws...) = pycall(f.o, PyAny, args...; kws...)
-Base.Docs.doc(f::Figure) = Base.Docs.doc(f.o)
+==(f::Figure, g::Figure) = PyObject(f) == PyObject(g)
+==(f::Figure, g::PyObject) = PyObject(f) == g
+==(f::PyObject, g::Figure) = f == PyObject(g)
+hash(f::Figure) = hash(PyObject(f))
+pycall(f::Figure, args...; kws...) = pycall(PyObject(f), args...; kws...)
+(f::Figure)(args...; kws...) = pycall(PyObject(f), PyAny, args...; kws...)
+Base.Docs.doc(f::Figure) = Base.Docs.doc(PyObject(f))
 
-getindex(f::Figure, x) = getindex(f.o, x)
-setindex!(f::Figure, v, x) = setindex!(f.o, v, x)
-haskey(f::Figure, x) = haskey(f.o, x)
-keys(f::Figure) = keys(f.o)
+# Note: using `Union{Symbol,String}` produces ambiguity.
+Base.getproperty(f::Figure, s::Symbol) = getproperty(PyObject(f), s)
+Base.getproperty(f::Figure, s::AbstractString) = getproperty(PyObject(f), s)
+Base.setproperty!(f::Figure, s::Symbol, x) = setproperty!(PyObject(f), s, x)
+Base.setproperty!(f::Figure, s::AbstractString, x) = setproperty!(PyObject(f), s, x)
+hasproperty(f::Figure, s::Symbol) = hasproperty(PyObject(f), s)
+Base.propertynames(f::Figure) = propertynames(PyObject(f))
+haskey(f::Figure, x) = haskey(PyObject(f), x)
+
+@deprecate getindex(f::Figure, x) getproperty(f, x)
+@deprecate setindex!(f::Figure, v, x) setproperty!(f, v, x)
+@deprecate keys(f::Figure) propertynames(f)
 
 for (mime,fmt) in aggformats
     @eval function show(io::IO, m::MIME{Symbol($mime)}, f::Figure)
-        if !haskey(pycall(f.o."canvas"."get_supported_filetypes", PyDict),
+        if !haskey(pycall(PyObject(f)."canvas"."get_supported_filetypes", PyDict),
                    $fmt)
             throw(MethodError(show, (io, m, f)))
         end
-        f.o."canvas"."print_figure"(io, format=$fmt, bbox_inches="tight")
+        PyObject(f)."canvas"."print_figure"(io, format=$fmt, bbox_inches="tight")
     end
     if fmt != "svg"
         if isdefined(Base, :showable)
-            @eval Base.showable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(f.o."canvas"."get_supported_filetypes", PyDict), $fmt)
+            @eval Base.showable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(PyObject(f)."canvas"."get_supported_filetypes", PyDict), $fmt)
         else
-            @eval Base.mimewritable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(f.o."canvas"."get_supported_filetypes", PyDict), $fmt)
+            @eval Base.mimewritable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(PyObject(f)."canvas"."get_supported_filetypes", PyDict), $fmt)
         end
     end
 end
@@ -89,9 +99,9 @@ end
 # in IJulia is slow, and browser SVG display is buggy.  (Similar to IPython.)
 const SVG = [false]
 if isdefined(Base, :showable)
-    Base.showable(::MIME"image/svg+xml", f::Figure) = SVG[1] && !isempty(f) && haskey(pycall(f.o."canvas"."get_supported_filetypes", PyDict), "svg")
+    Base.showable(::MIME"image/svg+xml", f::Figure) = SVG[1] && !isempty(f) && haskey(pycall(PyObject(f)."canvas"."get_supported_filetypes", PyDict), "svg")
 else
-    Base.mimewritable(::MIME"image/svg+xml", f::Figure) = SVG[1] && !isempty(f) && haskey(pycall(f.o."canvas"."get_supported_filetypes", PyDict), "svg")
+    Base.mimewritable(::MIME"image/svg+xml", f::Figure) = SVG[1] && !isempty(f) && haskey(pycall(PyObject(f)."canvas"."get_supported_filetypes", PyDict), "svg")
 end
 svg() = SVG[1]
 svg(b::Bool) = (SVG[1] = b)
@@ -173,10 +183,10 @@ const plt_funcs = (:acorr,:annotate,:arrow,:autoscale,:autumn,:axes,:axhline,:ax
 for f in plt_funcs
     sf = string(f)
     @eval @doc LazyHelp(plt,$sf) function $f(args...; kws...)
-        if !haskey(plt, $sf)
+        if !hasproperty(plt, $sf)
             error("matplotlib ", version, " does not have pyplot.", $sf)
         end
-        return pycall(plt[$sf], PyAny, args...; kws...)
+        return pycall(plt.$sf, PyAny, args...; kws...)
     end
 end
 
