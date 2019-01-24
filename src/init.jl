@@ -70,7 +70,7 @@ function find_backend(matplotlib::PyObject)
 
     qt2gui = Dict("pyqt5"=>:qt_pyqt5, "pyqt4"=>:qt_pyqt4, "pyside"=>:qt_pyside)
 
-    rcParams = PyDict(matplotlib["rcParams"])
+    rcParams = PyDict(matplotlib."rcParams")
     default = lowercase(get(ENV, "MPLBACKEND",
                             getnone(rcParams, "backend", "none")))
     if haskey(matplotlib2gui,default)
@@ -119,27 +119,27 @@ function find_backend(matplotlib::PyObject)
             for (g,b) in options
                 if g == :none # Matplotlib is configured to be non-interactive
                     pygui(:default)
-                    matplotlib["use"](b)
-                    matplotlib["interactive"](false)
+                    matplotlib."use"(b)
+                    matplotlib."interactive"(false)
                     return (b, g)
                 elseif g == :gr
                     return (b, g)
                 elseif PyCall.pygui_works(g)
                     # must call matplotlib.use *before* loading backends module
-                    matplotlib["use"](b)
+                    matplotlib."use"(b)
                     if g == :qt || g == :qt4
                         if haskey(rcParams,"backend.qt4")
-                            g = qt2gui[lowercase(rcParams["backend.qt4"])]
+                            g = qt2gui[lowercase(rcParams."backend.qt4")]
                         elseif !PyCall.pyexists("PyQt5") && !PyCall.pyexists("PyQt4")
                             # both Matplotlib and PyCall default to PyQt4
                             # if it is available, but we need to tell
                             # Matplotlib to use PySide otherwise.
-                            rcParams["backend.qt4"] = "PySide"
+                            rcParams."backend.qt4" = "PySide"
                         end
                     end
                     if pyexists("matplotlib.backends.backend_" * lowercase(b))
                         isjulia_display[1] || pygui_start(g)
-                        matplotlib["interactive"](!isjulia_display[1] && Base.isinteractive())
+                        matplotlib."interactive"(!isjulia_display[1] && Base.isinteractive())
                         return (b, g)
                     end
                 end
@@ -147,12 +147,12 @@ function find_backend(matplotlib::PyObject)
             error("no gui found") # go to catch clause below
         else # the user specified a desired backend via pygui(gui)
             gui = pygui()
-            matplotlib["use"](gui2matplotlib[gui])
+            matplotlib."use"(gui2matplotlib[gui])
             if (gui==:qt && !PyCall.pyexists("PyQt5") && !PyCall.pyexists("PyQt4")) || gui==:qt_pyside
-                rcParams["backend.qt4"] = "PySide"
+                rcParams."backend.qt4" = "PySide"
             end
             isjulia_display[1] || pygui_start(gui)
-            matplotlib["interactive"](!isjulia_display[1] && Base.isinteractive())
+            matplotlib."interactive"(!isjulia_display[1] && Base.isinteractive())
             return (gui2matplotlib[gui], gui)
         end
     catch e
@@ -161,8 +161,8 @@ function find_backend(matplotlib::PyObject)
             isjulia_display[1] = true
         end
         pygui(:default)
-        matplotlib["use"]("Agg") # GUI not available
-        matplotlib["interactive"](false)
+        matplotlib."use"("Agg") # GUI not available
+        matplotlib."interactive"(false)
         return ("Agg", :none)
     end
 end
@@ -172,7 +172,7 @@ end
 function __init__()
     global isjulia_display = Bool[isdisplayok()]
     copy!(matplotlib, pyimport_conda("matplotlib", "matplotlib"))
-    mvers = matplotlib[:__version__]
+    mvers = matplotlib.__version__
     global version = try
         vparse(mvers)
     catch
@@ -186,13 +186,13 @@ function __init__()
 
     copy!(plt, pyimport("matplotlib.pyplot")) # raw Python module
 
-    pytype_mapping(plt["Figure"], Figure)
+    pytype_mapping(plt."Figure", Figure)
 
-    copy!(Gcf, pyimport("matplotlib._pylab_helpers")["Gcf"])
-    copy!(orig_gcf, plt["gcf"])
-    copy!(orig_figure, plt["figure"])
-    plt["gcf"] = gcf
-    plt["figure"] = figure
+    copy!(Gcf, pyimport("matplotlib._pylab_helpers")."Gcf")
+    copy!(orig_gcf, plt."gcf")
+    copy!(orig_figure, plt."figure")
+    plt."gcf" = gcf
+    plt."figure" = figure
 
     if isdefined(Main, :IJulia) && Main.IJulia.inited
         Main.IJulia.push_preexecute_hook(force_new_fig)
@@ -201,8 +201,8 @@ function __init__()
     end
 
     if isjulia_display[1] && gui != :gr && backend != "Agg"
-        plt["switch_backend"]("Agg")
-        plt["ioff"]()
+        plt."switch_backend"("Agg")
+        plt."ioff"()
     end
 
     init_colormaps()
@@ -211,12 +211,12 @@ end
 function pygui(b::Bool)
     if !b != isjulia_display[1]
         if backend != "Agg"
-            plt["switch_backend"](b ? backend : "Agg")
+            plt."switch_backend"(b ? backend : "Agg")
             if b
                 pygui_start(gui) # make sure event loop is started
-                Base.isinteractive() && plt["ion"]()
+                Base.isinteractive() && plt."ion"()
             else
-                plt["ioff"]()
+                plt."ioff"()
             end
         elseif b
             error("No working GUI backend found for matplotlib.")

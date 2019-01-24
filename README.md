@@ -107,7 +107,7 @@ version number is returned by `PyPlot.version`.
 
 Only the currently documented `matplotlib.pyplot` API is exported.  To use
 other functions in the module, you can also call `matplotlib.pyplot.foo(...)`
-as `plt[:foo](...)`.  For example, `plt[:plot](x, y)` also works.  (And
+as `plt.foo(...)`.  For example, `plt.plot(x, y)` also works.  (And
 the raw `PyObject` for the `matplotlib` modules is also accessible
 as `PyPlot.matplotlib`.)
 

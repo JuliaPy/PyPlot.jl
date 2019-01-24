@@ -29,7 +29,7 @@ function show(io::IO, ::MIME"text/plain", h::LazyHelp)
         o = o[k]
     end
     if haskey(o, "__doc__")
-        print(io, convert(AbstractString, o["__doc__"]))
+        print(io, convert(AbstractString, o."__doc__"))
     else
         print(io, "no Python docstring found for ", h.k)
     end
@@ -70,17 +70,17 @@ keys(f::Figure) = keys(f.o)
 
 for (mime,fmt) in aggformats
     @eval function show(io::IO, m::MIME{Symbol($mime)}, f::Figure)
-        if !haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict),
+        if !haskey(pycall(f.o."canvas"."get_supported_filetypes", PyDict),
                    $fmt)
             throw(MethodError(show, (io, m, f)))
         end
-        f.o["canvas"]["print_figure"](io, format=$fmt, bbox_inches="tight")
+        f.o."canvas"."print_figure"(io, format=$fmt, bbox_inches="tight")
     end
     if fmt != "svg"
         if isdefined(Base, :showable)
-            @eval Base.showable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict), $fmt)
+            @eval Base.showable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(f.o."canvas"."get_supported_filetypes", PyDict), $fmt)
         else
-            @eval Base.mimewritable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict), $fmt)
+            @eval Base.mimewritable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(f.o."canvas"."get_supported_filetypes", PyDict), $fmt)
         end
     end
 end
@@ -89,9 +89,9 @@ end
 # in IJulia is slow, and browser SVG display is buggy.  (Similar to IPython.)
 const SVG = [false]
 if isdefined(Base, :showable)
-    Base.showable(::MIME"image/svg+xml", f::Figure) = SVG[1] && !isempty(f) && haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict), "svg")
+    Base.showable(::MIME"image/svg+xml", f::Figure) = SVG[1] && !isempty(f) && haskey(pycall(f.o."canvas"."get_supported_filetypes", PyDict), "svg")
 else
-    Base.mimewritable(::MIME"image/svg+xml", f::Figure) = SVG[1] && !isempty(f) && haskey(pycall(f.o["canvas"]["get_supported_filetypes"], PyDict), "svg")
+    Base.mimewritable(::MIME"image/svg+xml", f::Figure) = SVG[1] && !isempty(f) && haskey(pycall(f.o."canvas"."get_supported_filetypes", PyDict), "svg")
 end
 svg() = SVG[1]
 svg(b::Bool) = (SVG[1] = b)
@@ -103,7 +103,7 @@ svg(b::Bool) = (SVG[1] = b)
 # since the user is keeping track of these in some other way,
 # e.g. for interactive widgets.
 
-Base.isempty(f::Figure) = isempty(pycall(f["get_axes"], PyVector))
+Base.isempty(f::Figure) = isempty(pycall(f."get_axes", PyVector))
 
 # We keep a set of figure numbers for the figures used in withfig, because
 # for these figures we don't want to auto-display or auto-close them
@@ -114,12 +114,12 @@ const withfig_fignums = Set{Int}()
 
 function display_figs() # called after IJulia cell executes
     if isjulia_display[1]
-        for manager in Gcf["get_all_fig_managers"]()
-            f = manager["canvas"]["figure"]
-            if f[:number] ∉ withfig_fignums
+        for manager in Gcf."get_all_fig_managers"()
+            f = manager."canvas"."figure"
+            if f.number ∉ withfig_fignums
                 fig = Figure(f)
                 isempty(fig) || display(fig)
-                pycall(plt["close"], PyAny, f)
+                pycall(plt."close", PyAny, f)
             end
         end
     end
@@ -127,10 +127,10 @@ end
 
 function close_figs() # called after error in IJulia cell
     if isjulia_display[1]
-        for manager in Gcf["get_all_fig_managers"]()
-            f = manager["canvas"]["figure"]
-            if f[:number] ∉ withfig_fignums
-                pycall(plt["close"], PyAny, f)
+        for manager in Gcf."get_all_fig_managers"()
+            f = manager."canvas"."figure"
+            if f.number ∉ withfig_fignums
+                pycall(plt."close", PyAny, f)
             end
         end
     end
@@ -180,25 +180,25 @@ for f in plt_funcs
     end
 end
 
-@doc LazyHelp(plt,"step") step(x, y; kws...) = pycall(plt["step"], PyAny, x, y; kws...)
+@doc LazyHelp(plt,"step") step(x, y; kws...) = pycall(plt."step", PyAny, x, y; kws...)
 
-Base.show(; kws...) = begin pycall(plt["show"], PyObject; kws...); nothing; end
+Base.show(; kws...) = begin pycall(plt."show", PyObject; kws...); nothing; end
 
-close(f::Figure) = close(f[:number])
+close(f::Figure) = close(f.number)
 function close(f::Integer)
     pop!(withfig_fignums, f, f)
-    pycall(plt["close"], PyAny, f)
+    pycall(plt."close", PyAny, f)
 end
-close(f::Union{AbstractString,Symbol}) = pycall(plt["close"], PyAny, f)
-@doc LazyHelp(plt,"close") close() = pycall(plt["close"], PyAny)
+close(f::Union{AbstractString,Symbol}) = pycall(plt."close", PyAny, f)
+@doc LazyHelp(plt,"close") close() = pycall(plt."close", PyAny)
 
-@doc LazyHelp(plt,"connect") connect(s::Union{AbstractString,Symbol}, f::Function) = pycall(plt["connect"], PyAny, s, f)
+@doc LazyHelp(plt,"connect") connect(s::Union{AbstractString,Symbol}, f::Function) = pycall(plt."connect", PyAny, s, f)
 
 @doc LazyHelp(plt,"fill") fill(x::AbstractArray,y::AbstractArray, args...; kws...) =
-    pycall(plt["fill"], PyAny, x, y, args...; kws...)
+    pycall(plt."fill", PyAny, x, y, args...; kws...)
 
 # consistent capitalization with mplot3d, avoid conflict with Base.hist2d
-@doc LazyHelp(plt,"hist2d") hist2D(args...; kws...) = pycall(plt["hist2d"], PyAny, args...; kws...)
+@doc LazyHelp(plt,"hist2d") hist2D(args...; kws...) = pycall(plt."hist2d", PyAny, args...; kws...)
 
 include("colormaps.jl")
 
@@ -212,9 +212,9 @@ function bar(x::AbstractVector{T}, y; kws...) where T<:AbstractString
     end
     p = bar(xi, y; kws...)
     ax = any(kw -> kw[1] == :orientation && lowercase(kw[2]) == "horizontal",
-             kws) ? gca()["yaxis"] : gca()["xaxis"]
-    ax["set_ticks"](xi)
-    ax["set_ticklabels"](x)
+             kws) ? gca()."yaxis" : gca()."xaxis"
+    ax."set_ticks"(xi)
+    ax."set_ticklabels"(x)
     return p
 end
 
@@ -274,8 +274,8 @@ end
 
 function withfig(actions::Function, f::Figure; clear=true)
     ax_save = gca()
-    push!(withfig_fignums, f[:number])
-    figure(f[:number])
+    push!(withfig_fignums, f.number)
+    figure(f.number)
     @compat finalizer(close, f)
     try
         if clear && !isempty(f)

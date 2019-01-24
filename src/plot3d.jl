@@ -51,7 +51,7 @@ for f in mplot3d_funcs
     end
 end
 
-@doc LazyHelp(axes3D,"Axes3D") Axes3D(args...; kws...) = pycall(axes3D["Axes3D"], PyAny, args...; kws...)
+@doc LazyHelp(axes3D,"Axes3D") Axes3D(args...; kws...) = pycall(axes3D."Axes3D", PyAny, args...; kws...)
 
 # correct for annoying mplot3d inconsistency
 @doc LazyHelp(axes3D,"Axes3D", "bar3d") bar3D(args...) = bar3d(args...)
