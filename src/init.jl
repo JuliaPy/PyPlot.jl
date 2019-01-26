@@ -70,6 +70,14 @@ function find_backend(matplotlib::PyObject)
 
     qt2gui = Dict("pyqt5"=>:qt_pyqt5, "pyqt4"=>:qt_pyqt4, "pyside"=>:qt_pyside)
 
+    if haskey(matplotlib, :pyplot)
+        # If matplotlib.pyplot exists, it means that matplotlib
+        # backend is already configured.  It may mean that PyPlot.jl
+        # is called via PyJulia.
+        backend = lowercase(matplotlib[:get_backend]())
+        return (backend, get(matplotlib2gui, backend, :none))
+    end
+
     rcParams = PyDict(matplotlib["rcParams"])
     default = lowercase(get(ENV, "MPLBACKEND",
                             getnone(rcParams, "backend", "none")))
