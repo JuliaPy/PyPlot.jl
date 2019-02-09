@@ -96,10 +96,12 @@ deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 
 [[PyCall]]
-deps = ["Compat", "Conda", "MacroTools", "Statistics", "VersionParsing"]
-git-tree-sha1 = "ce4681263f41d98b3faf6107b28284bf8b866f5f"
+deps = ["Conda", "Dates", "Libdl", "LinearAlgebra", "MacroTools", "Serialization", "Statistics", "Test", "VersionParsing"]
+git-tree-sha1 = "01020c8d55ed7e0f4e810f3685c6818022a02085"
+repo-rev = "7e1c8353f969dabc6b91b2883778c0420a9d2753"
+repo-url = "https://github.com/JuliaPy/PyCall.jl.git"
 uuid = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
-version = "1.18.5"
+version = "1.18.5+"
 
 [[REPL]]
 deps = ["InteractiveUtils", "Markdown", "Sockets"]
