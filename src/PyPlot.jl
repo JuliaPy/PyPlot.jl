@@ -77,17 +77,17 @@ haskey(f::Figure, x) = haskey(PyObject(f), x)
 
 for (mime,fmt) in aggformats
     @eval function show(io::IO, m::MIME{Symbol($mime)}, f::Figure)
-        if !haskey(pycall(PyObject(f)."canvas"."get_supported_filetypes", PyDict),
+        if !haskey(pycall(f."canvas"."get_supported_filetypes", PyDict),
                    $fmt)
             throw(MethodError(show, (io, m, f)))
         end
-        PyObject(f)."canvas"."print_figure"(io, format=$fmt, bbox_inches="tight")
+        f."canvas"."print_figure"(io, format=$fmt, bbox_inches="tight")
     end
     if fmt != "svg"
         if isdefined(Base, :showable)
-            @eval Base.showable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(PyObject(f)."canvas"."get_supported_filetypes", PyDict), $fmt)
+            @eval Base.showable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(f."canvas"."get_supported_filetypes", PyDict), $fmt)
         else
-            @eval Base.mimewritable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(PyObject(f)."canvas"."get_supported_filetypes", PyDict), $fmt)
+            @eval Base.mimewritable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(f."canvas"."get_supported_filetypes", PyDict), $fmt)
         end
     end
 end
@@ -96,9 +96,9 @@ end
 # in IJulia is slow, and browser SVG display is buggy.  (Similar to IPython.)
 const SVG = [false]
 if isdefined(Base, :showable)
-    Base.showable(::MIME"image/svg+xml", f::Figure) = SVG[1] && !isempty(f) && haskey(pycall(PyObject(f)."canvas"."get_supported_filetypes", PyDict), "svg")
+    Base.showable(::MIME"image/svg+xml", f::Figure) = SVG[1] && !isempty(f) && haskey(pycall(f."canvas"."get_supported_filetypes", PyDict), "svg")
 else
-    Base.mimewritable(::MIME"image/svg+xml", f::Figure) = SVG[1] && !isempty(f) && haskey(pycall(PyObject(f)."canvas"."get_supported_filetypes", PyDict), "svg")
+    Base.mimewritable(::MIME"image/svg+xml", f::Figure) = SVG[1] && !isempty(f) && haskey(pycall(f."canvas"."get_supported_filetypes", PyDict), "svg")
 end
 svg() = SVG[1]
 svg(b::Bool) = (SVG[1] = b)
