@@ -11,23 +11,31 @@ mutable struct ColorMap
     o::PyObject
 end
 
-PyObject(c::ColorMap) = c.o
+PyObject(c::ColorMap) = getfield(c, :o)
 convert(::Type{ColorMap}, o::PyObject) = ColorMap(o)
-==(c::ColorMap, g::ColorMap) = c.o == g.o
-==(c::PyObject, g::ColorMap) = c == g.o
-==(c::ColorMap, g::PyObject) = c.o == g
-hash(c::ColorMap) = hash(c.o)
-pycall(c::ColorMap, args...; kws...) = pycall(c.o, args...; kws...)
-(c::ColorMap)(args...; kws...) = pycall(c.o, PyAny, args...; kws...)
-Base.Docs.doc(c::ColorMap) = Base.Docs.doc(c.o)
+==(c::ColorMap, g::ColorMap) = PyObject(c) == PyObject(g)
+==(c::PyObject, g::ColorMap) = c == PyObject(g)
+==(c::ColorMap, g::PyObject) = PyObject(c) == g
+hash(c::ColorMap) = hash(PyObject(c))
+pycall(c::ColorMap, args...; kws...) = pycall(PyObject(c), args...; kws...)
+(c::ColorMap)(args...; kws...) = pycall(PyObject(c), PyAny, args...; kws...)
+Base.Docs.doc(c::ColorMap) = Base.Docs.doc(PyObject(c))
 
-getindex(c::ColorMap, x) = getindex(c.o, x)
-setindex!(c::ColorMap, v, x) = setindex!(c.o, v, x)
-haskey(c::ColorMap, x) = haskey(c.o, x)
-keys(c::ColorMap) = keys(c.o)
+# Note: using `Union{Symbol,String}` produces ambiguity.
+Base.getproperty(c::ColorMap, s::Symbol) = getproperty(PyObject(c), s)
+Base.getproperty(c::ColorMap, s::AbstractString) = getproperty(PyObject(c), s)
+Base.setproperty!(c::ColorMap, s::Symbol, x) = setproperty!(PyObject(c), s, x)
+Base.setproperty!(c::ColorMap, s::AbstractString, x) = setproperty!(PyObject(c), s, x)
+Base.propertynames(c::ColorMap) = propertynames(PyObject(c))
+hasproperty(c::ColorMap, s::Union{Symbol,AbstractString}) = hasproperty(PyObject(c), s)
+haskey(c::ColorMap, x) = haskey(PyObject(c), x)
+
+@deprecate getindex(c::ColorMap, x) getproperty(c, x)
+@deprecate setindex!(c::ColorMap, s, x) setproperty!(c, s, x)
+@deprecate keys(c::ColorMap) propertynames(c)
 
 function show(io::IO, c::ColorMap)
-    print(io, "ColorMap \"$(c[:name])\"")
+    print(io, "ColorMap \"$(c.name)\"")
 end
 
 # all Python dependencies must be initialized at runtime (not when precompiled)
@@ -42,15 +50,15 @@ function init_colormaps()
     copy!(colorsm, pyimport("matplotlib.colors"))
     copy!(cm, pyimport("matplotlib.cm"))
 
-    pytype_mapping(colorsm["Colormap"], ColorMap)
+    pytype_mapping(colorsm."Colormap", ColorMap)
 
-    copy!(LinearSegmentedColormap, colorsm["LinearSegmentedColormap"])
+    copy!(LinearSegmentedColormap, colorsm."LinearSegmentedColormap")
 
-    copy!(cm_get_cmap, cm["get_cmap"])
-    copy!(cm_register_cmap, cm["register_cmap"])
+    copy!(cm_get_cmap, cm."get_cmap")
+    copy!(cm_register_cmap, cm."register_cmap")
 
-    copy!(ScalarMappable, cm["ScalarMappable"])
-    copy!(Normalize01, pycall(colorsm["Normalize"],PyAny,vmin=0,vmax=1))
+    copy!(ScalarMappable, cm."ScalarMappable")
+    copy!(Normalize01, pycall(colorsm."Normalize",PyAny,vmin=0,vmax=1))
 end
 
 ########################################################################
@@ -149,7 +157,7 @@ register_cmap(n::Union{AbstractString,Symbol}, c::ColorMap) = pycall(cm_register
 get_cmaps() =
     ColorMap[get_cmap(c) for c in
              sort(filter!(c -> !endswith(c, "_r"),
-                          AbstractString[c for (c,v) in PyDict(PyPlot.cm["datad"])]),
+                          AbstractString[c for (c,v) in PyDict(PyPlot.cm."datad")]),
                   by=lowercase)]
 
 ########################################################################
@@ -158,8 +166,8 @@ get_cmaps() =
 function show(io::IO, ::MIME"image/svg+xml", cs::AbstractVector{ColorMap})
     n = 256
     nc = length(cs)
-    a = Compat.range(0; stop=1, length=n)
-    namelen = mapreduce(c -> length(c[:name]), max, cs)
+    a = range(0; stop=1, length=n)
+    namelen = mapreduce(c -> length(c.name), max, cs)
     width = 0.5
     height = 5
     pad = 0.5
@@ -175,9 +183,9 @@ function show(io::IO, ::MIME"image/svg+xml", cs::AbstractVector{ColorMap})
     for j = 1:nc
         c = cs[j]
         y = (j-1) * (height+pad)
-        write(io, """<text x="$(n*width+1)mm" y="$(y+3.8)mm" font-size="3mm">$(c[:name])</text>""")
+        write(io, """<text x="$(n*width+1)mm" y="$(y+3.8)mm" font-size="3mm">$(c.name)</text>""")
         rgba = pycall(pycall(ScalarMappable, PyObject, cmap=c,
-                             norm=Normalize01)["to_rgba"], PyArray, a)
+                             norm=Normalize01)."to_rgba", PyArray, a)
         for i = 1:n
             write(io, """<rect x="$((i-1)*width)mm" y="$(y)mm" width="$(width)mm" height="$(height)mm" fill="#$(hex(RGB(rgba[i,1],rgba[i,2],rgba[i,3])))" stroke="none" />""")
         end
