@@ -4,7 +4,11 @@ module PyPlot
 
 using PyCall
 import PyCall: PyObject, pygui, pycall, pyexists
-import PyCall: hasproperty  # to be imported from Base
+if isdefined(Base, :hasproperty)
+    import Base: hasproperty
+else
+    import PyCall: hasproperty
+end
 import Base: convert, ==, isequal, hash, getindex, setindex!, haskey, keys, show
 using Base: @deprecate
 export Figure, plt, matplotlib, pygui, withfig
@@ -84,22 +88,14 @@ for (mime,fmt) in aggformats
         f."canvas"."print_figure"(io, format=$fmt, bbox_inches="tight")
     end
     if fmt != "svg"
-        if isdefined(Base, :showable)
-            @eval Base.showable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(f."canvas"."get_supported_filetypes", PyDict), $fmt)
-        else
-            @eval Base.mimewritable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(f."canvas"."get_supported_filetypes", PyDict), $fmt)
-        end
+        @eval Base.showable(::MIME{Symbol($mime)}, f::Figure) = !isempty(f) && haskey(pycall(f."canvas"."get_supported_filetypes", PyDict), $fmt)
     end
 end
 
 # disable SVG output by default, since displaying large SVGs (large datasets)
 # in IJulia is slow, and browser SVG display is buggy.  (Similar to IPython.)
 const SVG = [false]
-if isdefined(Base, :showable)
-    Base.showable(::MIME"image/svg+xml", f::Figure) = SVG[1] && !isempty(f) && haskey(pycall(f."canvas"."get_supported_filetypes", PyDict), "svg")
-else
-    Base.mimewritable(::MIME"image/svg+xml", f::Figure) = SVG[1] && !isempty(f) && haskey(pycall(f."canvas"."get_supported_filetypes", PyDict), "svg")
-end
+Base.showable(::MIME"image/svg+xml", f::Figure) = SVG[1] && !isempty(f) && haskey(pycall(f."canvas"."get_supported_filetypes", PyDict), "svg")
 svg() = SVG[1]
 svg(b::Bool) = (SVG[1] = b)
 

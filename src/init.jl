@@ -7,13 +7,6 @@ using VersionParsing
 # initialize them here (rather than via "global foo = ..." in __init__)
 # so that their type is known at compile-time.
 
-# remove this once we tag and require a newer PyCall version:
-if isdefined(PyCall,:PyNULL)
-    PyNULL() = PyCall.PyNULL()
-else
-    PyNULL() = PyCall.PyObject()
-end
-
 const matplotlib = PyNULL()
 const plt = PyNULL()
 const Gcf = PyNULL()
