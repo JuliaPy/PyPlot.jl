@@ -4,11 +4,7 @@ module PyPlot
 
 using PyCall
 import PyCall: PyObject, pygui, pycall, pyexists
-if isdefined(Base, :hasproperty)
-    import Base: hasproperty
-else
-    import PyCall: hasproperty
-end
+import PyCall: hasproperty # Base.hasproperty in Julia 1.2
 import Base: convert, ==, isequal, hash, getindex, setindex!, haskey, keys, show
 using Base: @deprecate
 export Figure, plt, matplotlib, pygui, withfig
