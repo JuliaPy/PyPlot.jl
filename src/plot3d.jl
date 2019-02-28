@@ -47,7 +47,7 @@ for f in mplot3d_funcs
     @eval @doc LazyHelp(axes3D,"Axes3D", $fs) function $f(args...; kws...)
         using3D() # make sure mplot3d is loaded
         ax = gca(projection="3d")
-        pycall(ax[$fs], PyAny, args...; kws...)
+        pycall(ax.$fs, PyAny, args...; kws...)
     end
 end
 
@@ -63,7 +63,7 @@ for f in zlabel_funcs
     @eval @doc LazyHelp(axes3D,"Axes3D", $fs) function $f(args...; kws...)
         using3D() # make sure mplot3d is loaded
         ax = gca(projection="3d")
-        pycall(ax[$fs], PyAny, args...; kws...)
+        pycall(ax.$fs, PyAny, args...; kws...)
     end
 end
 

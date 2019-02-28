@@ -53,7 +53,7 @@ function find_backend(matplotlib::PyObject)
                           :qt_pyside=>"Qt4Agg", :qt4=>"Qt4Agg",
                           :qt5=>"Qt5Agg", :qt=>"Qt4Agg",:tk=>"TkAgg")
     conda = PyCall.conda || !isempty(PyCall.anaconda_conda())
-    if Compat.Sys.islinux()
+    if Sys.islinux()
         guis = [:tk, :gtk3, :gtk, :qt5, :qt4, :wx]
     else
         guis = [:tk, :qt5, :qt4, :wx, :gtk, :gtk3]
@@ -110,7 +110,7 @@ function find_backend(matplotlib::PyObject)
         # throw exception (drop to catch block below) if DISPLAY
         # is not set.  [Might be more reliable to test
         # success(`xdpyinfo`), but only if xdpyinfo is installed.]
-        if options[1][1] != :none && Compat.Sys.isunix() && !Compat.Sys.isapple()
+        if options[1][1] != :none && Sys.isunix() && !Sys.isapple()
             ENV["DISPLAY"]
         end
 
@@ -157,7 +157,7 @@ function find_backend(matplotlib::PyObject)
         end
     catch e
         if !isjulia_display[1]
-            Compat.@warn("No working GUI backend found for matplotlib")
+            @warn("No working GUI backend found for matplotlib")
             isjulia_display[1] = true
         end
         pygui(:default)

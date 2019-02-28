@@ -1,10 +1,8 @@
 ENV["MPLBACKEND"]="agg" # no GUI
 
-using PyPlot, PyCall
-using Compat
-using Compat.Test
+using PyPlot, PyCall, Test
 
-Compat.@info("PyPlot is using Matplotlib $(PyPlot.version) with Python $(PyCall.pyversion)")
+@info("PyPlot is using Matplotlib $(PyPlot.version) with Python $(PyCall.pyversion)")
 
 plot(1:5, 2:6, "ro-")
 
@@ -26,7 +24,7 @@ if PyPlot.version >= v"2"
     m = match(r"%%BoundingBox: *([0-9]+) +([0-9]+) +([0-9]+) +([0-9]+)", s)
     @test m !== nothing
     boundingbox = map(s -> parse(Int, s), m.captures)
-    Compat.@info("got plot bounding box ", boundingbox)
+    @info("got plot bounding box ", boundingbox)
     @test all([300, 200] .< boundingbox[3:4] - boundingbox[1:2] .< [450,350])
 end
 
