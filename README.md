@@ -296,6 +296,15 @@ Matplotlib
 [savefig](http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.savefig)
 command, e.g. `savefig("plot.svg")`.
 
+## Modifying matplotlib.rcParams
+You can mutate the `rcParams` dictionary that Matplotlib uses for global parameters following this example:
+```jl
+rcParams = PyPlot.PyDict(PyPlot.matplotlib."rcParams")
+rcParams["font.size"] = 15
+```
+(If you instead used `PyPlot.matplotlib.rcParams`, PyCall would make a copy of the dictionary
+so that the Python `rcParams` wouldn't be modified.)
+
 ## Author
 
 This module was written by [Steven G. Johnson](http://math.mit.edu/~stevenj/).
