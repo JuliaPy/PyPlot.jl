@@ -12,7 +12,7 @@ package to call Matplotlib directly from Julia with little or no
 overhead (arrays are passed without making a copy).
 
 This package takes advantage of Julia's [multimedia
-I/O](https://docs.julialang.org/en/latest/stdlib/io-network.html#Multimedia-I/O-1)
+I/O](https://docs.julialang.org/en/latest/base/io-network/#Multimedia-I/O-1)
 API to display plots in any Julia graphical backend, including as
 inline graphics in [IJulia](https://github.com/JuliaLang/IJulia.jl).
 Alternatively, you can use a Python-based graphical Matplotlib
@@ -129,7 +129,7 @@ You can get the current figure as a `Figure` object (a wrapper
 around `matplotlib.pyplot.Figure`) by calling `gcf()`.
 
 The `Figure` type supports Julia's [multimedia I/O
-API](http://docs.julialang.org/en/latest/stdlib/base/#multimedia-i-o),
+API](https://docs.julialang.org/en/latest/base/io-network/#Multimedia-I/O-1),
 so you can use `display(fig)` to show a `fig::PyFigure` and
 `show(io, mime, fig)` (or `writemime` in Julia 0.4) to write it to a given `mime` type string
 (e.g. `"image/png"` or `"application/pdf"`) that is supported by the
@@ -154,7 +154,7 @@ PyPlot can use any Julia graphics backend capable of displaying PNG,
 SVG, or PDF images, such as the IJulia environment.  To use a
 different backend, simply call `pushdisplay` with the desired
 `Display`; see the [Julia multimedia display
-API](http://docs.julialang.org/en/latest/stdlib/io-network/#multimedia-i-o)
+API](https://docs.julialang.org/en/latest/base/io-network/#Multimedia-I/O-1)
 for more detail.
 
 On the other hand, you may wish to use one of the Python Matplotlib
