@@ -112,6 +112,16 @@ function find_backend(matplotlib::PyObject)
         if PyCall.gui == :default
             # try to ensure that GUI both exists and has a matplotlib backend
             for (g,b) in options
+                if Sys.isapple() && g == :tk && default != "tkagg" && conda
+                    # tkagg backend crashes badly on MacOS
+                    g, b = try
+                        @info "Installing pyqt package to avoid buggy tkagg backend."
+                        pyimport_conda("PyQt5", "pyqt")
+                        :qt5, gui2matplotlib[:qt5]
+                    catch
+                        :none, "agg"
+                    end
+                end
                 if g == :none # Matplotlib is configured to be non-interactive
                     pygui(:default)
                     matplotlib."use"(b)
@@ -178,6 +188,9 @@ function __init__()
     # workaround JuliaLang/julia#8925
     global backend = backend_gui[1]
     global gui = backend_gui[2]
+    if Sys.isapple() && gui == :tk
+        @warn "PyPlot is using tkagg backend, which is known to cause crashes on MacOS (#410); use the MPLBACKEND environment variable to request a different backend."
+    end
 
     copy!(plt, pyimport("matplotlib.pyplot")) # raw Python module
 
