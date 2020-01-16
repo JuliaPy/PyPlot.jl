@@ -40,7 +40,7 @@ export art3D, Axes3D, using3D, surf, mesh, bar3D, contour3D, contourf3D, plot3D,
 
 const mplot3d_funcs = (:bar3d, :contour3D, :contourf3D, :plot3D, :plot_surface,
                        :plot_trisurf, :plot_wireframe, :scatter3D,
-                       :text2D, :text3D, :view_init)
+                       :text2D, :text3D, :view_init, :voxels)
 
 for f in mplot3d_funcs
     fs = string(f)
