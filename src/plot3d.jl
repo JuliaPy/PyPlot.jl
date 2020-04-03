@@ -6,14 +6,26 @@ mutable struct LazyPyModule
     o::PyObject
     LazyPyModule(n) = new(n, PyNULL())
 end
-PyObject(m::LazyPyModule) = ispynull(m.o) ? copy!(m.o, pyimport(m.name)) : m.o
+PyObject(m::LazyPyModule) = ispynull(getfield(m, :o)) ? copy!(getfield(m, :o), pyimport(getfield(m, :name))) : getfield(m, :o)
 pycall(m::LazyPyModule, args...; kws...) = pycall(PyObject(m), args...; kws...)
 (m::LazyPyModule)(args...; kws...) = pycall(PyObject(m), PyAny, args...; kws...)
 Base.Docs.doc(m::LazyPyModule) = Base.Docs.doc(PyObject(m))
+
+# define each of these separately for Symbol and AbstractString to avoid method ambiguity:
+Base.getproperty(m::LazyPyModule, x::Symbol) = getproperty(PyObject(m), x)
+Base.getproperty(m::LazyPyModule, x::AbstractString) = getproperty(PyObject(m), x)
+Base.setproperty!(m::LazyPyModule, x::Symbol, v) = setproperty!(PyObject(m), x, v)
+Base.setproperty!(m::LazyPyModule, x::AbstractString, v) = setproperty!(PyObject(m), x, v)
+PyCall.hasproperty(m::LazyPyModule, x::Symbol) = PyCall.hasproperty(PyObject(m), x)
+PyCall.hasproperty(m::LazyPyModule, x::AbstractString) = PyCall.hasproperty(PyObject(m), x)
+
+Base.propertynames(m::LazyPyModule) = propertynames(PyObject(m))
+keys(m::LazyPyModule) = keys(PyObject(m))
+
+# deprecated methods:
 getindex(m::LazyPyModule, x) = getindex(PyObject(m), x)
 setindex!(m::LazyPyModule, v, x) = setindex!(PyObject(m), v, x)
 haskey(m::LazyPyModule, x) = haskey(PyObject(m), x)
-keys(m::LazyPyModule) = keys(PyObject(m))
 
 ###########################################################################
 # Lazily load mplot3d modules.  This (slightly) improves load time of PyPlot,
