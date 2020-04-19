@@ -111,7 +111,7 @@ Base.isempty(f::Figure) = isempty(pycall(f."get_axes", PyVector))
 const withfig_fignums = Set{Int}()
 
 function display_figs() # called after IJulia cell executes
-    if isjulia_display[1]
+    if isjulia_display[]
         for manager in Gcf."get_all_fig_managers"()
             f = manager."canvas"."figure"
             if f.number ∉ withfig_fignums
@@ -124,7 +124,7 @@ function display_figs() # called after IJulia cell executes
 end
 
 function close_figs() # called after error in IJulia cell
-    if isjulia_display[1]
+    if isjulia_display[]
         for manager in Gcf."get_all_fig_managers"()
             f = manager."canvas"."figure"
             if f.number ∉ withfig_fignums
@@ -148,7 +148,7 @@ force_new_fig() = gcf_isnew[1] = true
 end
 
 @doc LazyHelp(orig_gcf) function gcf()
-    if isjulia_display[1] && gcf_isnew[1]
+    if isjulia_display[] && gcf_isnew[1]
         return figure()
     else
         return pycall(orig_gcf, PyAny)

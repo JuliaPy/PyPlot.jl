@@ -143,8 +143,8 @@ function find_backend(matplotlib::PyObject)
                         end
                     end
                     if pyexists("matplotlib.backends.backend_" * lowercase(b))
-                        isjulia_display[1] || pygui_start(g)
-                        matplotlib."interactive"(!isjulia_display[1] && Base.isinteractive())
+                        isjulia_display[] || pygui_start(g)
+                        matplotlib."interactive"(!isjulia_display[] && Base.isinteractive())
                         return (b, g)
                     end
                 end
@@ -156,14 +156,14 @@ function find_backend(matplotlib::PyObject)
             if (gui==:qt && !PyCall.pyexists("PyQt5") && !PyCall.pyexists("PyQt4")) || gui==:qt_pyside
                 rcParams."backend.qt4" = "PySide"
             end
-            isjulia_display[1] || pygui_start(gui)
-            matplotlib."interactive"(!isjulia_display[1] && Base.isinteractive())
+            isjulia_display[] || pygui_start(gui)
+            matplotlib."interactive"(!isjulia_display[] && Base.isinteractive())
             return (gui2matplotlib[gui], gui)
         end
     catch e
-        if !isjulia_display[1]
+        if !isjulia_display[]
             @warn("No working GUI backend found for matplotlib")
-            isjulia_display[1] = true
+            isjulia_display[] = true
         end
         pygui(:default)
         matplotlib."use"("Agg") # GUI not available
@@ -172,10 +172,16 @@ function find_backend(matplotlib::PyObject)
     end
 end
 
+# declare more globals created in __init__
+const isjulia_display = Ref(true)
+version = v"0.0.0"
+backend = "Agg"
+gui = :default
+
 # initialization -- anything that depends on Python has to go here,
 # so that it occurs at runtime (while the rest of PyPlot can be precompiled).
 function __init__()
-    global isjulia_display = Bool[isdisplayok()]
+    isjulia_display[] = isdisplayok()
     copy!(matplotlib, pyimport_conda("matplotlib", "matplotlib"))
     mvers = matplotlib.__version__
     global version = try
@@ -208,7 +214,7 @@ function __init__()
         Main.IJulia.push_posterror_hook(close_figs)
     end
 
-    if isjulia_display[1] && gui != :gr && backend != "Agg"
+    if isjulia_display[] && gui != :gr && backend != "Agg"
         plt."switch_backend"("Agg")
         plt."ioff"()
     end
@@ -217,7 +223,7 @@ function __init__()
 end
 
 function pygui(b::Bool)
-    if !b != isjulia_display[1]
+    if !b != isjulia_display[]
         if backend != "Agg"
             plt."switch_backend"(b ? backend : "Agg")
             if b
@@ -229,7 +235,7 @@ function pygui(b::Bool)
         elseif b
             error("No working GUI backend found for matplotlib.")
         end
-        isjulia_display[1] = !b
+        isjulia_display[] = !b
     end
     return b
 end
