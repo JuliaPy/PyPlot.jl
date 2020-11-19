@@ -21,9 +21,10 @@ end
 # with Matplotlib 1.3, I get "UserWarning: bbox_inches option for ps backend is not implemented yet"
 if PyPlot.version >= v"2"
     s = sprint(show, "application/postscript", fig);
-    m = match(r"%%BoundingBox: *([0-9]+) +([0-9]+) +([0-9]+) +([0-9]+)", s)
+    # m = match(r"%%BoundingBox: *([0-9]+) +([0-9]+) +([0-9]+) +([0-9]+)", s)
+    m = match(r"%%BoundingBox: *([0-9]+\.?[0-9]*) +([0-9]+\.?[0-9]*) +([0-9]+\.?[0-9]*) +([0-9]+\.?[0-9]*)", s)
     @test m !== nothing
-    boundingbox = map(s -> parse(Int, s), m.captures)
+    boundingbox = map(s -> parse(Float64, s), m.captures)
     @info("got plot bounding box ", boundingbox)
     @test all([300, 200] .< boundingbox[3:4] - boundingbox[1:2] .< [450,350])
 end
