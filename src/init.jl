@@ -228,7 +228,7 @@ function init()
 end
 
 function __init__()
-    if delay_init_until_cell[] && ("JPY_PARENT_PID" in keys(ENV))
+    if delay_init_until_cell[]
         Main.IJulia.push_preexecute_hook(init)  # delay init until cell execution if Jupyter
     else
         init()
