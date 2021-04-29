@@ -2,7 +2,7 @@
 # integrating with the Julia Colors package
 
 using Colors
-export ColorMap, get_cmap, register_cmap, get_cmaps
+export ColorMap, get_cmap, register_cmap, get_cmaps, mcolors
 
 ########################################################################
 # Wrapper around colors.Colormap type:
@@ -39,7 +39,7 @@ function show(io::IO, c::ColorMap)
 end
 
 # all Python dependencies must be initialized at runtime (not when precompiled)
-const colorsm = PyNULL()
+const mcolors = PyNULL()
 const cm = PyNULL()
 const LinearSegmentedColormap = PyNULL()
 const cm_get_cmap = PyNULL()
@@ -47,18 +47,18 @@ const cm_register_cmap = PyNULL()
 const ScalarMappable = PyNULL()
 const Normalize01 = PyNULL()
 function init_colormaps()
-    copy!(colorsm, pyimport("matplotlib.colors"))
+    copy!(mcolors, pyimport("matplotlib.colors"))
     copy!(cm, pyimport("matplotlib.cm"))
 
-    pytype_mapping(colorsm."Colormap", ColorMap)
+    pytype_mapping(mcolors."Colormap", ColorMap)
 
-    copy!(LinearSegmentedColormap, colorsm."LinearSegmentedColormap")
+    copy!(LinearSegmentedColormap, mcolors."LinearSegmentedColormap")
 
     copy!(cm_get_cmap, cm."get_cmap")
     copy!(cm_register_cmap, cm."register_cmap")
 
     copy!(ScalarMappable, cm."ScalarMappable")
-    copy!(Normalize01, pycall(colorsm."Normalize",PyAny,vmin=0,vmax=1))
+    copy!(Normalize01, pycall(mcolors."Normalize",PyAny,vmin=0,vmax=1))
 end
 
 ########################################################################
