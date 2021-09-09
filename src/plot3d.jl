@@ -27,6 +27,9 @@ getindex(m::LazyPyModule, x) = getindex(PyObject(m), x)
 setindex!(m::LazyPyModule, v, x) = setindex!(PyObject(m), v, x)
 haskey(m::LazyPyModule, x) = haskey(PyObject(m), x)
 
+# version dependent call to axes with 3d projection
+gca_with_3d() = PyPlot.version <= v"3.4" ? (() -> gca(projection = "3d")) : (() -> plt.subplot(projection = "3d"))
+
 ###########################################################################
 # Lazily load mplot3d modules.  This (slightly) improves load time of PyPlot,
 # and it also allows PyPlot to load on systems where mplot3d is not installed.
@@ -58,7 +61,7 @@ for f in mplot3d_funcs
     fs = string(f)
     @eval @doc LazyHelp(axes3D,"Axes3D", $fs) function $f(args...; kws...)
         using3D() # make sure mplot3d is loaded
-        ax = plt.axes(projection="3d")
+        ax = gca_with_3d()
         pycall(ax.$fs, PyAny, args...; kws...)
     end
 end
@@ -74,7 +77,7 @@ for f in zlabel_funcs
     fs = string("set_", f)
     @eval @doc LazyHelp(axes3D,"Axes3D", $fs) function $f(args...; kws...)
         using3D() # make sure mplot3d is loaded
-        ax = plt.axes(projection="3d")
+        ax = gca_with_3d()
         pycall(ax.$fs, PyAny, args...; kws...)
     end
 end
