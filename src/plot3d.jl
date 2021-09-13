@@ -58,7 +58,7 @@ for f in mplot3d_funcs
     fs = string(f)
     @eval @doc LazyHelp(axes3D,"Axes3D", $fs) function $f(args...; kws...)
         using3D() # make sure mplot3d is loaded
-          ax = PyPlot.version <= v"3.4" ? gca(projection="3d") : plt."subplot"(projection="3d")
+        ax = PyPlot.version <= v"3.4" ? gca(projection="3d") : plt."subplot"(projection="3d")
         pycall(ax.$fs, PyAny, args...; kws...)
     end
 end
