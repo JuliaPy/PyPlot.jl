@@ -66,7 +66,7 @@ end
 @doc LazyHelp(axes3D,"Axes3D") Axes3D(args...; kws...) = pycall(axes3D."Axes3D", PyAny, args...; kws...)
 
 # correct for annoying mplot3d inconsistency
-@doc LazyHelp(axes3D,"Axes3D", "bar3d") bar3D(args...) = bar3d(args...)
+@doc LazyHelp(axes3D,"Axes3D", "bar3d") bar3D(args...; kws...) = bar3d(args...; kws...)
 
 # it's annoying to have xlabel etc. but not zlabel
 const zlabel_funcs = (:zlabel, :zlim, :zscale, :zticks)
