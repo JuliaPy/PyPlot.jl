@@ -58,7 +58,11 @@ for f in mplot3d_funcs
     fs = string(f)
     @eval @doc LazyHelp(axes3D,"Axes3D", $fs) function $f(args...; kws...)
         using3D() # make sure mplot3d is loaded
-        ax = PyPlot.version <= v"3.4" ? gca(projection="3d") : plt."subplot"(projection="3d")
+        if PyPlot.version <= v"3.4"
+            ax = gca(projection="3d")
+        else
+            ax = gca()._subplotspec.get_geometry() == (1,1,0,0) ? plt."subplot"(projection="3d") : gca()
+        end
         pycall(ax.$fs, PyAny, args...; kws...)
     end
 end
@@ -74,7 +78,11 @@ for f in zlabel_funcs
     fs = string("set_", f)
     @eval @doc LazyHelp(axes3D,"Axes3D", $fs) function $f(args...; kws...)
         using3D() # make sure mplot3d is loaded
-        ax = PyPlot.version <= v"3.4" ? gca(projection="3d") : plt."subplot"(projection="3d")
+        if PyPlot.version <= v"3.4"
+            ax = gca(projection="3d")
+        else
+            ax = gca()._subplotspec.get_geometry() == (1,1,0,0) ? plt."subplot"(projection="3d") : gca()
+        end
         pycall(ax.$fs, PyAny, args...; kws...)
     end
 end
