@@ -1,14 +1,14 @@
 
 """
-PyPlot allows Julia to interface with the Matplotlib library in Python, specifically the matplotlib.pyplot module, so you can create beautiful plots in Julia with your favorite Python package. 
+PyPlot allows Julia to interface with the Matplotlib library in Python, specifically the matplotlib.pyplot module, so you can create beautiful plots in Julia with your favorite Python package.
 
-Only the currently documented matplotlib.pyplot API is exported. To use other functions in the module, you can also call matplotlib.pyplot.foo(...) as plt.foo(...). 
+Only the currently documented matplotlib.pyplot API is exported. To use other functions in the module, you can also call matplotlib.pyplot.foo(...) as plt.foo(...).
 For example, plt.plot(x, y) also works. (And the raw PyObject for the matplotlib modules is also accessible as PyPlot.matplotlib.)
 
-In general, all the arguments are the same as in Python. 
+In general, all the arguments are the same as in Python.
 
 Here's a brief demo of a simple plot in Julia:
-    
+
     using PyPlot
     x = range(0; stop=2*pi, length=1000); y = sin.(3 * x + 4 * cos.(2 * x));
     plot(x, y, color="red", linewidth=2.0, linestyle="--")
@@ -220,14 +220,15 @@ include("colormaps.jl")
 ###########################################################################
 # Support array of string labels in bar chart
 
-function bar(x::AbstractVector{T}, y; kws...) where T<:AbstractString
+function bar(x::AbstractVector{<:AbstractString}, y; kws_...)
+    kws = Dict{Any,Any}(kws_)
     xi = 1:length(x)
-    if !any(kw -> kw[1] == :align, kws)
-        push!(kws, (:align, "center"))
+    if !any(==(:align), keys(kws))
+        kws[:align] = "center"
     end
     p = bar(xi, y; kws...)
     ax = any(kw -> kw[1] == :orientation && lowercase(kw[2]) == "horizontal",
-             kws) ? gca()."yaxis" : gca()."xaxis"
+             pairs(kws)) ? gca()."yaxis" : gca()."xaxis"
     ax."set_ticks"(xi)
     ax."set_ticklabels"(x)
     return p
