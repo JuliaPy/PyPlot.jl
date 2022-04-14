@@ -54,12 +54,15 @@ const mplot3d_funcs = (:bar3d, :contour3D, :contourf3D, :plot3D, :plot_surface,
                        :plot_trisurf, :plot_wireframe, :scatter3D,
                        :text2D, :text3D, :view_init, :voxels)
 
+function gca3d()
+    using3D() # make sure mplot3d is loaded
+    return PyPlot.version <= v"3.4" ? gca(projection="3d") : plt."subplot"(gca()."get_subplotspec"(), projection="3d")
+end
+
 for f in mplot3d_funcs
     fs = string(f)
     @eval @doc LazyHelp(axes3D,"Axes3D", $fs) function $f(args...; kws...)
-        using3D() # make sure mplot3d is loaded
-        ax = PyPlot.version <= v"3.4" ? gca(projection="3d") : plt."subplot"(projection="3d")
-        pycall(ax.$fs, PyAny, args...; kws...)
+        pycall(gca3d().$fs, PyAny, args...; kws...)
     end
 end
 
@@ -73,9 +76,7 @@ const zlabel_funcs = (:zlabel, :zlim, :zscale, :zticks)
 for f in zlabel_funcs
     fs = string("set_", f)
     @eval @doc LazyHelp(axes3D,"Axes3D", $fs) function $f(args...; kws...)
-        using3D() # make sure mplot3d is loaded
-        ax = PyPlot.version <= v"3.4" ? gca(projection="3d") : plt."subplot"(projection="3d")
-        pycall(ax.$fs, PyAny, args...; kws...)
+        pycall(gca3d().$fs, PyAny, args...; kws...)
     end
 end
 
