@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/JuliaPy/PyPlot.jl.svg?branch=master)](https://travis-ci.org/JuliaPy/PyPlot.jl)
-[![Build status](https://ci.appveyor.com/api/projects/status/github/JuliaPy/PyPlot.jl?branch=master)](https://ci.appveyor.com/project/StevenGJohnson/pyplot-jl/branch/master)
+[![CI](https://github.com/JuliaPy/PyPlot.jl/workflows/CI/badge.svg)](https://github.com/JuliaPy/PyPlot.jl/actions?query=workflow%3ACI)
 
 # The PyPlot module for Julia
 
@@ -9,7 +8,7 @@ specifically to the `matplotlib.pyplot` module.
 
 PyPlot uses the Julia [PyCall](https://github.com/stevengj/PyCall.jl)
 package to call Matplotlib directly from Julia with little or no
-overhead (arrays are passed without making a copy).
+overhead (arrays are passed without making a copy).  (See also [PythonPlot.jl](https://github.com/stevengj/PythonPlot.jl) for a version of PyPlot.jl using the alternative [PythonCall.jl](https://github.com/cjdoris/PythonCall.jl) package.)
 
 This package takes advantage of Julia's [multimedia
 I/O](https://docs.julialang.org/en/latest/base/io-network/#Multimedia-I/O-1)
