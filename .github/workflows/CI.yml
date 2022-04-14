@@ -23,6 +23,8 @@ jobs:
         arch:
           - x64
     steps:
+      - name: Install matplotlib
+        run: test "$RUNNER_OS" == "Linux" && sudo apt-get install -y python3-matplotlib
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
