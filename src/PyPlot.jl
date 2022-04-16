@@ -46,7 +46,7 @@ function show(io::IO, ::MIME"text/plain", h::LazyHelp)
     if hasproperty(o, "__doc__")
         print(io, convert(AbstractString, o."__doc__"))
     else
-        print(io, "no Python docstring found for ", h.k)
+        print(io, "no Python docstring found for ", h.keys)
     end
 end
 Base.show(io::IO, h::LazyHelp) = show(io, "text/plain", h)
