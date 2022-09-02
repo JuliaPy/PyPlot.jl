@@ -278,7 +278,7 @@ By default, plots in IJulia are sent to the notebook as PNG images.
 Optionally, you can tell PyPlot to display plots in the browser as
 [SVG](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics) images,
 which have the advantage of being resolution-independent (so that they
-display without pixellation at high-resolutions, for example if you
+display without pixelation at high-resolutions, for example if you
 convert an IJulia notebook to PDF), by running:
 ```
 PyPlot.svg(true)
