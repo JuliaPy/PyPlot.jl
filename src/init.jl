@@ -162,13 +162,18 @@ end
 
 # declare more globals created in __init__
 const isjulia_display = Ref(true)
+const delay_init_until_cell = Ref(false)
 version = v"0.0.0"
 backend = "Agg"
 gui = :default
 
 # initialization -- anything that depends on Python has to go here,
 # so that it occurs at runtime (while the rest of PyPlot can be precompiled).
-function __init__()
+function init()
+    if !ispynull(plt)
+        return  # we already initialized
+    end
+
     isjulia_display[] = isdisplayok()
     copy!(matplotlib, pyimport_conda("matplotlib", "matplotlib"))
     mvers = matplotlib.__version__
@@ -205,6 +210,14 @@ function __init__()
     end
 
     init_colormaps()
+end
+
+function __init__()
+    if delay_init_until_cell[]
+        Main.IJulia.push_preexecute_hook(init)  # delay init until cell execution if Jupyter
+    else
+        init()
+    end
 end
 
 function pygui(b::Bool)
