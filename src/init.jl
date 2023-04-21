@@ -169,6 +169,7 @@ gui = :default
 # initialization -- anything that depends on Python has to go here,
 # so that it occurs at runtime (while the rest of PyPlot can be precompiled).
 function __init__()
+    ccall(:jl_generating_output, Cint, ()) == 1 && return nothing
     isjulia_display[] = isdisplayok()
     copy!(matplotlib, pyimport_conda("matplotlib", "matplotlib"))
     mvers = matplotlib.__version__
