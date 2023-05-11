@@ -40,7 +40,7 @@ private (not in the system `PATH`) Julia Python distribution (via
 Miniconda), then PyPlot will automatically install Matplotlib as needed.
 
 If you are installing PyCall and PyPlot for the first time, just do `ENV["PYTHON"]=""` before running `Pkg.add("PyPlot")`.  Otherwise, you can reconfigure PyCall to use Conda via:
-```
+```julia
 ENV["PYTHON"]=""
 Pkg.build("PyCall")
 ```
@@ -64,7 +64,7 @@ Alternatively, you can install the
 (which also includes `ipython` and other IJulia dependencies).
 
 Otherwise, you can use the [Homebrew](http://brew.sh/) package manager:
-```
+```sh
 brew install python gcc freetype pyqt
 brew link --force freetype
 export PATH="/usr/local/bin:$PATH"
@@ -82,7 +82,7 @@ graphics-capable Julia environment such as IJulia, you can simply type
 [matplotlib.pyplot](http://matplotlib.org/api/pyplot_api.html) API.
 For example:
 
-```
+```julia
 using PyPlot
 # use x = linspace(0,2*pi,1000) in Julia 0.6
 x = range(0; stop=2*pi, length=1000); y = sin.(3 * x + 4 * cos.(2 * x));
@@ -159,7 +159,7 @@ for more detail.
 On the other hand, you may wish to use one of the Python Matplotlib
 backends to open an interactive window for each plot (for interactive
 zooming, panning, etcetera).  You can do this at any time by running:
-```
+```julia
 pygui(true)
 ```
 to turn on the Python-based GUI (if possible) for subsequent plots,
@@ -182,7 +182,7 @@ when it starts up (based on what you have installed), but you can
 force a specific toolkit to be chosen by importing the PyCall module
 and using its `pygui` function to set a Python backend *before*
 importing PyPlot:
-```
+```julia
 using PyCall
 pygui(gui)
 using PyPlot
@@ -235,7 +235,7 @@ correspondingly named methods of
 We also export the Matlab-like synonyms `surf` for `plot_surface` (or
 `plot_trisurf` for 1d-array arguments) and `mesh` for
 `plot_wireframe`.  For example, you can do:
-```
+```julia
 surf(rand(30,40))
 ```
 to plot a random 30×40 surface mesh.
@@ -263,7 +263,7 @@ To simplify this, PyPlot uses the [LaTeXStrings package](https://github.com/stev
 be constructed via `L"...."` without escaping backslashes or dollar
 signs.  For example, one can simply write `L"$\alpha + \beta$"` for the
 abovementioned equation, and thus you can do things like:
-```
+```jl
 title(L"Plot of $\Gamma_3(x)$")
 ```
 If your string contains *only* equations, you can omit the dollar
@@ -280,7 +280,7 @@ Optionally, you can tell PyPlot to display plots in the browser as
 which have the advantage of being resolution-independent (so that they
 display without pixellation at high-resolutions, for example if you
 convert an IJulia notebook to PDF), by running:
-```
+```julia
 PyPlot.svg(true)
 ```
 This is not the default because SVG plots in the browser are much
@@ -297,7 +297,7 @@ command, e.g. `savefig("plot.svg")`.
 
 ## Modifying matplotlib.rcParams
 You can mutate the `rcParams` dictionary that Matplotlib uses for global parameters following this example:
-```jl
+```julia
 rcParams = PyPlot.PyDict(PyPlot.matplotlib."rcParams")
 rcParams["font.size"] = 15
 ```
