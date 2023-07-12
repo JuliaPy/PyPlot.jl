@@ -46,6 +46,10 @@ Pkg.build("PyCall")
 ```
 The next time you import `PyPlot`, it will tell Conda to install Matplotlib.
 
+If you don't want to use Conda when loading `matplotlib`, set `ENV["PYPLOT_MATPLOTLIB_NO_CONDA"]="true"` and
+set `ENV["PYTHON"]` to your Python binary. The `matplotlib` library must be installed in the environment assoicated
+with that binary.
+
 ### OS X
 
 On MacOS, you should either install

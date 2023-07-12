@@ -171,7 +171,11 @@ gui = :default
 function __init__()
     ccall(:jl_generating_output, Cint, ()) == 1 && return nothing
     isjulia_display[] = isdisplayok()
-    copy!(matplotlib, pyimport_conda("matplotlib", "matplotlib"))
+    if lowercase(strip(get(ENV, "PYPLOT_MATPLOTLIB_NO_CONDA", ""))) == "true"
+        copy!(matplotlib, pyimport("matplotlib"))
+    else
+        copy!(matplotlib, pyimport_conda("matplotlib", "matplotlib"))
+    end
     mvers = matplotlib.__version__
     global version = try
         vparse(mvers)
