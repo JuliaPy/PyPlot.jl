@@ -54,7 +54,7 @@ function init_colormaps()
 
     copy!(LinearSegmentedColormap, colorsm."LinearSegmentedColormap")
 
-    copy!(cm_get_cmap, cm."get_cmap")
+    copy!(cm_get_cmap, cm.ColormapRegistry."get_cmap")
     copy!(cm_register_cmap, cm."register_cmap")
 
     copy!(ScalarMappable, cm."ScalarMappable")
