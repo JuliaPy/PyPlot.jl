@@ -205,7 +205,7 @@ colors in various plot types).  In particular:
 
   * Even more general color maps may be defined by passing arrays of (x,y0,y1) tuples for the red, green, blue, and (optionally) alpha components, as defined by the [matplotlib.colors.LinearSegmentedColormap](http://matplotlib.org/api/colors_api.html#matplotlib.colors.LinearSegmentedColormap) constructor, via: `ColorMap{T<:Real}(name::String, r::AbstractVector{(T,T,T)}, g::AbstractVector{(T,T,T)}, b::AbstractVector{(T,T,T)}, n=256, gamma=1.0)` or `ColorMap{T<:Real}(name::String, r::AbstractVector{(T,T,T)}, g::AbstractVector{(T,T,T)}, b::AbstractVector{(T,T,T)}, alpha::AbstractVector{(T,T,T)}, n=256, gamma=1.0)`
 
-  * `ColorMap(name::String)` returns an existing (registered) colormap, equivalent to [matplotlib.cm.get_cmap](http://matplotlib.org/api/cm_api.html#matplotlib.cm.get_cmap)(`name`).
+  * `ColorMap(name::String)` returns an existing (registered) colormap, equivalent to [matplotlib.cm.ColormapRegistry.get_cmap](http://matplotlib.org/stable/api/cm_api.html#matplotlib.cm.ColormapRegistry.get_cmap)(`name`).
 
   * `matplotlib.colors.Colormap` objects returned by Python functions are automatically converted to the `ColorMap` type.
 
