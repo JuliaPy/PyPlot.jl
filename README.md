@@ -209,7 +209,7 @@ colors in various plot types).  In particular:
 
   * `matplotlib.colors.Colormap` objects returned by Python functions are automatically converted to the `ColorMap` type.
 
-* `get_cmap(name::String)` or `get_cmap(name::String, lut::Integer)` call the [matplotlib.pyplotget_cmap](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.get_cmap.html#matplotlib-pyplot-get-cmap) function.
+* `get_cmap(name::String)` or `get_cmap(name::String, lut::Integer)` call the [matplotlib.pyplot.get_cmap](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.get_cmap.html#matplotlib-pyplot-get-cmap) function.
 
 * `register_cmap(c::ColorMap)` or `register_cmap(name::String, c::ColorMap)` call the [matplotlib.colormap.register](https://matplotlib.org/stable/api/cm_api.html#matplotlib.cm.ColormapRegistry.register) function.
 
