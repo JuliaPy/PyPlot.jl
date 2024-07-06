@@ -55,7 +55,7 @@ function init_colormaps()
     copy!(LinearSegmentedColormap, colorsm."LinearSegmentedColormap")
 
     copy!(cm_get_cmap, hasproperty(plt, "get_cmap") ? plt."get_cmap" : cm."get_cmap")
-    copy!(cm_register_cmap, hasproperty(matplotlib.colormaps, "register") ? matplotlib.colormaps."register" : cm."register_cmap")
+    copy!(cm_register_cmap, hasproperty(matplotlib, "colormaps") && hasproperty(matplotlib."colormaps", "register") ? matplotlib."colormaps"."register" : cm."register_cmap")
 
     copy!(ScalarMappable, cm."ScalarMappable")
     copy!(Normalize01, pycall(colorsm."Normalize",PyAny,vmin=0,vmax=1))
