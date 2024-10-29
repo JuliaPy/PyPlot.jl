@@ -173,8 +173,7 @@ function __init__()
     isjulia_display[] = isdisplayok()
     copy!(matplotlib, pyimport_conda("matplotlib", "matplotlib"))
     global version = try
-        mvers = matplotlib.__version__
-        vparse(mvers)
+        vparse(matplotlib.__version__)
     catch
         v"0.0.0" # fallback
     end
