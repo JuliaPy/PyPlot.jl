@@ -73,7 +73,7 @@ convert(::Type{Figure}, o::PyObject) = Figure(o)
 ==(f::Figure, g::Figure) = PyObject(f) == PyObject(g)
 ==(f::Figure, g::PyObject) = PyObject(f) == g
 ==(f::PyObject, g::Figure) = f == PyObject(g)
-hash(f::Figure) = hash(PyObject(f))
+hash(f::Figure, h::UInt) = hash(PyObject(f), h)
 pycall(f::Figure, args...; kws...) = pycall(PyObject(f), args...; kws...)
 (f::Figure)(args...; kws...) = pycall(PyObject(f), PyAny, args...; kws...)
 Base.Docs.doc(f::Figure) = Base.Docs.doc(PyObject(f))

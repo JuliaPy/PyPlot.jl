@@ -16,7 +16,7 @@ convert(::Type{ColorMap}, o::PyObject) = ColorMap(o)
 ==(c::ColorMap, g::ColorMap) = PyObject(c) == PyObject(g)
 ==(c::PyObject, g::ColorMap) = c == PyObject(g)
 ==(c::ColorMap, g::PyObject) = PyObject(c) == g
-hash(c::ColorMap) = hash(PyObject(c))
+hash(c::ColorMap, h::UInt) = hash(PyObject(c), h)
 pycall(c::ColorMap, args...; kws...) = pycall(PyObject(c), args...; kws...)
 (c::ColorMap)(args...; kws...) = pycall(PyObject(c), PyAny, args...; kws...)
 Base.Docs.doc(c::ColorMap) = Base.Docs.doc(PyObject(c))
